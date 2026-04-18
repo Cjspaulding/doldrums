@@ -520,11 +520,12 @@
       .masthead-right { display:none; }
 
       /* Nav */
-      .masthead-nav-strip { padding:0 16px; }
-      .nav-item { padding:10px 10px; font-size:7.5px; letter-spacing:.12em; }
-      .masthead-actions { gap:8px; }
+      .masthead-nav-strip { padding:0 16px; overflow-x:auto; }
+      .masthead-nav { gap:0; flex-shrink:0; }
+      .nav-item { padding:10px 10px; font-size:7.5px; letter-spacing:.12em; white-space:nowrap; }
+      .masthead-actions { gap:8px; flex-shrink:0; }
       .countdown-txt { display:none !important; }
-      .refresh-btn { padding:6px 12px; font-size:8px; }
+      .refresh-btn { padding:6px 12px; font-size:8px; white-space:nowrap; }
 
       /* Sticky */
       .sticky-bar { padding:6px 16px; }
@@ -546,8 +547,14 @@
       .location-name { font-size:24px; }
       .temp-numeral { font-size:80px; }
       .reading-val { font-size:24px; }
+
+      /* Forecast table — scroll horizontally */
+      .forecast-view { padding:0 10px 28px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .fv-table { min-width:520px; }
     }
 
+    /* Global overflow fix */
+    html, body { overflow-x:hidden; max-width:100vw; }
     .forecast-view {
       position:relative;z-index:9;
       padding:0 16px 40px;
