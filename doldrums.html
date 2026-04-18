@@ -26,6 +26,13 @@
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2212%22 fill=%22%230b2545%22/><text y=%22.9em%22 font-size=%2272%22 x=%2250%25%22 text-anchor=%22middle%22>🌫️</text></svg>">
+
+  <!-- PWA -->
+  <link rel="manifest" href="data:application/json,{%22name%22:%22Doldrums%22,%22short_name%22:%22Doldrums%22,%22description%22:%22Know%20your%20skies.%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230b2545%22,%22theme_color%22:%22%230b2545%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'><rect%20width='100'%20height='100'%20rx='12'%20fill='%230b2545'/><text%20y='.9em'%20font-size='72'%20x='50%25'%20text-anchor='middle'>🌫️</text></svg>%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Doldrums">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
   <style>
@@ -507,6 +514,52 @@
     }
     .modal-status.error { color:var(--orange); }
 
+    /* Geo button */
+    .geo-btn {
+      width:100%;background:var(--ice);border:1px solid var(--rule);
+      padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:9px;
+      letter-spacing:.16em;text-transform:uppercase;cursor:pointer;
+      color:var(--ink3);transition:all .2s;display:flex;align-items:center;
+      gap:8px;margin-bottom:14px;
+    }
+    .geo-btn:hover { background:var(--navy-pale);color:var(--navy);border-color:var(--navy3); }
+    .geo-btn:disabled { opacity:.4;cursor:not-allowed; }
+    .geo-icon { font-size:14px; }
+
+    .modal-divider {
+      display:flex;align-items:center;gap:10px;margin-bottom:14px;
+      font-size:8px;color:var(--ink5);letter-spacing:.14em;text-transform:uppercase;
+    }
+    .modal-divider::before,.modal-divider::after {
+      content:'';flex:1;height:1px;background:var(--rule);
+    }
+
+    /* Share strip */
+    .share-strip {
+      position:fixed;bottom:0;left:0;right:0;z-index:150;
+      background:var(--navy);border-top:3px solid var(--orange);
+      padding:12px 20px;display:flex;align-items:center;
+      justify-content:space-between;gap:12px;
+      transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+    }
+    .share-strip.open { transform:translateY(0); }
+    .share-url {
+      font-size:10px;color:rgba(255,255,255,0.6);
+      letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;
+      white-space:nowrap;flex:1;font-family:'IBM Plex Mono',monospace;
+    }
+    .share-copy-btn {
+      background:var(--orange);color:#fff;border:none;
+      padding:7px 16px;font-family:'IBM Plex Mono',monospace;
+      font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+      cursor:pointer;flex-shrink:0;transition:background .2s;
+    }
+    .share-copy-btn:hover { background:var(--orange2); }
+    .share-close {
+      background:none;border:none;color:rgba(255,255,255,0.4);
+      cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0;
+    }
+
     /* ── MOBILE ── */
     @media(max-width:540px){
       /* AON band — single line */
@@ -687,7 +740,10 @@
     <div class="sticky-sep">·</div>
     <div class="sticky-status" id="last-updated">Fetching readings…</div>
   </div>
-  <div class="sticky-status" id="sticky-count"></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="sticky-status" id="sticky-count"></div>
+    <button onclick="shareUrl()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">↗ Share</button>
+  </div>
 </div>
 
 <!-- SUMMARY -->
@@ -734,7 +790,11 @@
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="modal-label">Search for a city, region, or location</div>
+      <button class="geo-btn" id="geo-btn" onclick="addMyLocation()">
+        <span class="geo-icon">◎</span> Use my current location
+      </button>
+      <div class="modal-divider">or search</div>
+      <div class="modal-label">City, region, or location</div>
       <div class="modal-input-wrap">
         <input class="modal-input" id="city-input" type="text" placeholder="e.g. Tokyo, Bedford NH, Cape Town…"
           oninput="onCityInput()" onkeydown="if(event.key==='Enter')searchCity()">
@@ -743,6 +803,13 @@
       <div class="modal-results" id="modal-results"></div>
     </div>
   </div>
+</div>
+
+<!-- SHARE STRIP -->
+<div class="share-strip" id="share-strip">
+  <div class="share-url" id="share-url"></div>
+  <button class="share-copy-btn" id="share-copy-btn" onclick="copyShareUrl()">Copy Link</button>
+  <button class="share-close" onclick="closeShare()">✕</button>
 </div>
 
 <script>
@@ -1097,54 +1164,17 @@ function addCity(idx){
   saveCities();
   closeModal();
 
-  // Add just this card without full rebuild
   const i=LOCATIONS.length-1;
-  const grid=document.getElementById('weather-grid');
-  const div=document.createElement('div');
-  div.className='card';div.id=`card-${i}`;div.style.animationDelay='0ms';
-  div.innerHTML=`
-    <div class="card-bar"></div>
-    <div class="card-head">
-      <div>
-        <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
-        <div class="location-name">${loc.name}</div>
-        <div class="location-sub" id="meta-${i}">${localTime(loc.tz)}</div>
-      </div>
-      <div class="card-head-right">
-        <div class="card-icon" id="icon-${i}">—</div>
-        <div class="card-cond" id="cond-${i}">—</div>
-        <button class="remove-btn" onclick="removeCity(${i})">Remove</button>
-      </div>
-    </div>
-    <div id="body-${i}">
-      <div class="skel-wrap">
-        <div class="skel" style="height:84px;width:44%;border-radius:1px"></div>
-        <div class="skel" style="height:10px;width:58%;border-radius:1px;margin-top:8px"></div>
-      </div>
-    </div>`;
-  grid.appendChild(div);
 
-  // Add summary pill
-  const scroll=document.getElementById('summary-scroll');
-  const addPill=scroll.querySelector('.add-city-pill');
-  const pill=document.createElement('div');
-  pill.className='summary-pill';pill.id=`sum-${i}`;
-  pill.onclick=()=>scrollToCard(i);
-  pill.innerHTML=`
-    <div class="sum-icon" id="sum-icon-${i}">—</div>
-    <div>
-      <div class="sum-name">${loc.name}${loc.state?', '+loc.state:''}</div>
-      <div class="sum-temp" id="sum-temp-${i}">—</div>
-    </div>`;
-  scroll.insertBefore(pill,addPill);
+  // If coming from empty state, rebuild grid first
+  const main=document.querySelector('main');
+  if(!document.getElementById('weather-grid')){
+    main.innerHTML='<div class="grid" id="weather-grid"></div>';
+  }
 
-  // Update counts
-  const count=`${LOCATIONS.length} stations`;
-  ['station-count','sticky-count'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=count;});
-
-  // Fetch and scroll
+  appendCard(loc,i);
   fetchWeather(loc,i);
-  setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  setTimeout(()=>document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
 function removeCity(i){
@@ -1367,6 +1397,157 @@ function renderForecastTable() {
         <tbody>${rows}</tbody>
       </table>
     </div>`;
+}
+
+// ── SHARED URL LOADING ────────────────────────────────────────────────────────
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const shared = params.get('cities');
+  if(shared) {
+    try {
+      const cities = JSON.parse(atob(shared));
+      if(Array.isArray(cities) && cities.length > 0) {
+        LOCATIONS = cities;
+        // Don't overwrite their localStorage — just load for this session
+      }
+    } catch(e) {}
+  }
+})();
+
+// ── GEOLOCATION ───────────────────────────────────────────────────────────────
+async function addMyLocation() {
+  const btn = document.getElementById('geo-btn');
+  if(!navigator.geolocation) {
+    document.getElementById('modal-results').innerHTML =
+      '<div class="modal-status error">Geolocation not supported by your browser.</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="geo-icon">◎</span> Locating…';
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    try {
+      // Reverse geocode using Open-Meteo
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&language=en&format=json`);
+      const data = await res.json();
+      if(data && data.name) {
+        const units = unitsForTz(data.timezone || 'UTC');
+        const loc = {
+          name: data.name,
+          state: data.admin1 || data.country_code || '',
+          lat: data.latitude,
+          lon: data.longitude,
+          tz: data.timezone || 'UTC',
+          ...units
+        };
+        closeModal();
+        LOCATIONS.push(loc);
+        saveCities();
+        const i = LOCATIONS.length - 1;
+        appendCard(loc, i);
+        fetchWeather(loc, i);
+        setTimeout(() => document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'}), 100);
+      } else {
+        // Fallback: just use coords directly with a generic name
+        const units = unitsForTz('UTC');
+        const loc = { name: `${lat.toFixed(2)}°N`, state: '', lat, lon, tz: 'UTC', ...units };
+        closeModal();
+        LOCATIONS.push(loc);
+        saveCities();
+        const i = LOCATIONS.length - 1;
+        appendCard(loc, i);
+        fetchWeather(loc, i);
+      }
+    } catch(e) {
+      document.getElementById('modal-results').innerHTML =
+        '<div class="modal-status error">Could not identify location. Try searching instead.</div>';
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<span class="geo-icon">◎</span> Use my current location';
+  }, err => {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="geo-icon">◎</span> Use my current location';
+    document.getElementById('modal-results').innerHTML =
+      '<div class="modal-status error">Location access denied.</div>';
+  }, { timeout: 8000 });
+}
+
+// ── SHARE URL ─────────────────────────────────────────────────────────────────
+function shareUrl() {
+  if(LOCATIONS.length === 0) return;
+  const encoded = btoa(JSON.stringify(LOCATIONS));
+  const url = `${window.location.origin}${window.location.pathname}?cities=${encoded}`;
+  const strip = document.getElementById('share-strip');
+  const urlEl = document.getElementById('share-url');
+  urlEl.textContent = url;
+  strip._shareUrl = url;
+  strip.classList.add('open');
+}
+
+function copyShareUrl() {
+  const strip = document.getElementById('share-strip');
+  const url = strip._shareUrl;
+  if(!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('share-copy-btn');
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = 'Copy Link'; }, 2000);
+  });
+}
+
+function closeShare() {
+  document.getElementById('share-strip').classList.remove('open');
+}
+
+// Helper to append a card without full rebuild (used by geo + addCity)
+function appendCard(loc, i) {
+  // Ensure grid exists
+  const main = document.querySelector('main');
+  if(!document.getElementById('weather-grid')) {
+    main.innerHTML = '<div class="grid" id="weather-grid"></div>';
+  }
+  const grid = document.getElementById('weather-grid');
+  const div = document.createElement('div');
+  div.className = 'card'; div.id = `card-${i}`; div.style.animationDelay = '0ms';
+  div.innerHTML = `
+    <div class="card-bar"></div>
+    <div class="card-head">
+      <div>
+        <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
+        <div class="location-name">${loc.name}</div>
+        <div class="location-sub" id="meta-${i}">${localTime(loc.tz)}</div>
+      </div>
+      <div class="card-head-right">
+        <div class="card-icon" id="icon-${i}">—</div>
+        <div class="card-cond" id="cond-${i}">—</div>
+        <button class="remove-btn" onclick="removeCity(${i})">Remove</button>
+      </div>
+    </div>
+    <div id="body-${i}">
+      <div class="skel-wrap">
+        <div class="skel" style="height:84px;width:44%;border-radius:1px"></div>
+        <div class="skel" style="height:10px;width:58%;border-radius:1px;margin-top:8px"></div>
+      </div>
+    </div>`;
+  grid.appendChild(div);
+
+  const scroll = document.getElementById('summary-scroll');
+  const addPill = scroll.querySelector('.add-city-pill');
+  const pill = document.createElement('div');
+  pill.className = 'summary-pill'; pill.id = `sum-${i}`;
+  pill.onclick = () => scrollToCard(i);
+  pill.innerHTML = `
+    <div class="sum-icon" id="sum-icon-${i}">—</div>
+    <div>
+      <div class="sum-name">${loc.name}${loc.state?', '+loc.state:''}</div>
+      <div class="sum-temp" id="sum-temp-${i}">—</div>
+    </div>`;
+  scroll.insertBefore(pill, addPill);
+
+  const count = `${LOCATIONS.length} stations`;
+  ['station-count','sticky-count'].forEach(id => { const e = document.getElementById(id); if(e) e.textContent = count; });
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
