@@ -345,6 +345,39 @@
     .error-wrap { padding:28px 18px;text-align:center;position:relative;z-index:1; }
     .error-text { font-size:9px;color:var(--orange);letter-spacing:.1em; }
 
+    /* EMPTY STATE */
+    .empty-state {
+      position:relative;z-index:9;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:60vh;padding:40px 20px;text-align:center;
+    }
+
+    .empty-icon {
+      font-size:56px;opacity:0.25;margin-bottom:28px;
+      filter:grayscale(0.5);
+    }
+
+    .empty-title {
+      font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;
+      letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
+      margin-bottom:10px;
+    }
+
+    .empty-sub {
+      font-family:'Spectral',serif;font-style:italic;font-size:15px;
+      color:var(--ink4);margin-bottom:32px;
+    }
+
+    .empty-btn {
+      background:var(--navy);color:#fff;border:none;padding:14px 32px;
+      font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;
+      text-transform:uppercase;cursor:pointer;transition:background .2s;
+      display:flex;align-items:center;gap:10px;
+    }
+
+    .empty-btn:hover { background:var(--navy2); }
+    .empty-btn-plus { font-size:18px;color:var(--orange2);line-height:1; }
+
     /* FOOTER */
     footer {
       position:relative;z-index:9;background:var(--navy);border-top:4px solid var(--orange);
@@ -549,14 +582,12 @@
 
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────────
-let LOCATIONS = [
-  { name:"Eliot",        state:"ME", lat:43.1437,  lon:-70.7800,  tz:"America/New_York", unit:"fahrenheit", windUnit:"mph", precUnit:"inch", sym:"°F" },
-  { name:"Ipswich",      state:"MA", lat:42.6787,  lon:-70.8409,  tz:"America/New_York", unit:"fahrenheit", windUnit:"mph", precUnit:"inch", sym:"°F" },
-  { name:"Portland",     state:"ME", lat:43.6591,  lon:-70.2568,  tz:"America/New_York", unit:"fahrenheit", windUnit:"mph", precUnit:"inch", sym:"°F" },
-  { name:"Williamstown", state:"VT", lat:44.1214,  lon:-72.4537,  tz:"America/New_York", unit:"fahrenheit", windUnit:"mph", precUnit:"inch", sym:"°F" },
-  { name:"Scottsdale",   state:"AZ", lat:33.4942,  lon:-111.9261, tz:"America/Phoenix",  unit:"fahrenheit", windUnit:"mph", precUnit:"inch", sym:"°F" },
-  { name:"Hong Kong",    state:"",   lat:22.3193,  lon:114.1694,  tz:"Asia/Hong_Kong",   unit:"celsius",    windUnit:"kmh", precUnit:"mm",   sym:"°C" },
-];
+// Load saved cities from localStorage, or start empty
+let LOCATIONS = JSON.parse(localStorage.getItem('doldrums_cities') || '[]');
+
+function saveCities() {
+  localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
+}
 
 const WMO = {
   0:{label:"Clear sky",icon:"☀️",tint:"clear"},1:{label:"Mainly clear",icon:"🌤️",tint:"clear"},
@@ -602,6 +633,35 @@ function buildGrid() {
   if(el) el.innerHTML = now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()
     +'<br>'+now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}).toUpperCase();
 
+  // Empty state
+  if(LOCATIONS.length === 0) {
+    document.getElementById('summary-scroll').innerHTML = `
+      <div class="add-city-pill" onclick="openModal()">
+        <span class="add-city-plus">+</span>
+        <span>Add City</span>
+      </div>`;
+    document.getElementById('weather-grid').innerHTML = '';
+    document.getElementById('station-count').textContent = '';
+    document.getElementById('sticky-count').textContent = '';
+    const main = document.querySelector('main');
+    main.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌫️</div>
+        <div class="empty-title">No stations yet</div>
+        <div class="empty-sub">Add a city to start tracking conditions.</div>
+        <button class="empty-btn" onclick="openModal()">
+          <span class="empty-btn-plus">+</span> Add your first city
+        </button>
+      </div>`;
+    return;
+  }
+
+  // Restore grid container if coming from empty state
+  const main = document.querySelector('main');
+  if(!document.getElementById('weather-grid')) {
+    main.innerHTML = '<div class="grid" id="weather-grid"></div>';
+  }
+
   // Summary pills (inject before the Add City pill)
   const scroll = document.getElementById('summary-scroll');
   // Keep the Add City pill
@@ -644,7 +704,7 @@ function buildGrid() {
         <div class="card-head-right">
           <div class="card-icon" id="icon-${i}">—</div>
           <div class="card-cond" id="cond-${i}">—</div>
-          ${i >= 6 ? `<button class="remove-btn" onclick="removeCity(${i})">Remove</button>` : ''}
+          ${`<button class="remove-btn" onclick="removeCity(${i})">Remove</button>`}
         </div>
       </div>
       <div id="body-${i}">
@@ -859,6 +919,7 @@ function addCity(idx){
   };
 
   LOCATIONS.push(loc);
+  saveCities();
   closeModal();
 
   // Add just this card without full rebuild
@@ -913,6 +974,7 @@ function addCity(idx){
 
 function removeCity(i){
   LOCATIONS.splice(i,1);
+  saveCities();
   refreshAll();
 }
 
