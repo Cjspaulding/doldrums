@@ -839,12 +839,19 @@ function renderCard(i, loc, data) {
   // 7-day forecast
   const forecastHTML = Array.from({ length: Math.min(7, daily.time.length) }, (_, d) => {
     const dw = wmo(daily.weather_code[d]);
+    const hiTemp = daily.temperature_2m_max[d];
     const precip = daily.precipitation_sum[d];
     const hasRain = precip > (loc.precUnit === 'inch' ? 0.01 : 0.1);
+    // If forecast says snow but daytime high is above 36°F (2°C), show rain instead
+    const isCold = loc.unit === 'celsius' ? hiTemp <= 2 : hiTemp <= 36;
+    let icon = dw.icon;
+    if (!isCold && (dw.tint === 'snowy')) {
+      icon = hiTemp > (loc.unit === 'celsius' ? 10 : 50) ? '🌧️' : '🌨️';
+    }
     return `
       <div class="fc-day${d === 0 ? ' today' : ''}">
         <div class="fc-name">${shortDay(daily.time[d], loc.tz, d === 0)}</div>
-        <div class="fc-icon">${dw.icon}</div>
+        <div class="fc-icon">${icon}</div>
         <div class="fc-hi">${Math.round(daily.temperature_2m_max[d])}°</div>
         <div class="fc-lo">${Math.round(daily.temperature_2m_min[d])}°</div>
         ${hasRain ? `<div class="fc-precip">${rv(precip)}${pu}</div>` : '<div class="fc-precip"> </div>'}
