@@ -79,14 +79,33 @@
 
     .masthead-left { display:flex;flex-direction:column;justify-content:center; }
 
+    /* AON BAND */
+    .aon-band {
+      background: var(--orange);
+      padding: 7px 28px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.92);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .aon-band-right {
+      font-size: 9px;
+      letter-spacing: .18em;
+      color: rgba(255,255,255,0.6);
+    }
+
     .brand-eyebrow {
-      font-size:8px;letter-spacing:.28em;text-transform:uppercase;
-      color:var(--orange2);margin-bottom:7px;font-weight:500;
+      display: none;
     }
 
     .brand-wordmark {
-      font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;
-      letter-spacing:.12em;text-transform:uppercase;color:#fff;line-height:.9;
+      font-family:'Cormorant Garamond',serif;font-size:62px;font-weight:300;
+      letter-spacing:.08em;text-transform:lowercase;color:#fff;line-height:.9;
     }
 
     .brand-tagline {
@@ -155,7 +174,7 @@
 
     .sticky-wordmark {
       font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;
-      letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.8);
+      letter-spacing:.1em;text-transform:lowercase;color:rgba(255,255,255,0.8);
     }
 
     .sticky-sep { color:rgba(255,255,255,0.2);margin:0 2px; }
@@ -385,7 +404,7 @@
     }
 
     .footer-left { display:flex;align-items:baseline;gap:14px; }
-    .footer-name { font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.5); }
+    .footer-name { font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:.1em;text-transform:lowercase;color:rgba(255,255,255,0.5); }
     .footer-tagline { font-family:'Spectral',serif;font-style:italic;font-size:12px;color:rgba(255,255,255,0.25); }
     .footer-right { display:flex;align-items:center;gap:14px;flex-wrap:wrap; }
     .footer-item { font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,0.25); }
@@ -480,12 +499,104 @@
       text-align:center;padding:16px 0;
     }
     .modal-status.error { color:var(--orange); }
+
+    /* ── FORECAST VIEW ── */
+    .forecast-view {
+      position:relative;z-index:9;
+      padding:0 16px 40px;
+    }
+
+    .fv-table {
+      width:100%;
+      border-collapse:collapse;
+      background:var(--white);
+      border:1px solid var(--rule);
+      box-shadow:var(--shadow);
+    }
+
+    .fv-th {
+      background:var(--navy);
+      color:rgba(255,255,255,0.7);
+      font-size:8px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      padding:10px 14px;
+      text-align:center;
+      border-right:1px solid rgba(255,255,255,0.08);
+      font-weight:400;
+    }
+
+    .fv-th:first-child { text-align:left; min-width:140px; }
+    .fv-th.today-col { color:#fff; border-bottom:2px solid var(--orange); }
+
+    .fv-city {
+      padding:0 14px;
+      border-bottom:1px solid var(--rule);
+      border-right:1px solid var(--rule);
+      background:var(--ice);
+    }
+
+    .fv-city-name {
+      font-family:'Cormorant Garamond',serif;
+      font-size:20px;font-weight:300;
+      color:var(--ink);letter-spacing:.02em;
+      padding:12px 0 2px;
+      line-height:1;
+    }
+
+    .fv-city-state {
+      font-size:7.5px;color:var(--ink4);
+      letter-spacing:.14em;text-transform:uppercase;
+      padding-bottom:10px;
+    }
+
+    .fv-cell {
+      padding:10px 8px;
+      text-align:center;
+      border-right:1px solid var(--rule);
+      border-bottom:1px solid var(--rule);
+      vertical-align:middle;
+      min-width:80px;
+    }
+
+    .fv-cell.today-col { background:var(--navy-dim); }
+
+    .fv-icon { font-size:20px;opacity:.55;filter:grayscale(.4);display:block;margin-bottom:4px; }
+
+    .fv-hi {
+      font-family:'Cormorant Garamond',serif;
+      font-size:22px;font-weight:400;
+      color:var(--navy);line-height:1;
+    }
+
+    .fv-lo { font-size:10px;color:var(--ink4);margin-top:2px; }
+
+    .fv-precip {
+      font-size:8px;color:var(--navy3);
+      margin-top:3px;letter-spacing:.03em;
+    }
+
+    .fv-loading {
+      text-align:center;padding:60px 20px;
+      font-size:9px;color:var(--ink4);
+      letter-spacing:.16em;text-transform:uppercase;
+    }
+
+    .fv-empty {
+      text-align:center;padding:80px 20px;
+      font-size:9px;color:var(--ink4);
+      letter-spacing:.16em;text-transform:uppercase;
+    }
   </style>
 </head>
 <body>
 
 <!-- MASTHEAD -->
 <div class="masthead">
+  <div class="aon-band">
+    <span>Atmospheric Observation Network</span>
+    <span class="aon-band-right">doldrums.app</span>
+  </div>
   <div class="masthead-top">
     <div class="masthead-left">
       <div class="brand-eyebrow">Atmospheric Observation Network</div>
@@ -499,11 +610,11 @@
   </div>
   <div class="masthead-nav-strip">
     <div class="masthead-nav">
-      <div class="nav-item active">Conditions</div>
-      <div class="nav-item">Forecast</div>
-      <div class="nav-item">Pressure</div>
-      <div class="nav-item">Alerts</div>
-      <div class="nav-item">Log</div>
+      <div class="nav-item active" onclick="setView('conditions')">Conditions</div>
+      <div class="nav-item" onclick="setView('forecast')">Forecast</div>
+      <div class="nav-item" style="opacity:.35;cursor:default">Pressure</div>
+      <div class="nav-item" style="opacity:.35;cursor:default">Alerts</div>
+      <div class="nav-item" style="opacity:.35;cursor:default">Log</div>
     </div>
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
@@ -571,8 +682,8 @@
     <div class="modal-body">
       <div class="modal-label">Search for a city, region, or location</div>
       <div class="modal-input-wrap">
-        <input class="modal-input" id="city-input" type="text" placeholder="e.g. Tokyo, Reykjavik, Cape Town…"
-          onkeydown="if(event.key==='Enter')searchCity()">
+        <input class="modal-input" id="city-input" type="text" placeholder="e.g. Tokyo, Bedford NH, Cape Town…"
+          oninput="onCityInput()" onkeydown="if(event.key==='Enter')searchCity()">
         <button class="modal-search-btn" id="search-btn" onclick="searchCity()">Search</button>
       </div>
       <div class="modal-results" id="modal-results"></div>
@@ -815,7 +926,9 @@ async function fetchWeather(loc,i){
   try{
     const res=await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    renderCard(i,loc,await res.json());
+    const data = await res.json();
+    cachedForecast[i] = data.daily; // cache for forecast view
+    renderCard(i,loc,data);
   }catch(err){renderError(i,err.message);}
 }
 
@@ -864,43 +977,51 @@ function handleOverlayClick(e){
   if(e.target===document.getElementById('modal-overlay'))closeModal();
 }
 
+// Parse "Bedford, NH" → just "Bedford" for the API, keep full string for display
+function parseQuery(raw) {
+  return raw.split(',')[0].trim();
+}
+
+let _searchTimer = null;
+function onCityInput() {
+  clearTimeout(_searchTimer);
+  const q = document.getElementById('city-input').value.trim();
+  if(q.length < 2) return;
+  _searchTimer = setTimeout(() => searchCity(), 400);
+}
+
 async function searchCity(){
-  const q=document.getElementById('city-input').value.trim();
-  if(!q)return;
-  const btn=document.getElementById('search-btn');
-  const results=document.getElementById('modal-results');
-  btn.disabled=true;
-  btn.textContent='…';
-  results.innerHTML='<div class="modal-status">Searching…</div>';
+  const raw = document.getElementById('city-input').value.trim();
+  if(!raw) return;
+  const q = parseQuery(raw);
+  const results = document.getElementById('modal-results');
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true; btn.textContent = '…';
+  results.innerHTML = '<div class="modal-status">Searching…</div>';
 
   try{
-    const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=en&format=json`);
-    const data=await res.json();
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=10&language=en&format=json`);
+    const data = await res.json();
 
-    if(!data.results||data.results.length===0){
-      results.innerHTML='<div class="modal-status error">No results found. Try a different spelling.</div>';
+    if(!data.results || data.results.length === 0){
+      results.innerHTML = '<div class="modal-status error">No results found — try just the city name.</div>';
       return;
     }
 
-    results.innerHTML=data.results.map((r,i)=>`
-      <div class="modal-result-item" onclick="addCity(${i})"
-        data-name="${r.name}" data-state="${r.admin1||''}" data-country="${r.country_code||''}"
-        data-lat="${r.latitude}" data-lon="${r.longitude}" data-tz="${r.timezone||'UTC'}">
+    window._geoResults = data.results;
+    results.innerHTML = data.results.map((r,i) => `
+      <div class="modal-result-item" onclick="addCity(${i})">
         <div>
           <div class="result-name">${r.name}</div>
-          <div class="result-meta">${[r.admin1,r.country].filter(Boolean).join(' · ')}</div>
+          <div class="result-meta">${[r.admin1, r.country].filter(Boolean).join(' · ')}</div>
         </div>
         <button class="result-add" onclick="event.stopPropagation();addCity(${i})">+ Add</button>
       </div>`).join('');
 
-    // store results globally for addCity
-    window._geoResults = data.results;
-
   }catch(err){
-    results.innerHTML=`<div class="modal-status error">Search failed. Check your connection.</div>`;
+    results.innerHTML = `<div class="modal-status error">Search failed. Check your connection.</div>`;
   }finally{
-    btn.disabled=false;
-    btn.textContent='Search';
+    btn.disabled = false; btn.textContent = 'Search';
   }
 }
 
@@ -976,6 +1097,222 @@ function removeCity(i){
   LOCATIONS.splice(i,1);
   saveCities();
   refreshAll();
+}
+
+// ── WEATHER ALERTS ────────────────────────────────────────────────────────────
+const prevConditions = {};
+
+const SEVERE = new Set([82,95,96,99]); // heavy showers, thunderstorm, hail
+const BAD    = new Set([55,65,75,86]); // heavy drizzle/rain/snow
+
+function checkAlert(i, loc, newCode) {
+  const prev = prevConditions[i];
+  prevConditions[i] = newCode;
+  if(prev === undefined) return; // first load, no comparison
+
+  const wasOk   = !SEVERE.has(prev) && !BAD.has(prev);
+  const nowBad  = SEVERE.has(newCode) || BAD.has(newCode);
+  const nowWorse = SEVERE.has(newCode) && !SEVERE.has(prev);
+
+  if((wasOk && nowBad) || nowWorse) {
+    showAlert(`⚠ ${loc.name}: ${wmo(newCode).label}`);
+  }
+}
+
+function showAlert(msg) {
+  let bar = document.getElementById('alert-bar');
+  if(!bar) {
+    bar = document.createElement('div');
+    bar.id = 'alert-bar';
+    bar.style.cssText = `
+      position:fixed;bottom:0;left:0;right:0;z-index:200;
+      background:var(--orange);color:#fff;
+      padding:12px 20px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+      display:flex;align-items:center;justify-content:space-between;
+      font-family:'IBM Plex Mono',monospace;
+      box-shadow:0 -2px 12px rgba(0,0,0,0.2);
+    `;
+    document.body.appendChild(bar);
+  }
+  bar.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
+  setTimeout(() => bar?.remove(), 8000);
+}
+
+// Patch renderCard to check alerts
+const _origRenderCard = renderCard;
+window.renderCard = function(i, loc, data) {
+  _origRenderCard(i, loc, data);
+  checkAlert(i, loc, data.current.weather_code);
+};
+
+// ── PULL TO REFRESH ───────────────────────────────────────────────────────────
+let _touchStartY = 0;
+let _ptr = null;
+
+document.addEventListener('touchstart', e => {
+  _touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  const dy = e.touches[0].clientY - _touchStartY;
+  if(window.scrollY === 0 && dy > 0) {
+    if(!_ptr) {
+      _ptr = document.createElement('div');
+      _ptr.style.cssText = `
+        position:fixed;top:0;left:0;right:0;z-index:500;
+        background:var(--orange);color:#fff;
+        font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;
+        text-transform:uppercase;text-align:center;
+        transition:height .1s;height:0;overflow:hidden;
+        display:flex;align-items:center;justify-content:center;
+      `;
+      document.body.appendChild(_ptr);
+    }
+    const pull = Math.min(dy, 80);
+    _ptr.style.height = pull + 'px';
+    _ptr.textContent = pull > 55 ? '↺  Release to refresh' : '↓  Pull to refresh';
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  const dy = e.changedTouches[0].clientY - _touchStartY;
+  if(_ptr) {
+    if(dy > 55 && window.scrollY === 0) {
+      _ptr.textContent = '↺  Refreshing…';
+      setTimeout(() => { _ptr?.remove(); _ptr = null; }, 600);
+      refreshAll();
+    } else {
+      _ptr.remove(); _ptr = null;
+    }
+  }
+}, { passive: true });
+
+// ── VIEW SWITCHING ─────────────────────────────────────────────────────────────
+let currentView = 'conditions';
+const cachedForecast = {}; // store daily data per location index
+
+function setView(view) {
+  currentView = view;
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => {
+    if(el.textContent.trim().toLowerCase() === view) el.classList.add('active');
+  });
+
+  const sectionHead = document.querySelector('.section-head');
+  const main = document.querySelector('main');
+
+  if(view === 'forecast') {
+    if(sectionHead) sectionHead.querySelector('.section-label').textContent = 'Seven-Day Outlook';
+    renderForecastView();
+  } else {
+    if(sectionHead) sectionHead.querySelector('.section-label').textContent = 'Field Readings';
+    // restore conditions grid
+    if(!document.getElementById('weather-grid')) {
+      main.innerHTML = '<div class="grid" id="weather-grid"></div>';
+    }
+    refreshAll();
+  }
+}
+
+function renderForecastView() {
+  const main = document.querySelector('main');
+
+  if(LOCATIONS.length === 0) {
+    main.innerHTML = `<div class="forecast-view"><div class="fv-empty">No cities added yet. Add a city from the Conditions view.</div></div>`;
+    return;
+  }
+
+  // Check if we have cached data
+  const hasData = Object.keys(cachedForecast).length > 0;
+  if(!hasData) {
+    main.innerHTML = `<div class="forecast-view"><div class="fv-loading">Loading forecast data…</div></div>`;
+    // Fetch all then re-render
+    Promise.all(LOCATIONS.map((loc,i) => fetchForecastOnly(loc,i))).then(renderForecastTable);
+    return;
+  }
+  renderForecastTable();
+}
+
+async function fetchForecastOnly(loc, i) {
+  const p = new URLSearchParams({
+    latitude:loc.lat, longitude:loc.lon,
+    daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum',
+    temperature_unit:loc.unit,
+    precipitation_unit:loc.precUnit,
+    timezone:loc.tz, forecast_days:7,
+  });
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    cachedForecast[i] = data.daily;
+  } catch(e) {
+    cachedForecast[i] = null;
+  }
+}
+
+function renderForecastTable() {
+  const main = document.querySelector('main');
+
+  // Build day headers from first location with data
+  const firstDaily = Object.values(cachedForecast).find(d => d !== null);
+  if(!firstDaily) {
+    main.innerHTML = `<div class="forecast-view"><div class="fv-empty">Could not load forecast data.</div></div>`;
+    return;
+  }
+
+  const days = firstDaily.time.slice(0,7);
+  const dayLabels = days.map((ds,d) => {
+    if(d===0) return 'Today';
+    return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  });
+
+  const headerCols = dayLabels.map((label,d) =>
+    `<th class="fv-th${d===0?' today-col':''}">${label}</th>`
+  ).join('');
+
+  const rows = LOCATIONS.map((loc,i) => {
+    const daily = cachedForecast[i];
+    const pu = loc.precUnit === 'inch' ? 'in' : 'mm';
+
+    const cells = days.map((_,d) => {
+      if(!daily) return `<td class="fv-cell${d===0?' today-col':''}"><span style="color:var(--ink5)">—</span></td>`;
+      const w = wmo(daily.weather_code[d]);
+      const precip = daily.precipitation_sum[d];
+      const hasRain = precip > (loc.precUnit==='inch' ? 0.01 : 0.1);
+      return `
+        <td class="fv-cell${d===0?' today-col':''}">
+          <span class="fv-icon">${w.icon}</span>
+          <div class="fv-hi">${Math.round(daily.temperature_2m_max[d])}°</div>
+          <div class="fv-lo">${Math.round(daily.temperature_2m_min[d])}°</div>
+          ${hasRain ? `<div class="fv-precip">${rv(precip)}${pu}</div>` : '<div class="fv-precip"> </div>'}
+        </td>`;
+    }).join('');
+
+    return `
+      <tr>
+        <td class="fv-city">
+          <div class="fv-city-name">${loc.name}</div>
+          <div class="fv-city-state">${loc.state||'Intl'}</div>
+        </td>
+        ${cells}
+      </tr>`;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="forecast-view">
+      <table class="fv-table">
+        <thead>
+          <tr>
+            <th class="fv-th" style="text-align:left">Location</th>
+            ${headerCols}
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
