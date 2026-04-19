@@ -1251,7 +1251,42 @@
       border-bottom:1px solid var(--rule);background:var(--ice);
     }
 
-    /* ── VIEW TRANSITIONS ─────────────────────────────────────────────────── */
+    /* ── RAIN ANSWER ──────────────────────────────────────────────────────── */
+    .rain-answer {
+      padding:14px 18px;
+      border-bottom:1px solid var(--rule);
+      position:relative;z-index:1;
+    }
+
+    .rain-answer-text {
+      font-size:13px;font-weight:400;color:var(--ink);
+      letter-spacing:.02em;line-height:1.4;margin-bottom:10px;
+    }
+    .rain-answer-text strong { color:var(--navy); }
+    .rain-answer-text.no-rain strong { color:var(--ink3); }
+
+    .rain-hour-bar {
+      display:flex;gap:2px;height:28px;align-items:flex-end;
+    }
+
+    .rain-hour-slot {
+      flex:1;border-radius:2px 2px 0 0;
+      transition:height .3s ease;
+      min-height:3px;
+    }
+
+    .rain-hour-labels {
+      display:flex;justify-content:space-between;
+      margin-top:5px;
+    }
+    .rain-hour-label {
+      font-size:7px;color:var(--ink5);letter-spacing:.06em;
+    }
+
+    .rain-answer-clear {
+      font-size:11px;color:var(--ink4);letter-spacing:.04em;
+      font-style:italic;
+    }
     .view-enter {
       animation: viewIn .2s cubic-bezier(.22,1,.36,1) both;
     }
@@ -1717,6 +1752,95 @@ function wmo(code, tempC) {
   return {...entry, icon: ICON_SVG[entry.svg] || ICON_SVG.fallback};
 }
 
+// ── WILL IT RAIN? ─────────────────────────────────────────────────────────────
+function willItRain(hourly, loc) {
+  if(!hourly?.time) return null;
+
+  const now = new Date();
+  const nowLocal = new Date(now.toLocaleString('en-US', { timeZone: loc.tz }));
+  const currentHour = nowLocal.getHours();
+  const todayStr = nowLocal.toISOString().slice(0,10);
+
+  // Find current hour index
+  let startIdx = hourly.time.findIndex(t =>
+    t.startsWith(todayStr) && parseInt(t.slice(11,13)) === currentHour
+  );
+  if(startIdx < 0) startIdx = 0;
+
+  // Next 12 hours
+  const slots = hourly.time.slice(startIdx, startIdx + 13).map((t, i) => ({
+    hour: parseInt(t.slice(11,13)),
+    prob: hourly.precipitation_probability[startIdx + i] ?? 0,
+    precip: hourly.precipitation?.[startIdx + i] ?? 0,
+    idx: i
+  }));
+
+  const THRESHOLD = 40; // % probability considered "likely rain"
+
+  // Find first rain window
+  const firstRain = slots.find(s => s.prob >= THRESHOLD);
+  const allClear = slots.every(s => s.prob < 20);
+
+  // Next hour slots (first 12 x 5min = ~1hr approximated by hourly slots)
+  const nextHourSlots = slots.slice(0, 12);
+
+  return { slots, firstRain, allClear, nextHourSlots, currentHour };
+}
+
+function formatRainHour(hour) {
+  if(hour === 0) return '12a';
+  if(hour < 12) return hour + 'a';
+  if(hour === 12) return '12p';
+  return (hour-12) + 'p';
+}
+
+function buildRainAnswer(hourly, loc) {
+  const r = willItRain(hourly, loc);
+  if(!r) return '';
+
+  const { slots, firstRain, allClear } = r;
+
+  let answerHTML = '';
+
+  if(allClear) {
+    answerHTML = `<div class="rain-answer-text no-rain"><strong>No rain</strong> in the next 12 hours.</div>`;
+  } else if(firstRain) {
+    const h = firstRain.hour;
+    const timeStr = formatRainHour(h);
+    const isNow = firstRain.idx === 0;
+    if(isNow) {
+      answerHTML = `<div class="rain-answer-text"><strong>Raining now.</strong> ${firstRain.prob}% chance this hour.</div>`;
+    } else {
+      answerHTML = `<div class="rain-answer-text">Rain likely <strong>around ${timeStr}</strong> — ${firstRain.prob}% chance.</div>`;
+    }
+  } else {
+    const maxProb = Math.max(...slots.map(s => s.prob));
+    answerHTML = `<div class="rain-answer-text no-rain"><strong>Probably dry</strong> — up to ${maxProb}% chance.</div>`;
+  }
+
+  // 12-hour probability bar
+  const barSlots = slots.slice(0, 12).map(s => {
+    const height = Math.max(3, Math.round(s.prob * 0.28)); // max 28px
+    const col = s.prob >= 60 ? '#2a6496'
+              : s.prob >= 40 ? '#5b9ec9'
+              : s.prob >= 20 ? '#9ab0c8'
+              : 'var(--rule)';
+    return `<div class="rain-hour-slot" style="height:${height}px;background:${col}"></div>`;
+  }).join('');
+
+  // Label every 3 hours
+  const labelSlots = slots.slice(0, 12);
+  const labels = labelSlots.map((s, i) =>
+    i % 3 === 0 ? `<span class="rain-hour-label">${formatRainHour(s.hour)}</span>` : '<span></span>'
+  ).join('');
+
+  return `<div class="rain-answer">
+    ${answerHTML}
+    <div class="rain-hour-bar">${barSlots}</div>
+    <div class="rain-hour-labels">${labels}</div>
+  </div>`;
+}
+
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
 // ── STATE ABBREVIATION ────────────────────────────────────────────────────────
@@ -1981,6 +2105,7 @@ function renderCard(i, loc, data) {
       </div>
       <div class="forecast-strip" id="fc-strip-${i}">${fcast}</div>
     </div>
+    ${buildRainAnswer(data.hourly, loc)}
     <div class="sun-row">
       <div class="sun-item">
         <span class="sun-icon">🌅</span>
@@ -2021,6 +2146,7 @@ async function fetchWeather(loc,i){
   const p=new URLSearchParams({
     latitude:loc.lat,longitude:loc.lon,
     current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,uv_index',
+    hourly:'precipitation_probability,precipitation,weather_code,temperature_2m',
     daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,sunrise,sunset',
     temperature_unit:loc.unit,wind_speed_unit:loc.windUnit,
     precipitation_unit:loc.precUnit,timezone:loc.tz,forecast_days:7,
@@ -2030,6 +2156,7 @@ async function fetchWeather(loc,i){
     if(!res.ok)throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     cachedForecast[i] = data.daily;
+    if(data.hourly) cachedHourly[i] = data.hourly;
     renderCard(i,loc,data);
   }catch(err){renderError(i,err.message);}
 }
