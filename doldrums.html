@@ -900,7 +900,6 @@
     <div class="masthead-nav">
       <div class="nav-item active" onclick="setView('conditions')">Conditions</div>
       <div class="nav-item" onclick="setView('forecast')">Forecast</div>
-      <div class="nav-item" onclick="setView('pressure')">Pressure</div>
       <div class="nav-item" onclick="setView('alerts')">Alerts</div>
       <div class="nav-item" onclick="setView('log')">Log</div>
     </div>
@@ -1204,6 +1203,16 @@ function renderCard(i, loc, data) {
         <div class="reading-val">${rv(daily.precipitation_sum[0])}<span class="reading-unit"> ${pu}</span></div>
       </div>
     </div>
+    <div class="readings readings-2col">
+      <div class="reading">
+        <div class="reading-label">Pressure</div>
+        <div class="reading-val">${c.surface_pressure != null ? Math.round(c.surface_pressure*10)/10 : "—"}<span class="reading-unit"> hPa</span></div>
+      </div>
+      <div class="reading" style="border-right:none">
+        <div class="reading-label">UV Index</div>
+        <div class="reading-val">${daily.uv_index_max ? Math.round(daily.uv_index_max[0]) : "—"}<span class="reading-unit">${daily.uv_index_max ? " "+(daily.uv_index_max[0]<=2?"low":daily.uv_index_max[0]<=5?"mod":daily.uv_index_max[0]<=7?"high":"v.high") : ""}</span></div>
+      </div>
+    </div>
     <div class="forecast">
       <div class="forecast-header">
         <div class="forecast-label">Seven-day outlook</div>
@@ -1224,7 +1233,7 @@ async function fetchWeather(loc,i){
   const p=new URLSearchParams({
     latitude:loc.lat,longitude:loc.lon,
     current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,surface_pressure',
-    daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
+    daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,uv_index_max',
     temperature_unit:loc.unit,wind_speed_unit:loc.windUnit,
     precipitation_unit:loc.precUnit,timezone:loc.tz,forecast_days:7,
   });
