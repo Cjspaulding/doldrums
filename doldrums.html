@@ -2091,35 +2091,6 @@ async function addMyLocationSheet() {
   await addMyLocation();
 }
 
-// ── SWIPE NAVIGATION ────────────────────────────────────────────────────────────────────────────────
-const MOBILE_VIEWS = ['conditions','forecast','hourly','radar','log'];
-let _swipeStartX = 0, _swipeStartY = 0, _swipeOk = false;
-
-document.addEventListener('touchstart', e => {
-  _swipeStartX = e.touches[0].clientX;
-  _swipeStartY = e.touches[0].clientY;
-  _swipeOk = true;
-}, {passive:true});
-
-document.addEventListener('touchmove', e => {
-  if(!_swipeOk) return;
-  const dy = Math.abs(e.touches[0].clientY - _swipeStartY);
-  const dx = Math.abs(e.touches[0].clientX - _swipeStartX);
-  if(dy > dx) _swipeOk = false;
-}, {passive:true});
-
-document.addEventListener('touchend', e => {
-  if(!_swipeOk || window.innerWidth > 600) { _swipeOk=false; return; }
-  const dx = e.changedTouches[0].clientX - _swipeStartX;
-  const dy = e.changedTouches[0].clientY - _swipeStartY;
-  _swipeOk = false;
-  if(Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
-  if(e.target.closest('#radar-map,.forecast-strip,.hv-strip,.city-sheet,.quick-note-overlay')) return;
-  const idx = MOBILE_VIEWS.indexOf(currentView);
-  if(idx < 0) return;
-  if(dx < 0 && idx < MOBILE_VIEWS.length-1) setView(MOBILE_VIEWS[idx+1]);
-  if(dx > 0 && idx > 0) setView(MOBILE_VIEWS[idx-1]);
-}, {passive:true});
 
 function closeModal(){
   document.getElementById('modal-overlay').classList.remove('open');
