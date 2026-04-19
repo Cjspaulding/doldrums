@@ -1203,16 +1203,7 @@ function renderCard(i, loc, data) {
         <div class="reading-val">${rv(daily.precipitation_sum[0])}<span class="reading-unit"> ${pu}</span></div>
       </div>
     </div>
-    <div class="readings readings-2col">
-      <div class="reading">
-        <div class="reading-label">Pressure</div>
-        <div class="reading-val">${c.surface_pressure != null ? Math.round(c.surface_pressure*10)/10 : "—"}<span class="reading-unit"> hPa</span></div>
-      </div>
-      <div class="reading" style="border-right:none">
-        <div class="reading-label">UV Index</div>
-        <div class="reading-val">${daily.uv_index_max ? Math.round(daily.uv_index_max[0]) : "—"}<span class="reading-unit">${daily.uv_index_max ? " "+(daily.uv_index_max[0]<=2?"low":daily.uv_index_max[0]<=5?"mod":daily.uv_index_max[0]<=7?"high":"v.high") : ""}</span></div>
-      </div>
-    </div>
+
     <div class="forecast">
       <div class="forecast-header">
         <div class="forecast-label">Seven-day outlook</div>
@@ -1232,8 +1223,8 @@ async function fetchWeather(loc,i){
   await new Promise(r=>setTimeout(r,i*350));
   const p=new URLSearchParams({
     latitude:loc.lat,longitude:loc.lon,
-    current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,surface_pressure',
-    daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,uv_index_max',
+    current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code',
+    daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
     temperature_unit:loc.unit,wind_speed_unit:loc.windUnit,
     precipitation_unit:loc.precUnit,timezone:loc.tz,forecast_days:7,
   });
@@ -1434,16 +1425,9 @@ window.renderCard = function(i, loc, data) {
     name: loc.name, state: loc.state,
     condition: w.label, icon: w.icon,
     temp: Math.round(data.current.temperature_2m), sym: loc.sym,
-    pressure: data.current.surface_pressure != null ? Math.round(data.current.surface_pressure * 10) / 10 : null,
     wind: Math.round(data.current.wind_speed_10m), windUnit: loc.windUnit,
   });
 
-  // Track pressure history for trend
-  if(data.current.surface_pressure != null) {
-    if(!pressureHistory[i]) pressureHistory[i] = [];
-    pressureHistory[i].push(data.current.surface_pressure);
-    if(pressureHistory[i].length > 6) pressureHistory[i].shift();
-  }
 };
 
 // ── PULL TO REFRESH ───────────────────────────────────────────────────────────
