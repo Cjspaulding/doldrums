@@ -286,11 +286,10 @@
     }
 
     .remove-btn {
-      font-size:9px;color:var(--ink5);background:none;border:none;cursor:pointer;
-      letter-spacing:.1em;text-transform:uppercase;padding:2px 4px;
-      transition:color .2s;line-height:1;
+      font-size:13px;color:var(--ink5);background:none;border:none;cursor:pointer;
+      padding:2px 4px;transition:color .2s;line-height:1;opacity:0.35;
     }
-    .remove-btn:hover { color:var(--orange); }
+    .remove-btn:hover { color:var(--orange);opacity:1; }
 
     /* TEMP HERO */
     .temp-hero {
@@ -906,7 +905,7 @@
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
       <button class="refresh-btn" id="refresh-btn" onclick="refreshAll()">
-        <span id="refresh-icon">↺</span> Fetch
+        <span id="refresh-icon">↺</span> Refresh
       </button>
     </div>
   </div>
@@ -1112,14 +1111,14 @@ function buildGrid() {
       <div class="card-bar"></div>
       <div class="card-head">
         <div>
-          <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
+          <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${(loc.state||'INTL').slice(0,12).toUpperCase()}</div>
           <div class="location-name">${loc.name}</div>
           <div class="location-sub" id="meta-${i}">${localTime(loc.tz)}</div>
         </div>
         <div class="card-head-right">
           <div class="card-icon" id="icon-${i}">—</div>
           <div class="card-cond" id="cond-${i}">—</div>
-          ${`<button class="remove-btn" onclick="removeCity(${i})">Remove</button>`}
+          ${`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station">✕</button>`}
         </div>
       </div>
       <div id="body-${i}">
@@ -1172,7 +1171,7 @@ function renderCard(i, loc, data) {
       <div class="temp-numeral">${Math.round(c.temperature_2m)}</div>
       <div class="temp-degree">${loc.sym}</div>
       <div class="temp-right">
-        <div class="feels-label">Apparent</div>
+        <div class="feels-label">Feels like</div>
         <div class="feels-val">${Math.round(c.apparent_temperature)}${loc.sym}</div>
         <div class="obs-time">${localDate(loc.tz)}</div>
       </div>
@@ -1193,6 +1192,7 @@ function renderCard(i, loc, data) {
         <div class="reading-note">max ${Math.round(daily.wind_speed_10m_max[0])}</div>
       </div>
     </div>
+    ${(rain > 0 || daily.precipitation_sum[0] > 0) ? `
     <div class="readings readings-2col">
       <div class="reading">
         <div class="reading-label">Precip Now</div>
@@ -1202,7 +1202,7 @@ function renderCard(i, loc, data) {
         <div class="reading-label">Today Total</div>
         <div class="reading-val">${rv(daily.precipitation_sum[0])}<span class="reading-unit"> ${pu}</span></div>
       </div>
-    </div>
+    </div>` : ''}
 
     <div class="forecast">
       <div class="forecast-header">
@@ -1734,14 +1734,14 @@ function appendCard(loc, i) {
     <div class="card-bar"></div>
     <div class="card-head">
       <div>
-        <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
+        <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${(loc.state||'INTL').slice(0,12).toUpperCase()}</div>
         <div class="location-name">${loc.name}</div>
         <div class="location-sub" id="meta-${i}">${localTime(loc.tz)}</div>
       </div>
       <div class="card-head-right">
         <div class="card-icon" id="icon-${i}">—</div>
         <div class="card-cond" id="cond-${i}">—</div>
-        <button class="remove-btn" onclick="removeCity(${i})">Remove</button>
+        <button class="remove-btn" onclick="removeCity(${i})" title="Remove station">✕</button>
       </div>
     </div>
     <div id="body-${i}">
@@ -1849,7 +1849,7 @@ function renderPressureView() {
       <div class="pv-card" id="pv-${i}" style="animation-delay:${i*80}ms">
         <div class="pv-head">
           <div>
-            <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
+            <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${(loc.state||'INTL').slice(0,12).toUpperCase()}</div>
             <div class="location-name">${loc.name}</div>
           </div>
           <div class="pv-head-right" id="pv-status-${i}">Loading…</div>
@@ -1924,7 +1924,7 @@ function renderPressureCard(i, loc) {
           <span class="pv-trend-label">${trend.label}${history.length > 1 ? ' ' + trend.delta : ''}</span>
         </div>
         <div class="pv-class ${cls}">${clsLabel}</div>
-        <div class="pv-spark">${spark || '<span style="font-size:8px;color:var(--ink5)">Fetch again for trend data</span>'}</div>
+        <div class="pv-spark">${spark || '<span style="font-size:8px;color:var(--ink5)">Refresh to build trend data</span>'}</div>
       </div>
     </div>
     <div class="pv-footer">
@@ -2026,7 +2026,7 @@ function renderLogView() {
     main.innerHTML = `<div class="empty-state">
       <div class="empty-icon" style="font-size:42px;opacity:.35">📋</div>
       <div class="empty-title">No observations yet</div>
-      <div class="empty-sub">Readings are logged automatically on each fetch.</div>
+      <div class="empty-sub">Readings are logged automatically on each refresh.</div>
     </div>`;
     return;
   }
