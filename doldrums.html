@@ -1114,7 +1114,7 @@ function buildGrid() {
     pill.innerHTML = `
       <div class="sum-icon" id="sum-icon-${i}">—</div>
       <div>
-        <div class="sum-name">${loc.name}${loc.state?', '+loc.state:''}</div>
+        <div class="sum-name">${loc.name}${loc.state?', '+stateAbbr(loc.state):''}</div>
         <div class="sum-temp" id="sum-temp-${i}">—</div>
       </div>`;
     scroll.appendChild(pill);
@@ -1612,7 +1612,7 @@ function renderForecastTable() {
       <tr>
         <td class="fv-city">
           <div class="fv-city-name">${loc.name}</div>
-          <div class="fv-city-state">${loc.state||'Intl'}</div>
+          <div class="fv-city-state">${stateAbbr(loc.state)||'Intl'}</div>
         </td>
         ${cells}
       </tr>`;
@@ -1784,7 +1784,7 @@ function appendCard(loc, i) {
   pill.innerHTML = `
     <div class="sum-icon" id="sum-icon-${i}">—</div>
     <div>
-      <div class="sum-name">${loc.name}${loc.state?', '+loc.state:''}</div>
+      <div class="sum-name">${loc.name}${loc.state?', '+stateAbbr(loc.state):''}</div>
       <div class="sum-temp" id="sum-temp-${i}">—</div>
     </div>`;
   scroll.insertBefore(pill, addPill);
