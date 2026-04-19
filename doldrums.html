@@ -1336,6 +1336,7 @@
 
     @media(max-width:600px) {
       .masthead-nav-strip { display:none; }
+      .masthead { display:none; }
 
       .bottom-nav {
         display:flex;
@@ -3676,7 +3677,11 @@ function dismissInstall() {
   if(p) p.style.display = 'none';
 }
 
-// ── QUICK NOTE ────────────────────────────────────────────────────────────────
+// ── UPDATE DATE ICON ─────────────────────────────────────────────────────────
+(function() {
+  const el = document.querySelector('.bottom-nav-item[data-view="forecast"] .bottom-nav-icon');
+  if(el) el.textContent = new Date().getDate();
+})();
 function openQuickNote() {
   const overlay = document.getElementById('qn-overlay');
   const ta = document.getElementById('qn-ta');
@@ -3765,11 +3770,11 @@ if('serviceWorker' in navigator) {
 <!-- BOTTOM NAV (mobile only) -->
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bottom-nav-item active" onclick="setView('conditions')" data-view="conditions">
-    <span class="bottom-nav-icon">🌡</span>
+    <span class="bottom-nav-icon">◎</span>
     <span class="bottom-nav-label">Now</span>
   </button>
   <button class="bottom-nav-item" onclick="setView('forecast')" data-view="forecast">
-    <span class="bottom-nav-icon">📅</span>
+    <span class="bottom-nav-icon" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500">19</span>
     <span class="bottom-nav-label">Forecast</span>
   </button>
   <button class="bottom-nav-item" onclick="setView('hourly')" data-view="hourly">
@@ -3777,7 +3782,7 @@ if('serviceWorker' in navigator) {
     <span class="bottom-nav-label">Hourly</span>
   </button>
   <button class="bottom-nav-item" onclick="setView('radar')" data-view="radar">
-    <span class="bottom-nav-icon">🌫️</span>
+    <span class="bottom-nav-icon">🛰</span>
     <span class="bottom-nav-label">Radar</span>
   </button>
   <button class="bottom-nav-item" onclick="setView('log')" data-view="log">
