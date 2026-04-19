@@ -694,6 +694,187 @@
       font-size:9px;color:var(--ink4);
       letter-spacing:.16em;text-transform:uppercase;
     }
+
+    /* ── PRESSURE VIEW ─────────────────────────────────────────────────────── */
+    .pressure-view {
+      display:grid;grid-template-columns:1fr;gap:14px;
+    }
+    @media(min-width:600px){ .pressure-view{grid-template-columns:repeat(2,1fr);} }
+    @media(min-width:980px){ .pressure-view{grid-template-columns:repeat(3,1fr);} }
+
+    .pv-card {
+      background:var(--white);border:1px solid var(--rule);overflow:hidden;
+      box-shadow:var(--shadow);animation:cardIn .6s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .pv-head {
+      padding:14px 18px 12px;display:flex;justify-content:space-between;align-items:flex-start;
+      border-bottom:1px solid var(--rule);background:var(--ice);
+    }
+
+    .pv-head-right { font-size:9px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase; }
+
+    .pv-main {
+      padding:16px 18px 14px;display:flex;align-items:center;gap:22px;
+      border-bottom:1px solid var(--rule);
+    }
+
+    .pv-big { display:flex;align-items:baseline;gap:5px;flex-shrink:0; }
+
+    .pv-hpa {
+      font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:300;
+      line-height:.87;letter-spacing:-.02em;color:var(--navy);
+    }
+
+    .pv-unit {
+      font-size:10px;color:var(--ink4);letter-spacing:.14em;text-transform:uppercase;
+      align-self:flex-end;margin-bottom:7px;
+    }
+
+    .pv-info { flex:1;min-width:0; }
+
+    .pv-trend {
+      display:flex;align-items:center;gap:7px;margin-bottom:7px;
+    }
+
+    .pv-arrow { font-size:18px;line-height:1; }
+    .trend-up .pv-arrow { color:var(--orange2); }
+    .trend-dn .pv-arrow { color:var(--navy3); }
+    .trend-st .pv-arrow { color:var(--ink4); }
+
+    .pv-trend-label { font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3); }
+
+    .pv-class {
+      font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--ink4);margin-bottom:10px;
+    }
+    .pv-low { color:var(--navy2); }
+    .pv-high { color:var(--orange); }
+
+    .pv-spark { margin-top:2px; }
+
+    .pv-footer {
+      padding:8px 18px;background:var(--ice);
+      font-size:8.5px;color:var(--ink4);letter-spacing:.08em;
+    }
+    .pv-fl { text-transform:uppercase;letter-spacing:.16em;margin-right:6px;color:var(--ink5); }
+    .pv-fv { color:var(--ink2);font-family:'Cormorant Garamond',serif;font-size:12px; }
+
+    /* ── ALERTS VIEW ──────────────────────────────────────────────────────── */
+    .alert-view, .log-view { }
+
+    .log-toolbar {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 0 14px;
+    }
+
+    .log-count {
+      font-size:9px;color:var(--ink4);letter-spacing:.14em;text-transform:uppercase;
+    }
+
+    .log-clear-btn {
+      font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.14em;
+      text-transform:uppercase;background:none;border:1px solid var(--rule-dk);
+      color:var(--ink3);padding:5px 12px;cursor:pointer;transition:all .2s;
+    }
+    .log-clear-btn:hover { border-color:var(--orange);color:var(--orange); }
+
+    .log-export-btn {
+      font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.14em;
+      text-transform:uppercase;background:var(--navy);border:1px solid var(--navy);
+      color:rgba(255,255,255,0.8);padding:5px 12px;cursor:pointer;transition:all .2s;
+    }
+    .log-export-btn:hover { background:var(--navy2); }
+
+    .alert-list { display:flex;flex-direction:column;gap:3px; }
+
+    .alert-row {
+      display:flex;align-items:flex-start;gap:14px;
+      padding:14px 16px;background:var(--white);
+      border:1px solid var(--rule);border-left:3px solid var(--orange2);
+    }
+
+    .alert-row.severe { border-left-color:#5a3e8a; }
+
+    .alert-row-icon { font-size:22px;flex-shrink:0;line-height:1.2; }
+
+    .alert-row-msg {
+      font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;
+      color:var(--ink);margin-bottom:5px;
+    }
+
+    .alert-row-time {
+      font-size:8px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;
+    }
+
+    /* ── LOG VIEW ─────────────────────────────────────────────────────────── */
+    .log-table {
+      width:100%;border-collapse:collapse;background:var(--white);
+      border:1px solid var(--rule);box-shadow:var(--shadow);
+      overflow-x:auto;display:block;
+    }
+    @media(min-width:600px){ .log-table{display:table;} }
+
+    .log-th {
+      background:var(--navy);color:rgba(255,255,255,0.7);font-size:8px;
+      letter-spacing:.18em;text-transform:uppercase;padding:9px 12px;
+      text-align:left;font-weight:400;border-right:1px solid rgba(255,255,255,0.08);
+      white-space:nowrap;
+    }
+
+    .log-td {
+      padding:9px 12px;border-bottom:1px solid var(--rule);
+      border-right:1px solid var(--rule);vertical-align:middle;
+      font-size:10px;color:var(--ink2);
+    }
+
+    .log-time { font-size:8.5px;color:var(--ink4);letter-spacing:.05em;white-space:nowrap; }
+    .log-loc-name { font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--ink);line-height:1.1; }
+    .log-loc-state { font-size:7.5px;color:var(--ink4);letter-spacing:.14em;text-transform:uppercase; }
+    .log-num { font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--navy); }
+    .log-cond-icon { font-size:15px; }
+    .log-cond-label { font-size:8px;color:var(--ink3);display:block;margin-top:2px; }
+    .log-row:hover td { background:var(--ice); }
+
+    /* ── INSTALL PROMPT ───────────────────────────────────────────────────── */
+    .install-prompt {
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:300;
+      background:var(--navy);border:1px solid rgba(255,255,255,0.12);
+      border-bottom:3px solid var(--orange);padding:14px 18px;
+      display:flex;align-items:center;gap:16px;
+      box-shadow:0 8px 40px rgba(11,37,69,0.4);
+      min-width:280px;max-width:380px;width:calc(100% - 32px);
+      animation:slideUp .4s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes slideUp {
+      from{opacity:0;transform:translateX(-50%) translateY(20px);}
+      to  {opacity:1;transform:translateX(-50%) translateY(0);}
+    }
+
+    .install-prompt-text { flex:1;min-width:0; }
+    .install-prompt-title {
+      font-family:'Cormorant Garamond',serif;font-size:19px;color:#fff;
+      font-weight:300;letter-spacing:.06em;
+    }
+    .install-prompt-sub {
+      font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:.14em;
+      text-transform:uppercase;margin-top:2px;
+    }
+
+    .install-btn {
+      background:var(--orange);color:#fff;border:none;
+      font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.16em;
+      text-transform:uppercase;padding:8px 14px;cursor:pointer;flex-shrink:0;
+      transition:background .2s;
+    }
+    .install-btn:hover { background:var(--orange2); }
+
+    .install-dismiss {
+      background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;
+      font-size:17px;padding:0;flex-shrink:0;transition:color .2s;
+    }
+    .install-dismiss:hover { color:rgba(255,255,255,0.7); }
   </style>
 </head>
 <body>
@@ -719,9 +900,9 @@
     <div class="masthead-nav">
       <div class="nav-item active" onclick="setView('conditions')">Conditions</div>
       <div class="nav-item" onclick="setView('forecast')">Forecast</div>
-      <div class="nav-item" style="opacity:.35;cursor:default">Pressure</div>
-      <div class="nav-item" style="opacity:.35;cursor:default">Alerts</div>
-      <div class="nav-item" style="opacity:.35;cursor:default">Log</div>
+      <div class="nav-item" onclick="setView('pressure')">Pressure</div>
+      <div class="nav-item" onclick="setView('alerts')">Alerts</div>
+      <div class="nav-item" onclick="setView('log')">Log</div>
     </div>
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
@@ -1042,7 +1223,7 @@ async function fetchWeather(loc,i){
   await new Promise(r=>setTimeout(r,i*350));
   const p=new URLSearchParams({
     latitude:loc.lat,longitude:loc.lon,
-    current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code',
+    current:'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,surface_pressure',
     daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
     temperature_unit:loc.unit,wind_speed_unit:loc.windUnit,
     precipitation_unit:loc.precUnit,timezone:loc.tz,forecast_days:7,
@@ -1202,11 +1383,17 @@ function checkAlert(i, loc, newCode) {
   const nowWorse = SEVERE.has(newCode) && !SEVERE.has(prev);
 
   if((wasOk && nowBad) || nowWorse) {
-    showAlert(`⚠ ${loc.name}: ${wmo(newCode).label}`);
+    const w = wmo(newCode);
+    const severity = SEVERE.has(newCode) ? 'severe' : 'bad';
+    showAlert(`${loc.name}: ${w.label}`, w.icon, severity);
   }
 }
 
-function showAlert(msg) {
+function showAlert(msg, icon='⚠️', severity='') {
+  // Persist to localStorage
+  pushAlert({ ts: Date.now(), msg: `${icon} ${msg}`, icon, severity });
+  if(currentView === 'alerts') renderAlertsView();
+
   let bar = document.getElementById('alert-bar');
   if(!bar) {
     bar = document.createElement('div');
@@ -1221,15 +1408,33 @@ function showAlert(msg) {
     `;
     document.body.appendChild(bar);
   }
-  bar.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
+  bar.innerHTML = `<span>${icon} ${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
   setTimeout(() => bar?.remove(), 8000);
 }
 
-// Patch renderCard to check alerts
+// Patch renderCard: alerts + observation log + pressure history
 const _origRenderCard = renderCard;
 window.renderCard = function(i, loc, data) {
   _origRenderCard(i, loc, data);
   checkAlert(i, loc, data.current.weather_code);
+
+  // Log observation
+  const w = wmo(data.current.weather_code);
+  pushObs({
+    ts: Date.now(),
+    name: loc.name, state: loc.state,
+    condition: w.label, icon: w.icon,
+    temp: Math.round(data.current.temperature_2m), sym: loc.sym,
+    pressure: data.current.surface_pressure != null ? Math.round(data.current.surface_pressure * 10) / 10 : null,
+    wind: Math.round(data.current.wind_speed_10m), windUnit: loc.windUnit,
+  });
+
+  // Track pressure history for trend
+  if(data.current.surface_pressure != null) {
+    if(!pressureHistory[i]) pressureHistory[i] = [];
+    pressureHistory[i].push(data.current.surface_pressure);
+    if(pressureHistory[i].length > 6) pressureHistory[i].shift();
+  }
 };
 
 // ── PULL TO REFRESH ───────────────────────────────────────────────────────────
@@ -1277,29 +1482,37 @@ document.addEventListener('touchend', e => {
 // ── VIEW SWITCHING ─────────────────────────────────────────────────────────────
 let currentView = 'conditions';
 const cachedForecast = {}; // store daily data per location index
+const cachedPressure = {};  // hourly pressure per location index
+const pressureHistory = {}; // rolling last-6 readings per city for trend
 
 function setView(view) {
   currentView = view;
-
-  // Update nav active state
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => {
-    if(el.textContent.trim().toLowerCase() === view) el.classList.add('active');
+    el.classList.toggle('active', el.textContent.trim().toLowerCase() === view);
   });
 
-  const sectionHead = document.querySelector('.section-head');
+  const sl = document.querySelector('.section-label');
   const main = document.querySelector('main');
 
-  if(view === 'forecast') {
-    if(sectionHead) sectionHead.querySelector('.section-label').textContent = 'Seven-Day Outlook';
-    renderForecastView();
-  } else {
-    if(sectionHead) sectionHead.querySelector('.section-label').textContent = 'Surface Observations';
-    // restore conditions grid
-    if(!document.getElementById('weather-grid')) {
-      main.innerHTML = '<div class="grid" id="weather-grid"></div>';
-    }
-    refreshAll();
+  const labels = {
+    conditions: 'Surface Observations',
+    forecast:   'Seven-Day Outlook',
+    pressure:   'Barometric Pressure',
+    alerts:     'Weather Alerts',
+    log:        'Observation Log',
+  };
+  if(sl) sl.textContent = labels[view] || '';
+
+  switch(view) {
+    case 'forecast': renderForecastView(); break;
+    case 'pressure': renderPressureView(); break;
+    case 'alerts':   renderAlertsView();   break;
+    case 'log':      renderLogView();      break;
+    default: // conditions
+      if(!document.getElementById('weather-grid')) {
+        main.innerHTML = '<div class="grid" id="weather-grid"></div>';
+      }
+      refreshAll();
   }
 }
 
@@ -1555,6 +1768,365 @@ function appendCard(loc, i) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 refreshAll();
+
+
+// ── PRESSURE VIEW ─────────────────────────────────────────────────────────────
+async function fetchHourlyPressure(loc, i) {
+  const p = new URLSearchParams({
+    latitude: loc.lat, longitude: loc.lon,
+    hourly: 'surface_pressure',
+    timezone: loc.tz, past_days: 1, forecast_days: 1,
+  });
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`);
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    cachedPressure[i] = data.hourly;
+  } catch(e) { cachedPressure[i] = null; }
+}
+
+function pressureTrend(readings) {
+  if(readings.length < 2) return { arrow:'→', delta:0, label:'Steady' };
+  const delta = readings[readings.length-1] - readings[readings.length-2];
+  if(delta >  1.5) return { arrow:'▲', delta:'+'+Math.abs(delta).toFixed(1), label:'Rising' };
+  if(delta < -1.5) return { arrow:'▼', delta:'-'+Math.abs(delta).toFixed(1), label:'Falling' };
+  return { arrow:'→', delta:(delta >= 0 ? '+' : '')+delta.toFixed(1), label:'Steady' };
+}
+
+function renderPressureSpark(pressures, tz) {
+  if(!pressures || pressures.length < 2) return '';
+
+  // With past_days:1 the hourly array is 48 entries (yesterday midnight → tomorrow midnight)
+  // Identify current hour index
+  const nowLocal = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+  const hoursToday = nowLocal.getHours();
+  const currentIdx = 24 + hoursToday; // 24 offset because past_days:1
+
+  const startIdx = Math.max(0, currentIdx - 23);
+  const slice = pressures.slice(startIdx, currentIdx + 1).filter(v => v != null);
+  if(slice.length < 2) return '';
+
+  const min = Math.min(...slice);
+  const max = Math.max(...slice);
+  const range = max - min || 1;
+  const W = 130, H = 30, pad = 3;
+
+  const pts = slice.map((v, idx) => {
+    const x = ((idx / (slice.length - 1)) * (W - 2*pad) + pad).toFixed(1);
+    const y = (H - pad - ((v - min) / range) * (H - 2*pad)).toFixed(1);
+    return `${x},${y}`;
+  }).join(' ');
+
+  const lastV = slice[slice.length - 1];
+  const lastX = (W - pad).toFixed(1);
+  const lastY = (H - pad - ((lastV - min) / range) * (H - 2*pad)).toFixed(1);
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;overflow:visible">
+    <polyline points="${pts}" fill="none" stroke="var(--orange2)" stroke-width="1.5"
+      stroke-linejoin="round" stroke-linecap="round" opacity="0.65"/>
+    <circle cx="${lastX}" cy="${lastY}" r="2.5" fill="var(--orange2)"/>
+  </svg>`;
+}
+
+function renderPressureView() {
+  const main = document.querySelector('main');
+
+  if(LOCATIONS.length === 0) {
+    main.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🌡️</div>
+      <div class="empty-title">No stations</div>
+      <div class="empty-sub">Add a city to track barometric pressure.</div>
+      <button class="empty-btn" onclick="openModal()"><span class="empty-btn-plus">+</span> Add a city</button>
+    </div>`;
+    return;
+  }
+
+  main.innerHTML = `<div class="pressure-view">
+    ${LOCATIONS.map((loc, i) => `
+      <div class="pv-card" id="pv-${i}" style="animation-delay:${i*80}ms">
+        <div class="pv-head">
+          <div>
+            <div class="station-id">STN-${String(i+1).padStart(3,'0')} · ${loc.state||'INTL'}</div>
+            <div class="location-name">${loc.name}</div>
+          </div>
+          <div class="pv-head-right" id="pv-status-${i}">Loading…</div>
+        </div>
+        <div class="pv-body" id="pv-body-${i}">
+          <div class="skel-wrap">
+            <div class="skel" style="height:60px;width:42%;border-radius:1px"></div>
+            <div class="skel" style="height:12px;width:55%;border-radius:1px;margin-top:10px"></div>
+          </div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+
+  LOCATIONS.forEach(async (loc, i) => {
+    await fetchHourlyPressure(loc, i);
+    renderPressureCard(i, loc);
+  });
+}
+
+function renderPressureCard(i, loc) {
+  const body    = document.getElementById(`pv-body-${i}`);
+  const status  = document.getElementById(`pv-status-${i}`);
+  if(status) status.textContent = '';
+
+  const hourly  = cachedPressure[i];
+  const history = pressureHistory[i] || [];
+  const trend   = pressureTrend(history);
+
+  // Get current pressure value
+  let current = history.length > 0 ? history[history.length - 1] : null;
+  if(!current && hourly) {
+    const nowLocal = new Date(new Date().toLocaleString('en-US', { timeZone: loc.tz }));
+    const currentIdx = 24 + nowLocal.getHours();
+    current = hourly.surface_pressure[currentIdx] || hourly.surface_pressure[currentIdx - 1];
+  }
+
+  if(!current && !hourly) {
+    if(body) body.innerHTML = `<div class="error-wrap"><div class="error-text">⚠ Could not load pressure data</div></div>`;
+    return;
+  }
+
+  // Pressure classification
+  let cls = '', clsLabel = 'Normal';
+  if(current < 990)       { cls = 'pv-low';  clsLabel = 'Very Low';  }
+  else if(current < 1005) { cls = 'pv-low';  clsLabel = 'Low';       }
+  else if(current > 1025) { cls = 'pv-high'; clsLabel = 'High';      }
+  else if(current > 1015) { cls = 'pv-high'; clsLabel = 'Elevated';  }
+
+  const spark = hourly ? renderPressureSpark(hourly.surface_pressure, loc.tz) : '';
+
+  // 24h range from hourly slice
+  let rangeStr = '—';
+  if(hourly) {
+    const nowLocal = new Date(new Date().toLocaleString('en-US', { timeZone: loc.tz }));
+    const ci = 24 + nowLocal.getHours();
+    const slice = hourly.surface_pressure.slice(Math.max(0, ci - 23), ci + 1).filter(v => v != null);
+    if(slice.length > 1) {
+      rangeStr = `${Math.min(...slice).toFixed(1)} – ${Math.max(...slice).toFixed(1)} hPa`;
+    }
+  }
+
+  if(!body) return;
+  body.innerHTML = `
+    <div class="pv-main">
+      <div class="pv-big">
+        <div class="pv-hpa">${current ? Math.round(current * 10) / 10 : '—'}</div>
+        <div class="pv-unit">hPa</div>
+      </div>
+      <div class="pv-info">
+        <div class="pv-trend trend-${trend.arrow === '▲' ? 'up' : trend.arrow === '▼' ? 'dn' : 'st'}">
+          <span class="pv-arrow">${trend.arrow}</span>
+          <span class="pv-trend-label">${trend.label}${history.length > 1 ? ' ' + trend.delta : ''}</span>
+        </div>
+        <div class="pv-class ${cls}">${clsLabel}</div>
+        <div class="pv-spark">${spark || '<span style="font-size:8px;color:var(--ink5)">Fetch again for trend data</span>'}</div>
+      </div>
+    </div>
+    <div class="pv-footer">
+      <span class="pv-fl">24h Range</span><span class="pv-fv">${rangeStr}</span>
+    </div>`;
+}
+
+// ── ALERT LOG ─────────────────────────────────────────────────────────────────
+function getAlertLog() {
+  try { return JSON.parse(localStorage.getItem('doldrums_alerts') || '[]'); } catch(e) { return []; }
+}
+function saveAlertLog(log) {
+  localStorage.setItem('doldrums_alerts', JSON.stringify(log.slice(-100)));
+}
+function pushAlert(entry) {
+  const log = getAlertLog();
+  log.push(entry);
+  saveAlertLog(log);
+}
+function clearAlerts() {
+  localStorage.removeItem('doldrums_alerts');
+  renderAlertsView();
+}
+
+function renderAlertsView() {
+  const main = document.querySelector('main');
+  const log  = getAlertLog().slice().reverse();
+
+  if(log.length === 0) {
+    main.innerHTML = `<div class="empty-state">
+      <div class="empty-icon" style="font-size:42px;opacity:.35">✅</div>
+      <div class="empty-title">All Clear</div>
+      <div class="empty-sub">No significant weather events recorded yet.</div>
+    </div>`;
+    return;
+  }
+
+  main.innerHTML = `<div class="alert-view">
+    <div class="log-toolbar">
+      <span class="log-count">${log.length} alert${log.length !== 1 ? 's' : ''} recorded</span>
+      <button class="log-clear-btn" onclick="clearAlerts()">Clear All</button>
+    </div>
+    <div class="alert-list">
+      ${log.map(e => `
+        <div class="alert-row ${e.severity || ''}">
+          <div class="alert-row-icon">${e.icon || '⚠️'}</div>
+          <div>
+            <div class="alert-row-msg">${e.msg}</div>
+            <div class="alert-row-time">${new Date(e.ts).toLocaleString('en-US',{
+              weekday:'short', month:'short', day:'numeric',
+              hour:'numeric', minute:'2-digit', hour12:true
+            })}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── OBSERVATION LOG ────────────────────────────────────────────────────────────
+function getObsLog() {
+  try { return JSON.parse(localStorage.getItem('doldrums_log') || '[]'); } catch(e) { return []; }
+}
+function saveObsLog(log) {
+  localStorage.setItem('doldrums_log', JSON.stringify(log.slice(-300)));
+}
+function pushObs(entry) {
+  const log = getObsLog();
+  const fiveMin = 5 * 60 * 1000;
+  const idx = log.findIndex(e => e.name === entry.name && (entry.ts - e.ts) < fiveMin);
+  if(idx >= 0) { log[idx] = entry; } else { log.push(entry); }
+  saveObsLog(log);
+}
+function clearLog() {
+  localStorage.removeItem('doldrums_log');
+  renderLogView();
+}
+function exportLog() {
+  const log = getObsLog();
+  if(!log.length) return;
+  const header = 'Timestamp,Location,State,Condition,Temperature,Pressure (hPa),Wind,Wind Unit\n';
+  const rows = log.slice().reverse().map(e => [
+    new Date(e.ts).toISOString(),
+    e.name, e.state || '', e.condition || '',
+    e.temp !== undefined ? e.temp + (e.sym || '°') : '',
+    e.pressure || '', e.wind || '', e.windUnit || ''
+  ].map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `doldrums-log-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function renderLogView() {
+  const main = document.querySelector('main');
+  const log  = getObsLog().slice().reverse();
+
+  if(log.length === 0) {
+    main.innerHTML = `<div class="empty-state">
+      <div class="empty-icon" style="font-size:42px;opacity:.35">📋</div>
+      <div class="empty-title">No observations yet</div>
+      <div class="empty-sub">Readings are logged automatically on each fetch.</div>
+    </div>`;
+    return;
+  }
+
+  main.innerHTML = `<div class="log-view">
+    <div class="log-toolbar">
+      <span class="log-count">${log.length} observation${log.length !== 1 ? 's' : ''}</span>
+      <div style="display:flex;gap:8px;">
+        <button class="log-export-btn" onclick="exportLog()">↓ CSV</button>
+        <button class="log-clear-btn" onclick="clearLog()">Clear</button>
+      </div>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th class="log-th">Time</th>
+          <th class="log-th">Location</th>
+          <th class="log-th">Condition</th>
+          <th class="log-th">Temp</th>
+          <th class="log-th">Pressure</th>
+          <th class="log-th">Wind</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${log.map(e => `
+          <tr class="log-row">
+            <td class="log-td log-time">${new Date(e.ts).toLocaleString('en-US',{
+              month:'numeric', day:'numeric',
+              hour:'numeric', minute:'2-digit', hour12:true
+            })}</td>
+            <td class="log-td">
+              <div class="log-loc-name">${e.name}</div>
+              <div class="log-loc-state">${e.state || 'INTL'}</div>
+            </td>
+            <td class="log-td">
+              <span class="log-cond-icon">${e.icon || '—'}</span>
+              <span class="log-cond-label">${e.condition || ''}</span>
+            </td>
+            <td class="log-td log-num">${e.temp !== undefined ? e.temp + (e.sym || '°') : '—'}</td>
+            <td class="log-td log-num">${e.pressure ? e.pressure + '<span style="font-size:9px;color:var(--ink4)"> hPa</span>' : '—'}</td>
+            <td class="log-td log-num">${e.wind !== undefined ? e.wind + '<span style="font-size:9px;color:var(--ink4)"> ' + (e.windUnit||'') + '</span>' : '—'}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ── PWA INSTALL PROMPT ────────────────────────────────────────────────────────
+let _deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstall = e;
+  if(localStorage.getItem('doldrums_install_dismissed') === '1') return;
+  setTimeout(() => {
+    const p = document.getElementById('install-prompt');
+    if(p) p.style.display = 'flex';
+  }, 4000);
+});
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('install-btn');
+  if(btn) btn.addEventListener('click', () => {
+    if(!_deferredInstall) return;
+    _deferredInstall.prompt();
+    _deferredInstall.userChoice.then(() => {
+      _deferredInstall = null;
+      const p = document.getElementById('install-prompt');
+      if(p) p.style.display = 'none';
+    });
+  });
+});
+function dismissInstall() {
+  localStorage.setItem('doldrums_install_dismissed', '1');
+  const p = document.getElementById('install-prompt');
+  if(p) p.style.display = 'none';
+}
+
+// ── SERVICE WORKER ────────────────────────────────────────────────────────────
+// Deploy sw.js alongside index.html for full offline/PWA support.
+// Minimal sw.js:
+//   const CACHE = 'doldrums-v1';
+//   self.addEventListener('install', e => e.waitUntil(
+//     caches.open(CACHE).then(c => c.addAll(['/']))
+//   ));
+//   self.addEventListener('fetch', e => e.respondWith(
+//     caches.match(e.request).then(r => r || fetch(e.request))
+//   ));
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 </script>
+
+<!-- INSTALL PROMPT -->
+<div class="install-prompt" id="install-prompt" style="display:none">
+  <div class="install-prompt-text">
+    <div class="install-prompt-title">Doldrums</div>
+    <div class="install-prompt-sub">Add to home screen</div>
+  </div>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-dismiss" onclick="dismissInstall()">✕</button>
+</div>
+
 </body>
 </html>
