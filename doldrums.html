@@ -1246,7 +1246,92 @@
       border-bottom:1px solid var(--rule);background:var(--ice);
     }
 
-    /* ── BOTTOM NAV (mobile) ──────────────────────────────────────────────── */
+    /* ── ADD CITY BOTTOM SHEET (mobile) ──────────────────────────────────── */
+    @media(max-width:600px) {
+      /* Hide the centered modal on mobile */
+      .modal-overlay { display:none !important; }
+
+      .city-sheet-overlay {
+        position:fixed;inset:0;z-index:1000;
+        background:rgba(11,25,41,0.5);
+        backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+        opacity:0;pointer-events:none;transition:opacity .2s;
+      }
+      .city-sheet-overlay.open { opacity:1;pointer-events:all; }
+
+      .city-sheet {
+        position:fixed;bottom:0;left:0;right:0;z-index:1001;
+        background:var(--white);
+        border-top:3px solid var(--orange);
+        transform:translateY(100%);
+        transition:transform .28s cubic-bezier(.22,1,.36,1);
+        padding-bottom:env(safe-area-inset-bottom);
+        max-height:85vh;
+        display:flex;flex-direction:column;
+      }
+      .city-sheet.open { transform:translateY(0); }
+
+      .city-sheet-head {
+        background:var(--navy);padding:14px 18px;
+        display:flex;align-items:center;justify-content:space-between;
+        flex-shrink:0;
+      }
+      .city-sheet-title {
+        font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+        color:rgba(255,255,255,0.7);
+      }
+      .city-sheet-close {
+        background:none;border:none;color:rgba(255,255,255,0.4);
+        font-size:20px;cursor:pointer;padding:0;line-height:1;
+      }
+
+      .city-sheet-body {
+        padding:16px;overflow-y:auto;flex:1;
+      }
+
+      .city-sheet-input {
+        width:100%;background:var(--ice);border:1px solid var(--rule-dk);
+        padding:13px 16px;
+        font-family:'IBM Plex Mono',monospace;font-size:16px;
+        color:var(--ink);outline:none;
+        border-radius:0;-webkit-appearance:none;
+        margin-bottom:12px;
+      }
+      .city-sheet-input::placeholder { color:var(--ink5); }
+      .city-sheet-input:focus { border-color:var(--navy3); }
+
+      .city-sheet-geo {
+        width:100%;background:var(--ice);border:1px solid var(--rule);
+        padding:12px 16px;
+        font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;
+        text-transform:uppercase;cursor:pointer;color:var(--ink3);
+        display:flex;align-items:center;gap:8px;margin-bottom:16px;
+      }
+
+      .city-sheet-results { display:flex;flex-direction:column;gap:6px; }
+
+      .city-sheet-result {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:12px 14px;border:1px solid var(--rule);
+        background:var(--ice);cursor:pointer;
+      }
+      .city-sheet-result-name {
+        font-size:15px;font-weight:400;color:var(--ink);
+      }
+      .city-sheet-result-meta {
+        font-size:8px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;
+      }
+      .city-sheet-add {
+        font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--navy3);background:none;border:1px solid var(--rule-dk);
+        padding:6px 14px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+        flex-shrink:0;
+      }
+    }
+
+    @media(min-width:601px) {
+      .city-sheet-overlay, .city-sheet { display:none !important; }
+    }
     .bottom-nav { display:none; }
 
     @media(max-width:600px) {
@@ -1937,14 +2022,104 @@ async function refreshAll(){
 
 // ── ADD CITY MODAL ────────────────────────────────────────────────────────────
 function openModal(){
+  if(window.innerWidth <= 600) { openCitySheet(); return; }
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('city-input').value='';
   document.getElementById('modal-results').innerHTML='';
   const input = document.getElementById('city-input');
-  // Chrome iOS needs focus called directly in user gesture, not in setTimeout
   input.focus();
   setTimeout(()=>input.focus(),80);
 }
+
+// ── CITY BOTTOM SHEET (mobile) ────────────────────────────────────────────────
+function openCitySheet() {
+  const overlay = document.getElementById('city-sheet-overlay');
+  const sheet   = document.getElementById('city-sheet');
+  const input   = document.getElementById('city-sheet-input');
+  if(!overlay||!sheet||!input) return;
+  document.getElementById('city-sheet-results').innerHTML = '';
+  input.value = '';
+  overlay.classList.add('open');
+  sheet.classList.add('open');
+  setTimeout(() => input.focus(), 320);
+}
+
+function closeCitySheet() {
+  document.getElementById('city-sheet-overlay')?.classList.remove('open');
+  document.getElementById('city-sheet')?.classList.remove('open');
+}
+
+let _sheetTimer = null;
+function onCitySheetInput() {
+  clearTimeout(_sheetTimer);
+  const q = document.getElementById('city-sheet-input').value.trim();
+  if(q.length < 2) return;
+  _sheetTimer = setTimeout(() => searchCitySheet(), 400);
+}
+
+async function searchCitySheet() {
+  const raw = document.getElementById('city-sheet-input').value.trim();
+  if(!raw) return;
+  const q = parseQuery(raw);
+  const results = document.getElementById('city-sheet-results');
+  results.innerHTML = '<div class="modal-status">Searching…</div>';
+  try {
+    const res = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=8&language=en&format=json');
+    const data = await res.json();
+    if(!data.results?.length) {
+      results.innerHTML = '<div class="modal-status error">No results — try just the city name.</div>';
+      return;
+    }
+    window._geoResults = data.results;
+    results.innerHTML = data.results.map((r,i) => `
+      <div class="city-sheet-result" onclick="addCity(${i});closeCitySheet()">
+        <div>
+          <div class="city-sheet-result-name">${r.name}</div>
+          <div class="city-sheet-result-meta">${[r.admin1,r.country].filter(Boolean).join(' · ')}</div>
+        </div>
+        <button class="city-sheet-add" onclick="event.stopPropagation();addCity(${i});closeCitySheet()">+ Add</button>
+      </div>`).join('');
+  } catch(e) {
+    results.innerHTML = '<div class="modal-status error">Search failed.</div>';
+  }
+}
+
+async function addMyLocationSheet() {
+  const btn = document.getElementById('city-sheet-geo-btn');
+  if(btn) btn.textContent = '◎ Locating…';
+  closeCitySheet();
+  await addMyLocation();
+}
+
+// ── SWIPE NAVIGATION ────────────────────────────────────────────────────────────────────────────────
+const MOBILE_VIEWS = ['conditions','forecast','hourly','radar','log'];
+let _swipeStartX = 0, _swipeStartY = 0, _swipeOk = false;
+
+document.addEventListener('touchstart', e => {
+  _swipeStartX = e.touches[0].clientX;
+  _swipeStartY = e.touches[0].clientY;
+  _swipeOk = true;
+}, {passive:true});
+
+document.addEventListener('touchmove', e => {
+  if(!_swipeOk) return;
+  const dy = Math.abs(e.touches[0].clientY - _swipeStartY);
+  const dx = Math.abs(e.touches[0].clientX - _swipeStartX);
+  if(dy > dx) _swipeOk = false;
+}, {passive:true});
+
+document.addEventListener('touchend', e => {
+  if(!_swipeOk || window.innerWidth > 600) { _swipeOk=false; return; }
+  const dx = e.changedTouches[0].clientX - _swipeStartX;
+  const dy = e.changedTouches[0].clientY - _swipeStartY;
+  _swipeOk = false;
+  if(Math.abs(dx) < 55 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+  if(e.target.closest('#radar-map,.forecast-strip,.hv-strip,.city-sheet,.quick-note-overlay')) return;
+  const idx = MOBILE_VIEWS.indexOf(currentView);
+  if(idx < 0) return;
+  if(dx < 0 && idx < MOBILE_VIEWS.length-1) setView(MOBILE_VIEWS[idx+1]);
+  if(dx > 0 && idx > 0) setView(MOBILE_VIEWS[idx-1]);
+}, {passive:true});
 
 function closeModal(){
   document.getElementById('modal-overlay').classList.remove('open');
@@ -3639,6 +3814,26 @@ if('serviceWorker' in navigator) {
     <span class="bottom-nav-label">Log</span>
   </button>
 </nav>
+
+<!-- CITY BOTTOM SHEET (mobile) -->
+<div class="city-sheet-overlay" id="city-sheet-overlay" onclick="closeCitySheet()"></div>
+<div class="city-sheet" id="city-sheet">
+  <div class="city-sheet-head">
+    <div class="city-sheet-title">Add City</div>
+    <button class="city-sheet-close" onclick="closeCitySheet()">✕</button>
+  </div>
+  <div class="city-sheet-body">
+    <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationSheet()">
+      <span>◎</span> Use my current location
+    </button>
+    <input class="city-sheet-input" id="city-sheet-input" type="text"
+      inputmode="search" autocomplete="off" autocorrect="off" spellcheck="false"
+      placeholder="City, region, or location…"
+      oninput="onCitySheetInput()"
+      onkeydown="if(event.key==='Enter')searchCitySheet()">
+    <div class="city-sheet-results" id="city-sheet-results"></div>
+  </div>
+</div>
 
 <!-- QUICK NOTE FAB -->
 <button class="fab" id="fab" onclick="openQuickNote()" title="Quick note">✏</button>
