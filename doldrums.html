@@ -200,7 +200,8 @@
     }
     .summary-pill:hover { background:rgba(255,255,255,0.05); }
 
-    .sum-icon { font-size:13px;opacity:.9;filter:grayscale(.1); }
+    .sum-icon { display:flex;align-items:center; }
+    .sum-icon svg { width:18px;height:18px; }
 
     .sum-name {
       font-family:'Cormorant Garamond',serif;font-size:14px;
@@ -279,7 +280,8 @@
 
     .card-head-right { display:flex;flex-direction:column;align-items:flex-end;gap:6px; }
 
-    .card-icon { font-size:28px;opacity:.8;filter:grayscale(.1);display:block;line-height:1; }
+    .card-icon { width:36px;height:36px;display:flex;align-items:center;justify-content:center; }
+    .card-icon svg { width:100%;height:100%; }
 
     .card-cond {
       font-family:'Spectral',serif;font-style:italic;font-size:10.5px;color:var(--ink3);
@@ -361,7 +363,8 @@
 
     .fc-name { font-size:7.5px;color:var(--ink4);text-transform:uppercase;letter-spacing:.1em; }
     .fc-day.today .fc-name { color:var(--navy2);font-weight:500; }
-    .fc-icon { font-size:14px;opacity:.85;filter:grayscale(.1); }
+    .fc-icon { display:flex;align-items:center;justify-content:center;margin:2px 0; }
+    .fc-icon svg { width:20px;height:20px; }
     .fc-hi { font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--navy);line-height:1; }
     .fc-lo { font-size:9.5px;color:var(--ink4); }
     .fc-rain { font-size:7.5px;color:var(--navy3);letter-spacing:.03em; }
@@ -667,7 +670,8 @@
 
     .fv-cell.today-col { background:var(--navy-dim); }
 
-    .fv-icon { font-size:20px;opacity:.55;filter:grayscale(.4);display:block;margin-bottom:4px; }
+    .fv-icon { display:flex;align-items:center;justify-content:center;margin-bottom:4px; }
+    .fv-icon svg { width:24px;height:24px; }
 
     .fv-hi {
       font-family:'Cormorant Garamond',serif;
@@ -1000,19 +1004,61 @@ function saveCities() {
   localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
 }
 
+
+// ── SVG WEATHER ICONS ─────────────────────────────────────────────────────────
+const ICON_SVG = {
+  clear: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="5.5" stroke="#c84b11" stroke-width="1.8"/><line x1="16" y1="2.5" x2="16" y2="6" stroke="#c84b11" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="29.5" stroke="#c84b11" stroke-width="1.8"/><line x1="2.5" y1="16" x2="6" y2="16" stroke="#c84b11" stroke-width="1.8"/><line x1="26" y1="16" x2="29.5" y2="16" stroke="#c84b11" stroke-width="1.8"/><line x1="6.5" y1="6.5" x2="8.8" y2="8.8" stroke="#c84b11" stroke-width="1.8"/><line x1="23.2" y1="23.2" x2="25.5" y2="25.5" stroke="#c84b11" stroke-width="1.8"/><line x1="25.5" y1="6.5" x2="23.2" y2="8.8" stroke="#c84b11" stroke-width="1.8"/><line x1="8.8" y1="23.2" x2="6.5" y2="25.5" stroke="#c84b11" stroke-width="1.8"/></svg>`,
+
+  'mostly-clear': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><circle cx="21" cy="11" r="5" stroke="#c84b11" stroke-width="1.6"/><line x1="21" y1="3" x2="21" y2="5.3" stroke="#c84b11" stroke-width="1.6"/><line x1="21" y1="16.7" x2="21" y2="19" stroke="#c84b11" stroke-width="1.6"/><line x1="13" y1="11" x2="15.3" y2="11" stroke="#c84b11" stroke-width="1.6"/><line x1="26.7" y1="11" x2="29" y2="11" stroke="#c84b11" stroke-width="1.6"/><line x1="15.5" y1="5.5" x2="17.2" y2="7.2" stroke="#c84b11" stroke-width="1.6"/><line x1="24.8" y1="14.8" x2="26.5" y2="16.5" stroke="#c84b11" stroke-width="1.6"/><line x1="26.5" y1="5.5" x2="24.8" y2="7.2" stroke="#c84b11" stroke-width="1.6"/><path d="M2,28 Q0,28 0,26 Q0,23.5 2.5,23 Q3,20.5 6.5,20.5 Q9,18.5 12.5,20.5 Q16,20.5 16,23.5 Q18.5,24 18.5,26 Q18.5,28 16,28 Z" stroke="#0b2545" stroke-width="1.5" fill="white"/></svg>`,
+
+  'partly-cloudy': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="12" r="5" stroke="#c84b11" stroke-width="1.6"/><line x1="20" y1="4" x2="20" y2="6.3" stroke="#c84b11" stroke-width="1.6"/><line x1="20" y1="17.7" x2="20" y2="20" stroke="#c84b11" stroke-width="1.6"/><line x1="12" y1="12" x2="14.3" y2="12" stroke="#c84b11" stroke-width="1.6"/><line x1="25.7" y1="12" x2="28" y2="12" stroke="#c84b11" stroke-width="1.6"/><line x1="14.5" y1="6.5" x2="16.2" y2="8.2" stroke="#c84b11" stroke-width="1.6"/><line x1="23.8" y1="15.8" x2="25.5" y2="17.5" stroke="#c84b11" stroke-width="1.6"/><line x1="25.5" y1="6.5" x2="23.8" y2="8.2" stroke="#c84b11" stroke-width="1.6"/><path d="M3,27 Q1,27 1,24.5 Q1,21.5 4,21.5 Q4.5,18 8.5,18 Q11.5,15.5 16,18 Q20.5,18 20.5,21.5 Q23.5,21.5 23.5,24.5 Q23.5,27 20.5,27 Z" stroke="#0b2545" stroke-width="1.6" fill="white"/></svg>`,
+
+  cloudy: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M6,22 Q3,22 3,19 Q3,16 6.5,15.5 Q7,12 11,12 Q14,9 19,12 Q24,12 24,16 Q28,16 28,19 Q28,22 24,22 Z" stroke="#5a7080" stroke-width="1.5" fill="#e8eef6"/><path d="M2,28 Q0,28 0,25.5 Q0,23 3,22.5 Q3.5,20 7,20 Q9.5,18 13,20 Q17,20 17,23 Q20,23 20,25.5 Q20,28 17,28 Z" stroke="#0b2545" stroke-width="1.6" fill="white"/></svg>`,
+
+  overcast: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,25 Q1,25 1,21.5 Q1,18 5,17.5 Q5.5,13.5 10,13.5 Q13.5,10 19,13.5 Q24.5,13.5 24.5,18 Q28.5,18 28.5,21.5 Q28.5,25 25,25 Z" stroke="#0b2545" stroke-width="1.7" fill="#dce8f5"/></svg>`,
+
+  fog: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M3,13 Q1,13 1,11 Q1,8.5 3.5,8 Q4,5.5 7.5,5.5 Q10,3.5 13.5,5.5 Q17.5,5.5 17.5,8.5 Q20.5,8.5 20.5,11 Q20.5,13 18,13 Z" stroke="#0b2545" stroke-width="1.5" fill="#dce8f5"/><line x1="2" y1="17" x2="29" y2="17" stroke="#8fa4b8" stroke-width="2" stroke-linecap="round"/><line x1="5" y1="21.5" x2="26" y2="21.5" stroke="#8fa4b8" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="26" x2="23" y2="26" stroke="#8fa4b8" stroke-width="2" stroke-linecap="round"/></svg>`,
+
+  drizzle: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,19 Q1,19 1,16 Q1,13 4.5,12.5 Q5,9.5 9,9.5 Q12,6.5 17,9.5 Q22,9.5 22,13 Q26,13 26,16 Q26,19 22.5,19 Z" stroke="#0b2545" stroke-width="1.6" fill="#dce8f5"/><line x1="9" y1="22" x2="7" y2="28" stroke="#2a6496" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="22" x2="14" y2="28" stroke="#2a6496" stroke-width="1.6" stroke-linecap="round"/><line x1="23" y1="22" x2="21" y2="28" stroke="#2a6496" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+
+  rain: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,18 Q1,18 1,15 Q1,12 4.5,11.5 Q5,8.5 9,8.5 Q12,5.5 17,8.5 Q22,8.5 22,12 Q26,12 26,15 Q26,18 22.5,18 Z" stroke="#0b2545" stroke-width="1.6" fill="#c8d8e8"/><line x1="7" y1="21" x2="5" y2="28" stroke="#2a6496" stroke-width="1.8" stroke-linecap="round"/><line x1="13" y1="21" x2="11" y2="28" stroke="#2a6496" stroke-width="1.8" stroke-linecap="round"/><line x1="19" y1="21" x2="17" y2="28" stroke="#2a6496" stroke-width="1.8" stroke-linecap="round"/><line x1="25" y1="21" x2="23" y2="28" stroke="#2a6496" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+
+  'heavy-rain': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,17 Q1,17 1,14 Q1,11 4.5,10.5 Q5,7.5 9,7.5 Q12,4.5 17,7.5 Q22,7.5 22,11 Q26,11 26,14 Q26,17 22.5,17 Z" stroke="#0b2545" stroke-width="1.8" fill="#9ab0c8"/><line x1="4" y1="20" x2="2" y2="28" stroke="#2a6496" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="20" x2="8" y2="28" stroke="#2a6496" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="20" x2="14" y2="28" stroke="#2a6496" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="20" x2="20" y2="28" stroke="#2a6496" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="20" x2="26" y2="28" stroke="#2a6496" stroke-width="2" stroke-linecap="round"/></svg>`,
+
+  'snow-light': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,18 Q1,18 1,15 Q1,12 4.5,11.5 Q5,8.5 9,8.5 Q12,5.5 17,8.5 Q22,8.5 22,12 Q26,12 26,15 Q26,18 22.5,18 Z" stroke="#0b2545" stroke-width="1.6" fill="#dce8f5"/><circle cx="8" cy="24" r="1.8" fill="#5b9ec9"/><circle cx="16" cy="24" r="1.8" fill="#5b9ec9"/><circle cx="24" cy="24" r="1.8" fill="#5b9ec9"/><circle cx="12" cy="29.5" r="1.8" fill="#5b9ec9"/><circle cx="20" cy="29.5" r="1.8" fill="#5b9ec9"/></svg>`,
+
+  snow: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,17 Q1,17 1,14 Q1,11 4.5,10.5 Q5,7.5 9,7.5 Q12,4.5 17,7.5 Q22,7.5 22,11 Q26,11 26,14 Q26,17 22.5,17 Z" stroke="#0b2545" stroke-width="1.6" fill="#dce8f5"/><line x1="16" y1="19.5" x2="16" y2="30" stroke="#5b9ec9" stroke-width="1.8" stroke-linecap="round"/><line x1="10.5" y1="22" x2="21.5" y2="27.5" stroke="#5b9ec9" stroke-width="1.8" stroke-linecap="round"/><line x1="21.5" y1="22" x2="10.5" y2="27.5" stroke="#5b9ec9" stroke-width="1.8" stroke-linecap="round"/><line x1="13.5" y1="19.5" x2="18.5" y2="21.5" stroke="#5b9ec9" stroke-width="1.2" stroke-linecap="round"/><line x1="18.5" y1="19.5" x2="13.5" y2="21.5" stroke="#5b9ec9" stroke-width="1.2" stroke-linecap="round"/><line x1="13" y1="27.8" x2="19" y2="27.8" stroke="#5b9ec9" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+
+  storm: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M4,18 Q1,18 1,15 Q1,12 4.5,11.5 Q5,8.5 9,8.5 Q12,5.5 17,8.5 Q22,8.5 22,12 Q26,12 26,15 Q26,18 22.5,18 Z" stroke="#0b2545" stroke-width="1.7" fill="#9ab0c8"/><polyline points="19,20 15,26.5 18.5,26.5 14,32" stroke="#c84b11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5" y1="21" x2="3.5" y2="27" stroke="#2a6496" stroke-width="1.6" stroke-linecap="round"/><line x1="10" y1="21" x2="8.5" y2="27" stroke="#2a6496" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+
+  fallback: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="14" r="4" stroke="#0b2545" stroke-width="1.6"/><line x1="16" y1="18" x2="16" y2="26" stroke="#0b2545" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="26" r="3" stroke="#0b2545" stroke-width="1.6"/></svg>`,
+};
+
 const WMO = {
-  0:{label:"Clear sky",icon:"☀️",tint:"clear"},1:{label:"Mainly clear",icon:"🌤️",tint:"clear"},
-  2:{label:"Partly cloudy",icon:"⛅",tint:"cloudy"},3:{label:"Overcast",icon:"☁️",tint:"cloudy"},
-  45:{label:"Fog",icon:"🌫️",tint:"foggy"},48:{label:"Icy fog",icon:"🌫️",tint:"foggy"},
-  51:{label:"Light drizzle",icon:"🌦️",tint:"rainy"},53:{label:"Drizzle",icon:"🌦️",tint:"rainy"},
-  55:{label:"Heavy drizzle",icon:"🌧️",tint:"rainy"},61:{label:"Light rain",icon:"🌧️",tint:"rainy"},
-  63:{label:"Rain",icon:"🌧️",tint:"rainy"},65:{label:"Heavy rain",icon:"🌧️",tint:"rainy"},
-  71:{label:"Light snow",icon:"🌨️",tint:"snowy"},73:{label:"Snow",icon:"❄️",tint:"snowy"},
-  75:{label:"Heavy snow",icon:"❄️",tint:"snowy"},77:{label:"Snow grains",icon:"🌨️",tint:"snowy"},
-  80:{label:"Light showers",icon:"🌦️",tint:"rainy"},81:{label:"Rain showers",icon:"🌧️",tint:"rainy"},
-  82:{label:"Heavy showers",icon:"⛈️",tint:"stormy"},85:{label:"Snow showers",icon:"🌨️",tint:"snowy"},
-  86:{label:"Heavy snow showers",icon:"❄️",tint:"snowy"},95:{label:"Thunderstorm",icon:"⛈️",tint:"stormy"},
-  96:{label:"Hail & thunder",icon:"⛈️",tint:"stormy"},99:{label:"Hail & thunder",icon:"⛈️",tint:"stormy"},
+  0:{label:"Clear sky",        svg:"clear",        tint:"clear"},
+  1:{label:"Mainly clear",     svg:"mostly-clear", tint:"clear"},
+  2:{label:"Partly cloudy",    svg:"partly-cloudy",tint:"cloudy"},
+  3:{label:"Overcast",         svg:"overcast",     tint:"cloudy"},
+  45:{label:"Fog",             svg:"fog",          tint:"foggy"},
+  48:{label:"Icy fog",         svg:"fog",          tint:"foggy"},
+  51:{label:"Light drizzle",   svg:"drizzle",      tint:"rainy"},
+  53:{label:"Drizzle",         svg:"drizzle",      tint:"rainy"},
+  55:{label:"Heavy drizzle",   svg:"rain",         tint:"rainy"},
+  61:{label:"Light rain",      svg:"drizzle",      tint:"rainy"},
+  63:{label:"Rain",            svg:"rain",         tint:"rainy"},
+  65:{label:"Heavy rain",      svg:"heavy-rain",   tint:"rainy"},
+  71:{label:"Light snow",      svg:"snow-light",   tint:"snowy"},
+  73:{label:"Snow",            svg:"snow",         tint:"snowy"},
+  75:{label:"Heavy snow",      svg:"snow",         tint:"snowy"},
+  77:{label:"Snow grains",     svg:"snow-light",   tint:"snowy"},
+  80:{label:"Light showers",   svg:"drizzle",      tint:"rainy"},
+  81:{label:"Rain showers",    svg:"rain",         tint:"rainy"},
+  82:{label:"Heavy showers",   svg:"heavy-rain",   tint:"stormy"},
+  85:{label:"Snow showers",    svg:"snow-light",   tint:"snowy"},
+  86:{label:"Heavy snow",      svg:"snow",         tint:"snowy"},
+  95:{label:"Thunderstorm",    svg:"storm",        tint:"stormy"},
+  96:{label:"Hail & thunder",  svg:"storm",        tint:"stormy"},
+  99:{label:"Hail & thunder",  svg:"storm",        tint:"stormy"},
 };
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -1040,7 +1086,7 @@ function stateAbbr(s) {
   return STATE_ABBR[s] || s.slice(0,3).toUpperCase();
 }
 
-function wmo(c){return WMO[c]||{label:"Unknown",icon:"🌡️",tint:"cloudy"};}
+function wmo(c){const e=WMO[c]||{label:"Unknown",svg:"fallback",tint:"cloudy"};return{...e,icon:ICON_SVG[e.svg]||ICON_SVG.fallback};}
 function compass(d){return['N','NE','E','SE','S','SW','W','NW'][Math.round(d/45)%8];}
 function arrow(d){return['↑','↗','→','↘','↓','↙','←','↖'][Math.round(d/45)%8];}
 function localTime(tz){return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:tz,hour12:true});}
