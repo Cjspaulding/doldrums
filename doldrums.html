@@ -1347,59 +1347,59 @@
       .city-sheet.open { transform:translateY(0); }
 
       .city-sheet-head {
-        background:var(--navy);padding:14px 18px;
+        background:var(--navy);padding:16px 20px;
         display:flex;align-items:center;justify-content:space-between;
         flex-shrink:0;
       }
       .city-sheet-title {
-        font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+        font-size:11px;letter-spacing:.22em;text-transform:uppercase;
         color:rgba(255,255,255,0.7);
       }
       .city-sheet-close {
         background:none;border:none;color:rgba(255,255,255,0.4);
-        font-size:20px;cursor:pointer;padding:0;line-height:1;
+        font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;
       }
 
       .city-sheet-body {
-        padding:16px;overflow-y:auto;flex:1;
+        padding:20px;overflow-y:auto;flex:1;
       }
 
       .city-sheet-input {
-        width:100%;background:var(--ice);border:1px solid var(--rule-dk);
-        padding:13px 16px;
-        font-family:'IBM Plex Mono',monospace;font-size:16px;
+        width:100%;background:var(--ice);border:2px solid var(--rule-dk);
+        padding:16px 18px;
+        font-family:'IBM Plex Mono',monospace;font-size:17px;
         color:var(--ink);outline:none;
         border-radius:0;-webkit-appearance:none;
-        margin-bottom:12px;
+        margin-bottom:14px;
       }
       .city-sheet-input::placeholder { color:var(--ink5); }
       .city-sheet-input:focus { border-color:var(--navy3); }
 
       .city-sheet-geo {
         width:100%;background:var(--ice);border:1px solid var(--rule);
-        padding:12px 16px;
-        font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;
+        padding:15px 18px;
+        font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;
         text-transform:uppercase;cursor:pointer;color:var(--ink3);
-        display:flex;align-items:center;gap:8px;margin-bottom:16px;
+        display:flex;align-items:center;gap:10px;margin-bottom:18px;
       }
 
-      .city-sheet-results { display:flex;flex-direction:column;gap:6px; }
+      .city-sheet-results { display:flex;flex-direction:column;gap:8px; }
 
       .city-sheet-result {
         display:flex;align-items:center;justify-content:space-between;
-        padding:12px 14px;border:1px solid var(--rule);
+        padding:14px 16px;border:1px solid var(--rule);
         background:var(--ice);cursor:pointer;
       }
       .city-sheet-result-name {
-        font-size:15px;font-weight:400;color:var(--ink);
+        font-size:17px;font-weight:400;color:var(--ink);
       }
       .city-sheet-result-meta {
-        font-size:8px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;
+        font-size:9px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;
       }
       .city-sheet-add {
-        font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+        font-size:9px;letter-spacing:.14em;text-transform:uppercase;
         color:var(--navy3);background:none;border:1px solid var(--rule-dk);
-        padding:6px 14px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+        padding:8px 16px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
         flex-shrink:0;
       }
     }
@@ -1488,8 +1488,11 @@
       border-top:3px solid var(--orange);
       transform:translateY(100%);
       transition:transform .28s cubic-bezier(.22,1,.36,1);
+      /* Let it anchor above keyboard via JS */
+      position:fixed;bottom:0;left:0;right:0;z-index:501;
+      max-height:70vh;display:flex;flex-direction:column;
     }
-    .quick-note-overlay.open .quick-note-sheet { transform:translateY(0); }
+    .quick-note-sheet.open { transform:translateY(0); }
 
     .quick-note-head {
       background:var(--navy);padding:13px 18px;
@@ -1511,10 +1514,10 @@
     .quick-note-close:hover { color:#fff; }
 
     .quick-note-ta {
-      width:100%;min-height:130px;padding:16px 18px;
-      font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.65;
+      width:100%;min-height:110px;padding:16px 18px;
+      font-family:'IBM Plex Mono',monospace;font-size:16px;line-height:1.6;
       color:var(--ink);background:var(--white);
-      border:none;outline:none;resize:none;
+      border:none;outline:none;resize:none;flex:1;
     }
     .quick-note-ta::placeholder { color:var(--ink5); }
 
@@ -2198,6 +2201,18 @@ async function refreshAll(){
   if(btn)btn.disabled=false;
   if(icon){icon.classList.remove('spin');icon.textContent='↺';}
   haptic('medium');
+  // Pulse FAB on first ever refresh to draw attention
+  if(!localStorage.getItem('doldrums_fab_seen')) {
+    localStorage.setItem('doldrums_fab_seen', '1');
+    const fab = document.getElementById('fab');
+    if(fab) {
+      fab.style.boxShadow = '0 0 0 0 rgba(200,75,17,0.7)';
+      fab.animate([
+        {boxShadow:'0 4px 20px rgba(11,37,69,0.35), 0 0 0 0 rgba(200,75,17,0.6)'},
+        {boxShadow:'0 4px 20px rgba(11,37,69,0.35), 0 0 0 16px rgba(200,75,17,0)'},
+      ], {duration:800, iterations:3, easing:'ease-out'});
+    }
+  }
   startCountdown();
 }
 
@@ -3796,9 +3811,11 @@ function renderLogView() {
     main.innerHTML = `<div style="padding:0 16px 40px">
       ${composerHTML}
       <div class="empty-state" style="min-height:30vh">
-        <div class="empty-icon" style="font-size:36px;opacity:.3">📋</div>
-        <div class="empty-title">No entries yet</div>
-        <div class="empty-sub">Readings log automatically on each refresh. Add your first field note above.</div>
+        <div style="font-size:48px;margin-bottom:20px;opacity:0.5">✏️</div>
+        <div class="empty-title">Your field journal</div>
+        <div class="empty-sub" style="max-width:280px;text-align:center">
+          Tap the ✏ button anytime to capture a thought — your location's weather is attached automatically.
+        </div>
       </div>
     </div>`;
     return;
@@ -3951,13 +3968,29 @@ function qnCycleCity() {
   qnUpdateMeta();
 }
 
+// ── KEYBOARD / VIEWPORT HANDLING ─────────────────────────────────────────────
+// Keep quick note sheet anchored above the keyboard using visualViewport
+if(window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const sheet = document.getElementById('qn-sheet');
+    const overlay = document.getElementById('qn-overlay');
+    if(!sheet || !overlay?.classList.contains('open')) return;
+    const vv = window.visualViewport;
+    const offsetBottom = window.innerHeight - vv.height - vv.offsetTop;
+    sheet.style.bottom = Math.max(0, offsetBottom) + 'px';
+  });
+}
+
 function openQuickNote() {
   const overlay = document.getElementById('qn-overlay');
-  const ta = document.getElementById('qn-ta');
+  const sheet   = document.getElementById('qn-sheet');
+  const ta      = document.getElementById('qn-ta');
+  if(!overlay || !ta) return;
   overlay.classList.add('open');
+  if(sheet) { sheet.style.bottom = '0'; sheet.classList.add('open'); }
   _qnCityIdx = 0;
   qnUpdateMeta();
-  setTimeout(() => ta?.focus(), 120);
+  setTimeout(() => ta?.focus(), 160);
 }
 
 function closeQuickNote() {
@@ -3971,6 +4004,8 @@ function closeQuickNote() {
 }
 function dismissQuickNote() {
   document.getElementById('qn-overlay').classList.remove('open');
+  const sheet = document.getElementById('qn-sheet');
+  if(sheet) { sheet.classList.remove('open'); sheet.style.bottom = '0'; }
 }
 
 function handleQnOverlay(e) {
@@ -4134,7 +4169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- QUICK NOTE SHEET -->
 <div class="quick-note-overlay" id="qn-overlay" onclick="handleQnOverlay(event)">
-  <div class="quick-note-sheet">
+  <div class="quick-note-sheet" id="qn-sheet">
     <div class="quick-note-head">
       <div class="quick-note-title">
         <div class="quick-note-dot"></div>
