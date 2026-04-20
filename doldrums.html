@@ -1383,24 +1383,21 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 500;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      height: 0;
-      overflow: hidden;
+      height: 48px;
       background: var(--orange);
       color: #fff;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 9px;
       letter-spacing: .18em;
       text-transform: uppercase;
-      transition: height .2s cubic-bezier(.22,1,.36,1);
-      will-change: height;
     }
-    #ptr-indicator.pulling { height: 48px; }
-    #ptr-indicator.releasing { height: 48px; background: var(--navy2); }
-    #ptr-indicator.refreshing { height: 48px; }
+    #ptr-indicator.pulling { display: flex; background: var(--orange); }
+    #ptr-indicator.releasing { display: flex; background: var(--navy2); }
+    #ptr-indicator.refreshing { display: flex; background: var(--navy); }
     .ptr-spinner {
       width: 14px; height: 14px;
       border: 2px solid rgba(255,255,255,0.3);
