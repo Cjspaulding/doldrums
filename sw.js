@@ -1,7 +1,7 @@
 // Doldrums — Service Worker
 // Strategy: cache-first for the app shell, network-first for weather API calls
 
-const CACHE = 'doldrums-v1';
+const CACHE = 'doldrums-v2';
 const SHELL = [
   '/',
   '/doldrums.html',
