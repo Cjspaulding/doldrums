@@ -1431,6 +1431,10 @@
       .city-sheet-overlay, .city-sheet { display:none !important; }
 
       /* ── NATIVE APP FEEL (mobile) ──────────────────────────────────────── */
+      /* Hide summary bar — city switching moves into greeting */
+      .summary-bar { display:none; }
+      /* Show + city button in sticky bar on mobile */
+      .sticky-add-btn { display:block !important; }
       /* Cards bleed full width, no borders, no shadows */
       .card {
         border-left:none !important;
@@ -1629,6 +1633,7 @@
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="sticky-status" id="sticky-count"></div>
+    <button onclick="openModal()" class="sticky-add-btn" style="background:none;border:none;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-size:16px;cursor:pointer;padding:2px 6px;display:none">+</button>
     <button onclick="toggleDark()" class="dark-toggle" id="dark-toggle-btn" title="Toggle dark mode">☽</button>
     <button onclick="shareUrl()" class="sticky-share-btn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">↗ Share</button>
   </div>
@@ -1799,6 +1804,29 @@ function wmo(code, tempC) {
   return {...entry, icon: ICON_SVG[entry.svg] || ICON_SVG.fallback};
 }
 
+// ── GREETING CITY CYCLE ───────────────────────────────────────────────────────
+let _greetingCityIdx = 0;
+function greetingCycleCity() {
+  if(LOCATIONS.length <= 1) return;
+  haptic('light');
+  _greetingCityIdx = (_greetingCityIdx + 1) % LOCATIONS.length;
+  // Scroll to that city's card
+  const card = document.getElementById('card-' + _greetingCityIdx);
+  if(card) card.scrollIntoView({ behavior:'smooth', block:'start' });
+  // Update greeting to show that city
+  const loc = LOCATIONS[_greetingCityIdx];
+  const greetingWrap = document.querySelector('.greeting-wrap');
+  if(greetingWrap && loc) {
+    const cityEl = greetingWrap.querySelector('.greeting-city');
+    const subEl  = greetingWrap.querySelector('.greeting-sub');
+    const cond   = document.getElementById('cond-' + _greetingCityIdx)?.textContent || '';
+    const temp   = document.getElementById('sum-temp-' + _greetingCityIdx)?.textContent || '';
+    const sub    = [cond, temp].filter(Boolean).join(' · ');
+    if(cityEl) cityEl.innerHTML = loc.name + `<span style="font-size:14px;color:var(--orange2);margin-left:6px;opacity:0.7">›</span>`;
+    if(subEl)  subEl.textContent = sub;
+  }
+}
+
 // ── WILL IT RAIN? ─────────────────────────────────────────────────────────────
 function willItRain(hourly, loc) {
   if(!hourly?.time) return null;
@@ -1907,10 +1935,14 @@ function buildGreeting(loc, i, data) {
   const tempStr = c ? `${Math.round(c.temperature_2m)}${loc.sym}` : '';
   const sub = [condStr, tempStr].filter(Boolean).join(' · ');
   const iconHTML = w ? `<div style="width:44px;height:44px;flex-shrink:0">${w.icon}</div>` : '';
+  const multiCity = LOCATIONS.length > 1;
+  const cityTap = multiCity ? `onclick="greetingCycleCity()" style="cursor:pointer;-webkit-tap-highlight-color:transparent"` : '';
+  const cityIndicator = multiCity ? `<span style="font-size:14px;color:var(--orange2);margin-left:6px;opacity:0.7">›</span>` : '';
+
   return `<div class="greeting-wrap" style="display:flex;align-items:flex-start;justify-content:space-between">
     <div>
       <div class="greeting-line">${greeting}</div>
-      <div class="greeting-city">${loc.name}</div>
+      <div class="greeting-city" ${cityTap}>${loc.name}${cityIndicator}</div>
       ${sub ? `<div class="greeting-sub">${sub}</div>` : ''}
     </div>
     ${iconHTML}
