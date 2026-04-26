@@ -33,6 +33,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/doldrums.html" }
+    { "source": "/(.*)", "destination": "/doldrums2.html" }
   ]
 }
