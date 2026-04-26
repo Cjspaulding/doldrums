@@ -303,7 +303,7 @@
       position: fixed;
       top: calc(44px + env(safe-area-inset-top));
       left: 0; right: 0;
-      bottom: calc(60px + env(safe-area-inset-bottom));
+      bottom: calc(70px + env(safe-area-inset-bottom));
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       z-index: 9;
@@ -1455,16 +1455,16 @@
 
       .city-sheet-overlay {
         position:fixed;inset:0;z-index:1000;
-        background:rgba(11,25,41,0.5);
-        backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+        background:rgba(4,10,20,0.75);
+        backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
         opacity:0;pointer-events:none;transition:opacity .2s;
       }
       .city-sheet-overlay.open { opacity:1;pointer-events:all; }
 
       .city-sheet {
         position:fixed;bottom:0;left:0;right:0;z-index:1001;
-        background:var(--white);
-        border-top:3px solid var(--orange);
+        background:#0d1f3c;
+        border-top:2px solid var(--orange);
         transform:translateY(100%);
         transition:transform .28s cubic-bezier(.22,1,.36,1);
         padding-bottom:env(safe-area-inset-bottom);
@@ -1474,16 +1474,17 @@
       .city-sheet.open { transform:translateY(0); }
 
       .city-sheet-head {
-        background:var(--navy);padding:16px 20px;
+        background:rgba(255,255,255,0.04);padding:16px 20px;
         display:flex;align-items:center;justify-content:space-between;
-        flex-shrink:0;
+        flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07);
       }
       .city-sheet-title {
         font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-        color:rgba(255,255,255,0.7);
+        color:rgba(255,255,255,0.4);
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       }
       .city-sheet-close {
-        background:none;border:none;color:rgba(255,255,255,0.4);
+        background:none;border:none;color:rgba(255,255,255,0.3);
         font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;
       }
 
@@ -1492,21 +1493,25 @@
       }
 
       .city-sheet-input {
-        width:100%;background:var(--ice);border:2px solid var(--rule-dk);
+        width:100%;background:rgba(255,255,255,0.07);
+        border:1px solid rgba(255,255,255,0.12);
         padding:16px 18px;
-        font-family:'IBM Plex Mono',monospace;font-size:17px;
-        color:var(--ink);outline:none;
-        border-radius:0;-webkit-appearance:none;
-        margin-bottom:14px;
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:17px;
+        color:rgba(255,255,255,0.92);outline:none;
+        border-radius:12px;-webkit-appearance:none;
+        margin-bottom:14px;caret-color:var(--orange);
       }
-      .city-sheet-input::placeholder { color:var(--ink5); }
-      .city-sheet-input:focus { border-color:var(--navy3); }
+      .city-sheet-input::placeholder { color:rgba(255,255,255,0.2); }
+      .city-sheet-input:focus { border-color:var(--orange); }
 
       .city-sheet-geo {
-        width:100%;background:var(--ice);border:1px solid var(--rule);
+        width:100%;background:rgba(255,255,255,0.07);
+        border:1px solid rgba(255,255,255,0.1);
+        border-radius:12px;
         padding:15px 18px;
-        font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;
-        text-transform:uppercase;cursor:pointer;color:var(--ink3);
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+        font-size:13px;letter-spacing:.04em;
+        cursor:pointer;color:rgba(255,255,255,0.6);
         display:flex;align-items:center;gap:10px;margin-bottom:18px;
       }
 
@@ -1514,19 +1519,25 @@
 
       .city-sheet-result {
         display:flex;align-items:center;justify-content:space-between;
-        padding:14px 16px;border:1px solid var(--rule);
-        background:var(--ice);cursor:pointer;
+        padding:14px 16px;border:1px solid rgba(255,255,255,0.07);
+        background:rgba(255,255,255,0.05);cursor:pointer;border-radius:12px;
       }
       .city-sheet-result-name {
-        font-size:17px;font-weight:400;color:var(--ink);
+        font-size:17px;font-weight:400;color:rgba(255,255,255,0.88);
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       }
       .city-sheet-result-meta {
-        font-size:9px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;
+        font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.08em;
+        text-transform:uppercase;margin-top:4px;
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       }
       .city-sheet-add {
-        font-size:9px;letter-spacing:.14em;text-transform:uppercase;
-        color:var(--navy3);background:none;border:1px solid var(--rule-dk);
-        padding:8px 16px;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+        font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+        color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.1);
+        border:1px solid rgba(255,255,255,0.15);
+        border-radius:8px;
+        padding:8px 16px;cursor:pointer;
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
         flex-shrink:0;
       }
     }
@@ -1861,17 +1872,24 @@
         background:var(--navy);
         border-top:2px solid var(--orange);
         padding-bottom:env(safe-area-inset-bottom);
+        pointer-events: all;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .bottom-nav-item {
         flex:1;display:flex;flex-direction:column;align-items:center;
         justify-content:center;gap:3px;
-        padding:9px 0 8px;
+        padding:10px 0 10px;
+        min-height:54px;
         cursor:pointer;
         color:rgba(255,255,255,0.3);
         transition:color .15s;
         -webkit-tap-highlight-color:transparent;
         border:none;background:none;font-family:inherit;
+        pointer-events: all;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
       }
       .bottom-nav-item.active .bottom-nav-icon { color:var(--orange2); }
       .bottom-nav-item.active .bottom-nav-label { color:#fff; }
