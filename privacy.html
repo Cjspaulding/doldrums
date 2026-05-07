@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Doldrums</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0D1B2A;
+      --blue: #1A6FA0;
+      --sky: #B8D8ED;
+      --fog: #F0F5F9;
+      --ink: #2C3E50;
+      --mist: #6B8296;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--fog);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--navy);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+    }
+
+    .app-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: white;
+      letter-spacing: 0.04em;
+    }
+
+    .app-tagline {
+      color: var(--sky);
+      font-size: 0.85rem;
+      font-weight: 300;
+      margin-top: 0.3rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 3rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .doc-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .effective-date {
+      font-size: 0.85rem;
+      color: var(--mist);
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+
+    .divider {
+      height: 2px;
+      background: linear-gradient(to right, var(--blue), transparent);
+      margin-bottom: 2.5rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--ink);
+      font-weight: 300;
+      margin-bottom: 0.75rem;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0.5rem 0;
+    }
+
+    ul li {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      font-weight: 300;
+      color: var(--ink);
+      padding-left: 1.25rem;
+      position: relative;
+      margin-bottom: 0.35rem;
+    }
+
+    ul li::before {
+      content: "–";
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+    }
+
+    .sub-heading {
+      font-weight: 500;
+      color: var(--navy);
+      margin-top: 1.25rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: var(--mist);
+      border-top: 1px solid #dde6ed;
+    }
+
+    @media (max-width: 600px) {
+      .doc-title { font-size: 1.6rem; }
+      main { margin: 2rem auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="app-name">Doldrums</div>
+    <div class="app-tagline">Weather, your way</div>
+  </header>
+
+  <main>
+    <h1 class="doc-title">Privacy Policy</h1>
+    <p class="effective-date">Effective Date: May 7, 2026</p>
+    <div class="divider"></div>
+
+    <section>
+      <h2>Overview</h2>
+      <p>Doldrums is a weather application. We take your privacy seriously. This policy explains what information the app accesses and how it is used.</p>
+    </section>
+
+    <section>
+      <h2>Information We Collect</h2>
+
+      <p class="sub-heading">Location Data</p>
+      <p>Doldrums may request access to your device's location solely to display local weather conditions for your current position. Location data is used only to fetch weather information and is never stored on our servers or shared with third parties.</p>
+
+      <p class="sub-heading">Weather Journal Data</p>
+      <p>Any notes, moods, or observations you log in the weather journal are stored locally on your device using your browser's local storage. This data never leaves your device and is not transmitted to any server.</p>
+
+      <p class="sub-heading">Cities You Add</p>
+      <p>The list of cities you save is stored locally on your device. It is not transmitted to or stored on our servers.</p>
+    </section>
+
+    <section>
+      <h2>Information We Do Not Collect</h2>
+      <ul>
+        <li>We do not collect your name, email address, or any account information</li>
+        <li>We do not require account creation</li>
+        <li>We do not use advertising or tracking</li>
+        <li>We do not sell your data to third parties</li>
+        <li>We do not store any personal information on our servers</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Third-Party Services</h2>
+      <p>Doldrums uses <a href="https://open-meteo.com" target="_blank">Open-Meteo</a> to retrieve weather data. Open-Meteo is a free, open-source weather API. When weather data is requested, your approximate location coordinates are sent to Open-Meteo to retrieve the forecast. Please refer to Open-Meteo's privacy policy for their data practices.</p>
+      <p>Doldrums uses <a href="https://nominatim.org" target="_blank">Nominatim</a> (OpenStreetMap) for location name lookups. Coordinates may be sent to Nominatim when searching for or resolving city names. Please refer to the Nominatim usage policy for their data practices.</p>
+    </section>
+
+    <section>
+      <h2>Data Retention</h2>
+      <p>All data stored by Doldrums (saved cities, journal entries) is retained locally on your device. You can clear this data at any time by clearing your app's local storage or uninstalling the app.</p>
+    </section>
+
+    <section>
+      <h2>Children's Privacy</h2>
+      <p>Doldrums does not knowingly collect personal information from children under 13. The app contains no content inappropriate for children.</p>
+    </section>
+
+    <section>
+      <h2>Changes to This Policy</h2>
+      <p>We may update this privacy policy from time to time. Any changes will be reflected with a new effective date at the top of this page.</p>
+    </section>
+
+    <section>
+      <h2>Contact</h2>
+      <p>If you have questions about this privacy policy, please contact us at <a href="mailto:cjspaulding@gmail.com">cjspaulding@gmail.com</a>.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    &copy; 2026 Doldrums &nbsp;·&nbsp; <a href="https://doldrums.app">doldrums.app</a>
+  </footer>
+
+</body>
+</html>
