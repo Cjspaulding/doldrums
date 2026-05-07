@@ -33,6 +33,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/(.*)", "destination": "/doldrums2.html" }
   ]
 }
