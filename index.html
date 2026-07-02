@@ -5127,20 +5127,30 @@ async function loadForecastDiscussion() {
     } catch (e) {}
 
     if (!raw) {
-      const listRes = await fetch(
-        'https://mesonet.agron.iastate.edu/api/1/nws/afd.json?wfo=' + wfo + '&limit=1',
-        { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined });
-      if (!listRes.ok) return;
-      const list = await listRes.json();
-      const entry = (list.data && list.data[0]) || null;
-      if (!entry) return;
-      raw = entry.text || null;
-      if (!raw && entry.product_id) {
-        const txtRes = await fetch(
-          'https://mesonet.agron.iastate.edu/api/1/nwstext/' + entry.product_id);
-        if (!txtRes.ok) return;
-        raw = await txtRes.text();
+      // IEM AFOS list: strict params (pil, cccc, date only), sorted oldest-first
+      const utcDay = (offset) => {
+        const d = new Date(Date.now() - offset * 86400000);
+        return d.toISOString().slice(0, 10);
+      };
+      let entry = null;
+      for (const off of [0, 1]) { // today UTC, then yesterday UTC
+        const listRes = await fetch(
+          'https://mesonet.agron.iastate.edu/api/1/nws/afos/list.json?pil=AFD'
+          + wfo + '&date=' + utcDay(off));
+        if (!listRes.ok) continue;
+        const list = await listRes.json();
+        if (list.data && list.data.length) {
+          entry = list.data[list.data.length - 1]; // newest is last
+          break;
+        }
       }
+      if (!entry) return;
+      const textUrl = entry.text_link ||
+        ('https://mesonet.agron.iastate.edu/api/1/nwstext/'
+          + (entry.product_id || entry.product));
+      const txtRes = await fetch(textUrl);
+      if (!txtRes.ok) return;
+      raw = await txtRes.text();
       if (!raw || raw.length < 80) return;
       try { sessionStorage.setItem('doldrums_afd_' + wfo,
         JSON.stringify({ ts: Date.now(), raw })); } catch (e) {}
