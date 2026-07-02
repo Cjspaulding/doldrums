@@ -5105,7 +5105,15 @@ function parseAFD(raw) {
     const body = raw.split(/\n\n/).find(p => p.trim().length > 120);
     synopsis = body ? body.trim() : null;
   }
-  if (synopsis) synopsis = synopsis.replace(/\n(?!\n)/g, ' ').replace(/\s{2,}/g, ' ');
+  if (synopsis) {
+    synopsis = synopsis.replace(/\n(?!\n)/g, ' ').replace(/\s{2,}/g, ' ');
+    // Trim the default view to a few sentences (~400 chars), ending cleanly
+    if (synopsis.length > 420) {
+      const cut = synopsis.slice(0, 420);
+      const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.'));
+      synopsis = (lastStop > 150 ? cut.slice(0, lastStop + 1) : cut.trim() + '…');
+    }
+  }
   return { synopsis, full: raw.trim() };
 }
 
