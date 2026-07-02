@@ -2154,6 +2154,57 @@
       font-size:9px;letter-spacing:.12em;text-transform:uppercase;
       color:rgba(255,255,255,0.2);margin-top:8px;
     }
+    /* ── FORECAST DISCUSSION (NWS AFD via Iowa State IEM) ─────────────────── */
+    .afd-section { margin-top:28px; }
+    .afd-card {
+      background:var(--white);border:1px solid var(--rule);
+      box-shadow:var(--shadow);position:relative;overflow:hidden;
+    }
+    .afd-bar { height:4px;background:var(--navy); }
+    .afd-head {
+      display:flex;align-items:baseline;justify-content:space-between;
+      gap:12px;padding:14px 18px 10px;border-bottom:1px solid var(--rule);
+      flex-wrap:wrap;
+    }
+    .afd-title {
+      font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+      color:var(--navy2);font-weight:500;
+    }
+    body.dark .afd-title { color:var(--ink2); }
+    .afd-office {
+      font-family:'IBM Plex Mono',monospace;font-size:9px;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);
+    }
+    .afd-body {
+      padding:14px 18px 6px;
+      font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:300;
+      line-height:1.65;color:var(--ink2);white-space:pre-wrap;
+      max-height:none;
+    }
+    .afd-body.afd-full { font-size:11px;color:var(--ink3); }
+    .afd-foot {
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 18px 14px;flex-wrap:wrap;
+    }
+    .afd-toggle {
+      background:none;border:1px solid var(--rule-dk);color:var(--ink3);
+      font-family:'IBM Plex Mono',monospace;font-size:8px;
+      letter-spacing:.14em;text-transform:uppercase;
+      padding:5px 12px;cursor:pointer;transition:all .2s;
+    }
+    .afd-toggle:hover { color:var(--navy);border-color:var(--navy); }
+    body.dark .afd-toggle:hover { color:var(--ink); border-color:var(--ink2); }
+    .afd-credit {
+      font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--ink4);
+    }
+    @media(max-width:600px) {
+      .afd-section { margin-top:16px;padding:0 2px; }
+      .afd-body, .afd-body.afd-full {
+        font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+        font-size:14px;letter-spacing:0;
+      }
+    }
   </style>
 </head>
 <body class="has-sticky">
@@ -2172,7 +2223,7 @@
     </div>
     <div class="masthead-right">
       <div class="masthead-date" id="masthead-date"></div>
-      <div class="masthead-coords">Open-Meteo · NWS</div>
+      <div class="masthead-coords">Open-Meteo · NWS · IEM</div>
     </div>
   </div>
   <div class="masthead-nav-strip">
@@ -2237,7 +2288,7 @@
     <div class="footer-tagline">Know your skies.</div>
   </div>
   <div class="footer-right">
-    <div class="footer-item">Source <span>Open-Meteo API</span></div>
+    <div class="footer-item">Source <span>Open-Meteo API · Iowa State IEM</span></div>
     <div class="footer-sep">·</div>
     <div class="footer-item"><a href="https://doldrums.app/support" style="color:inherit;text-decoration:none;">Support</a></div>
     <div class="footer-sep">·</div>
@@ -2915,6 +2966,7 @@ async function refreshAll(){
     }
   }
   startCountdown();
+  if (typeof loadForecastDiscussion === 'function') loadForecastDiscussion();
 }
 
 // ── ADD CITY MODAL ────────────────────────────────────────────────────────────
@@ -4988,5 +5040,161 @@ document.addEventListener('DOMContentLoaded', () => {
   <div style="flex:1;height:100%;" ontouchend="event.preventDefault();navTo('radar')" onclick="navTo('radar')"></div>
   <div style="flex:1;height:100%;" ontouchend="event.preventDefault();navTo('log')" onclick="navTo('log')"></div>
 </div>
+<script>
+/* ── FORECAST DISCUSSION ──────────────────────────────────────────────────
+   NWS Area Forecast Discussion for the primary station's region, served by
+   Iowa State University's IEM (mesonet.agron.iastate.edu). Fails silently:
+   if the primary city isn't near a US forecast office, or the fetch errors,
+   nothing renders and the app is unchanged. */
+
+const WFO_SITES = [
+["BOX",41.95,-71.13],["OKX",40.87,-72.86],["ALY",42.68,-73.83],["BGM",42.20,-75.98],
+["BUF",42.94,-78.72],["GYX",43.89,-70.25],["CAR",46.87,-68.02],["BTV",44.47,-73.15],
+["PHI",39.87,-74.67],["CTP",40.79,-77.85],["PBZ",40.53,-80.22],["LWX",38.98,-77.48],
+["RNK",37.20,-80.41],["AKQ",36.98,-77.00],["MHX",34.78,-76.88],["RAH",35.87,-78.79],
+["ILM",34.28,-77.90],["GSP",34.88,-82.22],["CAE",33.94,-81.12],["CHS",32.90,-80.03],
+["CLE",41.40,-81.86],["ILN",39.42,-83.82],["RLX",38.31,-81.72],["FFC",33.36,-84.57],
+["JAX",30.48,-81.70],["MLB",28.11,-80.65],["MFL",25.75,-80.38],["TBW",27.70,-82.40],
+["TAE",30.40,-84.35],["KEY",24.55,-81.75],["BMX",33.17,-86.77],["HUN",34.72,-86.66],
+["MOB",30.68,-88.24],["JAN",32.32,-90.08],["MEG",35.05,-89.98],["OHX",36.25,-86.56],
+["MRX",36.17,-83.40],["LMK",38.19,-85.71],["JKL",37.59,-83.31],["PAH",37.07,-88.77],
+["SJU",18.43,-66.00],["LOT",41.60,-88.08],["ILX",40.15,-89.33],["IND",39.71,-86.28],
+["IWX",41.36,-85.70],["GRR",42.89,-85.54],["DTX",42.70,-83.47],["APX",44.90,-84.72],
+["MQT",46.53,-87.55],["GRB",44.50,-88.11],["MKX",42.97,-88.55],["ARX",43.82,-91.19],
+["DLH",46.84,-92.21],["MPX",44.85,-93.57],["FGF",47.96,-97.18],["BIS",46.77,-100.76],
+["ABR",45.46,-98.41],["FSD",43.59,-96.73],["UNR",44.07,-103.21],["DMX",41.73,-93.72],
+["DVN",41.61,-90.58],["OAX",41.32,-96.37],["GID",40.58,-98.44],["LBF",41.13,-100.68],
+["CYS",41.15,-104.80],["EAX",38.81,-94.26],["TOP",39.07,-95.63],["ICT",37.65,-97.44],
+["DDC",37.76,-99.97],["GLD",39.37,-101.70],["SGF",37.24,-93.40],["LSX",38.70,-90.68],
+["OUN",35.24,-97.46],["TSA",36.17,-95.56],["AMA",35.23,-101.71],["LUB",33.65,-101.81],
+["MAF",31.94,-102.19],["SJT",31.37,-100.49],["FWD",32.83,-97.30],["EWX",29.70,-98.03],
+["HGX",29.47,-95.08],["CRP",27.78,-97.51],["BRO",25.92,-97.42],["EPZ",31.87,-106.70],
+["SHV",32.45,-93.84],["LCH",30.12,-93.22],["LIX",30.34,-89.83],["LZK",34.83,-92.26],
+["ABQ",35.04,-106.62],["FGZ",35.23,-111.82],["PSR",33.43,-112.02],["TWC",32.23,-110.95],
+["VEF",36.05,-115.18],["SLC",40.77,-111.95],["GJT",39.12,-108.53],["BOU",39.99,-105.26],
+["PUB",38.29,-104.50],["RIW",43.06,-108.48],["BYZ",45.80,-108.54],["TFX",47.46,-111.38],
+["MSO",46.92,-114.09],["GGW",48.21,-106.62],["BOI",43.57,-116.21],["PIH",42.91,-112.60],
+["PDT",45.69,-118.85],["OTX",47.68,-117.63],["SEW",47.68,-122.26],["PQR",45.56,-122.54],
+["MFR",42.37,-122.87],["EKA",40.80,-124.16],["STO",38.61,-121.35],["MTR",36.59,-121.85],
+["HNX",36.31,-119.63],["LOX",34.20,-119.18],["SGX",32.85,-117.11],["REV",39.57,-119.80],
+["LKN",40.86,-115.74],["AFC",61.16,-150.00],["AFG",64.80,-147.87],["AJK",58.36,-134.56],
+["HFO",21.30,-157.87],["GUM",13.48,144.80]
+];
+
+function nearestWFO(lat, lon) {
+  let best = null, bestD = Infinity;
+  for (const [code, wlat, wlon] of WFO_SITES) {
+    const dx = (lon - wlon) * Math.cos((lat + wlat) * Math.PI / 360);
+    const dy = lat - wlat;
+    const d = Math.sqrt(dx * dx + dy * dy) * 111; // approx km
+    if (d < bestD) { bestD = d; best = code; }
+  }
+  return bestD <= 400 ? best : null; // outside US coverage → no discussion
+}
+
+function parseAFD(raw) {
+  // AFD products are section blocks separated by "&&", each starting ".NAME..."
+  const blocks = raw.split(/\n&&\n?/);
+  let synopsis = null;
+  for (const b of blocks) {
+    const m = b.match(/^\s*\.(SYNOPSIS|UPDATE|DISCUSSION|SHORT TERM)[^\n]*\.{0,3}\s*\n?([\s\S]*)/m);
+    if (m && m[2] && m[2].trim().length > 40) { synopsis = m[2].trim(); break; }
+  }
+  if (!synopsis) {
+    // fall back to the first substantial paragraph after the header lines
+    const body = raw.split(/\n\n/).find(p => p.trim().length > 120);
+    synopsis = body ? body.trim() : null;
+  }
+  if (synopsis) synopsis = synopsis.replace(/\n(?!\n)/g, ' ').replace(/\s{2,}/g, ' ');
+  return { synopsis, full: raw.trim() };
+}
+
+async function loadForecastDiscussion() {
+  try {
+    if (currentView && currentView !== 'conditions') return;
+    if (!Array.isArray(LOCATIONS) || LOCATIONS.length === 0) return;
+    const loc = LOCATIONS[0];
+    if (typeof loc.lat !== 'number' && typeof loc.latitude !== 'number') return;
+    const lat = loc.lat ?? loc.latitude, lon = loc.lon ?? loc.longitude ?? loc.lng;
+    const wfo = nearestWFO(lat, lon);
+    if (!wfo) { removeAFD(); return; }
+
+    // 30-minute session cache per office
+    let raw = null;
+    try {
+      const c = JSON.parse(sessionStorage.getItem('doldrums_afd_' + wfo) || 'null');
+      if (c && Date.now() - c.ts < 30 * 60 * 1000) raw = c.raw;
+    } catch (e) {}
+
+    if (!raw) {
+      const listRes = await fetch(
+        'https://mesonet.agron.iastate.edu/api/1/nws/afd.json?wfo=' + wfo + '&limit=1',
+        { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined });
+      if (!listRes.ok) return;
+      const list = await listRes.json();
+      const entry = (list.data && list.data[0]) || null;
+      if (!entry) return;
+      raw = entry.text || null;
+      if (!raw && entry.product_id) {
+        const txtRes = await fetch(
+          'https://mesonet.agron.iastate.edu/api/1/nwstext/' + entry.product_id);
+        if (!txtRes.ok) return;
+        raw = await txtRes.text();
+      }
+      if (!raw || raw.length < 80) return;
+      try { sessionStorage.setItem('doldrums_afd_' + wfo,
+        JSON.stringify({ ts: Date.now(), raw })); } catch (e) {}
+    }
+
+    const { synopsis, full } = parseAFD(raw);
+    if (!synopsis) return;
+    renderAFD(wfo, synopsis, full);
+  } catch (e) { /* silent — app unchanged on any failure */ }
+}
+
+function removeAFD() {
+  const el = document.getElementById('afd-section');
+  if (el) el.remove();
+}
+
+function renderAFD(wfo, synopsis, full) {
+  const main = document.querySelector('main');
+  if (!main || !document.getElementById('weather-grid')) return;
+
+  let sec = document.getElementById('afd-section');
+  if (!sec) {
+    sec = document.createElement('div');
+    sec.id = 'afd-section';
+    sec.className = 'afd-section';
+    main.appendChild(sec);
+  }
+  sec.innerHTML =
+    '<div class="afd-card">' +
+      '<div class="afd-bar"></div>' +
+      '<div class="afd-head">' +
+        '<span class="afd-title">Forecast Discussion</span>' +
+        '<span class="afd-office" id="afd-office"></span>' +
+      '</div>' +
+      '<div class="afd-body" id="afd-body"></div>' +
+      '<div class="afd-foot">' +
+        '<button class="afd-toggle" id="afd-toggle" type="button">Read full discussion</button>' +
+        '<span class="afd-credit">NWS via Iowa State Univ. Mesonet</span>' +
+      '</div>' +
+    '</div>';
+
+  // textContent everywhere — feed text is never interpreted as HTML
+  document.getElementById('afd-office').textContent = 'NWS ' + wfo;
+  const body = document.getElementById('afd-body');
+  body.textContent = synopsis;
+
+  let expanded = false;
+  document.getElementById('afd-toggle').addEventListener('click', function () {
+    expanded = !expanded;
+    body.textContent = expanded ? full : synopsis;
+    body.classList.toggle('afd-full', expanded);
+    this.textContent = expanded ? 'Show synopsis' : 'Read full discussion';
+  });
+}
+</script>
 </body>
 </html>
