@@ -2205,6 +2205,78 @@
         font-size:14px;letter-spacing:0;
       }
     }
+    /* ── DESKTOP LAYOUT FOR V2 CARD SECTIONS ───────────────────────────────
+       The v2 (phone-first) card markup previously had styles only inside the
+       mobile media query, leaving desktop unstyled. This block gives those
+       classes an editorial desktop treatment. Scoped to min-width so the
+       mobile experience is untouched. */
+    @media(min-width:601px) {
+      /* Restore document flow: the v2 app shell pins main as a fixed pane
+         between mobile chrome, which collapses the desktop page. */
+      html, body { height:auto; overflow:visible; }
+      main {
+        position:static;top:auto;left:auto;right:auto;bottom:auto;
+        overflow:visible;-webkit-overflow-scrolling:auto;
+        max-width:1160px;margin:0 auto;
+        padding:30px clamp(20px,4vw,48px) 72px;
+      }
+
+      .greeting-wrap { padding:22px 24px 4px; }
+
+      .now-temp-section {
+        display:flex;align-items:flex-end;gap:18px;
+        padding:6px 24px 20px;border-bottom:1px solid var(--rule);
+      }
+      .now-hi-lo {
+        font-family:'IBM Plex Mono',monospace;font-size:11px;
+        letter-spacing:.08em;color:var(--ink3);padding-bottom:13px;
+      }
+
+      .now-section-card { padding:16px 24px 18px;border-bottom:1px solid var(--rule); }
+      .now-section-label {
+        font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+        color:var(--navy2);font-weight:500;margin-bottom:12px;
+      }
+
+      .vfc-row {
+        display:grid;grid-template-columns:112px 34px 1fr auto;
+        align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--rule);
+      }
+      .vfc-row:first-child { border-top:none;padding-top:0; }
+      .vfc-day { font-size:12.5px;color:var(--ink);letter-spacing:.02em; }
+      .vfc-today .vfc-day { color:var(--orange);font-weight:500; }
+      .vfc-icon { display:flex;align-items:center; }
+      .vfc-icon svg { width:22px;height:22px; }
+      .vfc-cond { font-size:11px;color:var(--ink3);letter-spacing:.03em; }
+      .vfc-temps {
+        display:flex;align-items:baseline;gap:12px;
+        font-family:'IBM Plex Mono',monospace;
+      }
+      .vfc-hi { font-size:13px;color:var(--navy); }
+      .vfc-lo { font-size:13px;color:var(--ink4); }
+      .vfc-rain { font-size:10px;color:var(--orange2); }
+
+      .now-readings-grid {
+        display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+        padding:18px 24px;border-bottom:1px solid var(--rule);
+      }
+      .now-reading-card { border:1px solid var(--rule);padding:13px 15px; }
+      .now-reading-label {
+        font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;
+        color:var(--ink4);margin-bottom:9px;
+      }
+      .now-reading-val {
+        font-family:'IBM Plex Mono',monospace;font-size:22px;
+        font-weight:300;color:var(--navy);line-height:1;
+      }
+      .now-reading-unit { font-size:11px;color:var(--ink4); }
+      .now-reading-sub {
+        font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+        color:var(--ink4);margin-top:7px;
+      }
+
+      .rain-answer { padding:16px 24px 20px; }
+    }
   </style>
 </head>
 <body class="has-sticky">
