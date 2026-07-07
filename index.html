@@ -2305,7 +2305,7 @@
       <div class="nav-item" onclick="setView('hourly')">Hourly</div>
       <div class="nav-item" onclick="setView('radar')">Radar</div>
       <div class="nav-item" onclick="setView('alerts')">Alerts</div>
-      <div class="nav-item" onclick="setView('log')">Log</div>
+      <div class="nav-item" onclick="setView('log')">Field Notes</div>
     </div>
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
@@ -2418,6 +2418,45 @@ if (!LOCATIONS || LOCATIONS.length === 0) {
 function saveCities() {
   localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
 }
+
+// ── FIRST-LAUNCH LOCATION ─────────────────────────────────────────────────────
+// Fresh installs open as the Boston edition. If the person grants location,
+// quietly make it their edition instead. Denied/unavailable → Boston stays,
+// exactly as before. Never runs once any city has been saved.
+const _PAGE_LOAD_TS = Date.now();
+function firstLaunchLocate() {
+  try {
+    if (localStorage.getItem('doldrums_cities')) return; // not a fresh install
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(async pos => {
+      try {
+        // Bail if the person added a city while we were locating
+        if (localStorage.getItem('doldrums_cities')) return;
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const [geoRes, tzRes] = await Promise.all([
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&accept-language=en`, {
+            headers: { 'Accept-Language': 'en', 'User-Agent': 'Doldrums/1.0 (doldrums.app)' }
+          }),
+          fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&timezone=auto&daily=weather_code&forecast_days=1`)
+        ]);
+        const geoData = await geoRes.json();
+        const tzData  = await tzRes.json();
+        const addr = geoData.address || {};
+        const name = addr.city || addr.town || addr.village || addr.hamlet || addr.county || geoData.name;
+        if (!name) return; // couldn't identify a place — keep Boston
+        const state = addr.state || addr.region || addr.country || '';
+        const tz = tzData.timezone || 'UTC';
+        const units = unitsForTz(tz);
+        if (localStorage.getItem('doldrums_cities')) return; // re-check after awaits
+        LOCATIONS = [{ name, state, lat, lon, tz, ...units }];
+        saveCities();
+        // Refresh to render their edition — only if they're still settling in
+        if (Date.now() - _PAGE_LOAD_TS < 25000) location.reload();
+      } catch (e) { /* keep Boston */ }
+    }, () => { /* denied — keep Boston */ }, { timeout: 8000, maximumAge: 600000 });
+  } catch (e) { /* keep Boston */ }
+}
+setTimeout(firstLaunchLocate, 800);
 
 
 // ── SVG WEATHER ICONS ─────────────────────────────────────────────────────────
@@ -3288,7 +3327,7 @@ function haptic(style) {
 const _navHistory = [];
 const _viewLabels = {
   conditions:'Now', forecast:'Forecast', hourly:'Hourly',
-  radar:'Radar', alerts:'Alerts', log:'Log'
+  radar:'Radar', alerts:'Alerts', log:'Field Notes'
 };
 
 function goBack() {
@@ -3347,7 +3386,7 @@ function setView(view, isBack) {
     radar:      'Precipitation Radar',
     pressure:   'Barometric Pressure',
     alerts:     'Weather Alerts',
-    log:        'Observation Log',
+    log:        'Field Notes',
   };
   if(sl) sl.textContent = labels[view] || '';
 
@@ -4980,7 +5019,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </button>
   <button class="bottom-nav-item" data-view="log" onclick="navTo('log')">
     <span class="bottom-nav-icon" style="font-size:22px;letter-spacing:-1px">≡</span>
-    <span class="bottom-nav-label">Log</span>
+    <span class="bottom-nav-label">Notes</span>
   </button>
 </nav>
 
