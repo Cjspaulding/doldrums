@@ -5088,71 +5088,17 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <script>
-// ── BOTTOM NAV TOUCH LISTENERS ───────────────────────────────────────────────
-(function() {
-  function attachNav() {
-    const nav = document.getElementById('bottom-nav');
-    if(!nav) { setTimeout(attachNav, 100); return; }
-
-    nav.addEventListener('pointerup', function(e) {
-      const btn = e.target.closest('[data-view]');
-      if(!btn) return;
-      navTo(btn.dataset.view);
-    });
-
-    nav.addEventListener('touchend', function(e) {
-      const btn = e.target.closest('[data-view]');
-      if(!btn) return;
-      e.preventDefault();
-      navTo(btn.dataset.view);
-    }, { passive: false });
-
-    nav.addEventListener('click', function(e) {
-      const btn = e.target.closest('[data-view]');
-      if(!btn) return;
-      navTo(btn.dataset.view);
-    });
-  }
-  attachNav();
-
-  // ── COORDINATE-BASED NAV FALLBACK ─────────────────────────────────────────
-  // Bypasses DOM event system entirely — uses raw touch position
-  window.addEventListener('touchend', function(e) {
-    // Ignore multi-touch (pinch/zoom)
-    if(e.touches.length > 0) return;
-
-    const touch = e.changedTouches[0];
-    const y = touch.clientY;
-    const x = touch.clientX;
-    const h = window.innerHeight;
-    const w = window.innerWidth;
-    const navH = 65;
-
-    if(y < h - navH) return;
-
-    if(x < w / 3) {
-      navTo('conditions');
-    } else if(x < (2 * w) / 3) {
-      navTo('radar');
-    } else {
-      navTo('log');
-    }
-    e.preventDefault();
-  }, { passive: false });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const ind = document.getElementById('ptr-indicator');
-    if(ind) ind.style.display = 'none';
-  });
-})();
+// Bottom nav taps are handled by the inline onclick attributes on the buttons.
+// (Removed: duplicate pointerup/touchend/click listeners, a window-level
+// coordinate touchend hijacker, and an invisible z-index:99999 "touch catcher"
+// div covering the bottom 80px of every view — it was swallowing taps on the
+// note composer's save button and anything else near the bottom of the screen.)
+document.addEventListener('DOMContentLoaded', () => {
+  const ind = document.getElementById('ptr-indicator');
+  if(ind) ind.style.display = 'none';
+});
 </script>
 
-<!-- NAV TOUCH CATCHER - highest z-index, transparent, catches all nav touches -->
-<div id="nav-touch-catcher" style="position:fixed;bottom:0;left:0;right:0;height:80px;z-index:99999;background:transparent;display:flex;">
-  <div style="flex:1;height:100%;" ontouchend="event.preventDefault();navTo('conditions')" onclick="navTo('conditions')"></div>
-  <div style="flex:1;height:100%;" ontouchend="event.preventDefault();navTo('radar')" onclick="navTo('radar')"></div>
-  <div style="flex:1;height:100%;" ontouchend="event.preventDefault();navTo('log')" onclick="navTo('log')"></div>
-</div>
 <script>
 /* ── FORECAST DISCUSSION ──────────────────────────────────────────────────
    NWS Area Forecast Discussion for the primary station's region, served by
