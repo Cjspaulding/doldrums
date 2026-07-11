@@ -3053,7 +3053,10 @@ async function refreshAll(){
   const gridExists = !!document.getElementById('weather-grid') && LOCATIONS.length > 0
     && !!document.getElementById('body-0');
 
-  if(!gridExists) {
+  // Only rebuild the grid when the Conditions view is actually on screen.
+  // Otherwise a background refresh (10-min countdown, add/remove city) would
+  // replace <main> and wipe whatever view the user is on — e.g. Field Notes.
+  if(!gridExists && currentView === 'conditions') {
     buildGrid();
   }
 
@@ -4617,31 +4620,6 @@ function editNote(ts) {
   setTimeout(() => ta?.focus(), 120);
 }
 
-const _origSaveQuickNote = saveQuickNote;
-function saveQuickNote() {
-  if(window._editingNoteTs) {
-    const ta = document.getElementById('qn-ta');
-    const text = ta?.value.trim();
-    if(!text) { window._editingNoteTs = null; return; }
-    haptic('success');
-    const notes = getNotes().map(n =>
-      n.ts === window._editingNoteTs ? {...n, text, edited: Date.now()} : n
-    );
-    saveNotes(notes);
-    ta.value = '';
-    window._editingNoteTs = null;
-    const saveBtn = document.getElementById('qn-save');
-    if(saveBtn) saveBtn.textContent = 'Save';
-    qnInput();
-    dismissQuickNote();
-    if(currentView === 'log') renderLogView();
-    const fab = document.getElementById('fab');
-    if(fab) { fab.textContent='✓'; fab.style.background='var(--orange)'; setTimeout(()=>{fab.textContent='✏';fab.style.background='';},1400); }
-    return;
-  }
-  _origSaveQuickNote();
-}
-
 function deleteNote(ts) {
   const notes = getNotes().filter(n => n.ts !== ts);
   saveNotes(notes);
@@ -4876,6 +4854,9 @@ function dismissQuickNote() {
   const sheet = document.getElementById('qn-sheet');
   if(sheet) { sheet.classList.remove('open'); sheet.style.bottom = '0'; }
   _qnMood = null;
+  window._editingNoteTs = null;
+  const saveBtn = document.getElementById('qn-save');
+  if(saveBtn) saveBtn.textContent = 'Save';
   document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
 }
 
@@ -4893,6 +4874,27 @@ function qnInput() {
 function saveQuickNote() {
   const ta = document.getElementById('qn-ta');
   const text = ta?.value.trim();
+
+  // Edit mode: update the existing note in place instead of creating a new one
+  if(window._editingNoteTs) {
+    if(!text) { window._editingNoteTs = null; return; }
+    haptic('success');
+    const updated = getNotes().map(n =>
+      n.ts === window._editingNoteTs ? {...n, text, edited: Date.now()} : n
+    );
+    saveNotes(updated);
+    ta.value = '';
+    window._editingNoteTs = null;
+    const saveBtn = document.getElementById('qn-save');
+    if(saveBtn) saveBtn.textContent = 'Save';
+    qnInput();
+    dismissQuickNote();
+    if(currentView === 'log') renderLogView();
+    const fab = document.getElementById('fab');
+    if(fab) { fab.textContent='✓'; fab.style.background='var(--orange)'; setTimeout(()=>{fab.textContent='✏';fab.style.background='';},1400); }
+    return;
+  }
+
   if(!_qnMood && !text) return;
   haptic('success');
 
