@@ -307,7 +307,8 @@
       position: fixed;
       top: calc(44px + env(safe-area-inset-top));
       left: 0; right: 0;
-      bottom: calc(80px + env(safe-area-inset-bottom));
+      bottom: 0;
+      padding-bottom: env(safe-area-inset-bottom);
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       padding: 0 0 20px;
@@ -1979,7 +1980,7 @@
       /* Rain answer cleaner */
       .rain-answer { border-bottom: 1px solid rgba(11,37,69,0.07) !important; }
       .bottom-nav {
-        display:flex;
+        display:none; /* 1.2: section strip in the nameplate is the nav */
         position:fixed;
         bottom:0;left:0;right:0;
         z-index:1000;
@@ -2017,9 +2018,9 @@
       }
       .bottom-nav-item.active .bottom-nav-label { color:#fff; }
 
-      body { padding-bottom:calc(60px + env(safe-area-inset-bottom)); }
+      body { padding-bottom:0; }
       footer { display:none; }
-      .fab { bottom:calc(76px + env(safe-area-inset-bottom)) !important; right:16px !important; left:auto !important; width:44px; height:44px; font-size:18px; border-width:1.5px; }
+      .fab { bottom:calc(24px + env(safe-area-inset-bottom)) !important; right:16px !important; left:auto !important; width:44px; height:44px; font-size:18px; border-width:1.5px; }
     }
 
     /* ── FAB MOBILE SAFE AREA ─────────────────────────────────────────────── */
@@ -2365,7 +2366,7 @@
   <div class="np-dateline">
     <span id="np-date"></span>
     <span id="np-edition"></span>
-    <span class="np-dateline-right"><span id="np-updated"></span><button class="np-moon" onclick="toggleDark()" title="Toggle dark mode">☽</button></span>
+    <span class="np-dateline-right"><span id="np-updated"></span></span>
   </div>
 </div>
 
@@ -3922,6 +3923,12 @@ function toggleDark() {
   if(btn) btn.textContent = isDark ? '☀' : '☽';
 }
 (function initDark() {
+  // Mobile broadsheet is paper-only — a stored dark preference would
+  // half-apply and break contrast, so it only honors dark on desktop.
+  if(window.matchMedia('(max-width:600px)').matches) {
+    document.body.classList.remove('dark');
+    return;
+  }
   if(localStorage.getItem('doldrums_dark') === '1') {
     document.body.classList.add('dark');
     const btn = document.getElementById('dark-toggle-btn');
@@ -4994,7 +5001,7 @@ async function preloadRadar() {
 
 // Preload radar when user hovers/touches the radar nav item
 document.addEventListener('DOMContentLoaded', () => {
-  const radarBtn = document.querySelector('.bottom-nav-item[data-view="radar"], .nav-item[onclick*="radar"]');
+  const radarBtn = document.querySelector('.np-section[data-view="radar"], .bottom-nav-item[data-view="radar"], .nav-item[onclick*="radar"]');
   if(radarBtn) {
     radarBtn.addEventListener('mouseenter', preloadRadar, {once:true});
     radarBtn.addEventListener('touchstart', preloadRadar, {once:true, passive:true});
