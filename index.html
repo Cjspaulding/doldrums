@@ -1607,16 +1607,16 @@
 
       /* ── FRONT PAGE LEAD STORY (1.2) ───────────────────────────────────── */
       .afd-section { display:none !important; } /* content promoted to the lead */
-      .lead-story.ls-ready { display:block; margin:16px 14px 6px; padding-bottom:16px; border-bottom:1px solid var(--rule); }
+      .lead-story.ls-ready { display:block; margin:16px 14px 6px; padding-bottom:16px; border-bottom:2px solid var(--navy); }
       .ls-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,.82fr); gap:14px; }
       .ls-kicker {
         font-family:'IBM Plex Mono',monospace; font-size:7.5px;
         letter-spacing:.2em; text-transform:uppercase;
-        color:var(--orange2); margin-bottom:7px;
+        color:var(--orange); margin-bottom:7px;
       }
       .ls-head {
         font-family:'Cormorant Garamond',serif; font-weight:500;
-        font-size:25px; line-height:1.12; color:var(--ink); margin-bottom:8px;
+        font-size:25px; line-height:1.12; color:var(--navy); margin-bottom:8px;
       }
       .ls-body {
         font-family:'Spectral',serif; font-size:12.5px;
@@ -1626,9 +1626,9 @@
       .ls-toggle {
         background:none; border:none; padding:8px 0 0; cursor:pointer;
         font-family:'IBM Plex Mono',monospace; font-size:8px;
-        letter-spacing:.14em; text-transform:uppercase; color:var(--orange2);
+        letter-spacing:.14em; text-transform:uppercase; color:var(--orange);
       }
-      .ls-rail { border-left:1px solid var(--rule); padding-left:12px; display:flex; flex-direction:column; gap:11px; }
+      .ls-rail { border-left:1px solid rgba(11,37,69,0.18); padding-left:12px; display:flex; flex-direction:column; gap:11px; }
       .ls-stat-label {
         font-family:'IBM Plex Mono',monospace; font-size:7px;
         letter-spacing:.16em; text-transform:uppercase; color:var(--ink4); margin-bottom:2px;
@@ -1637,40 +1637,10 @@
       .ls-stat-value.ls-now { font-size:21px; font-weight:300; }
       .ls-stat-sub { font-family:'Spectral',serif; font-size:10.5px; color:var(--ink3); margin-top:1px; }
 
-      /* ── NATIVE APP FEEL ─────────────────────────────────────────────── */
-      /* System font everywhere — kill IBM Plex Mono on mobile */
-      body, button, input,
-      .location-name, .location-sub, .card-cond,
-      .reading-label, .reading-unit, .reading-note,
-      .feels-label, .obs-time,
-      .fc-name, .fc-hi, .fc-lo, .fc-rain,
-      .forecast-label, .hv-time, .hv-precip-pct,
-      .bottom-nav-label, .sticky-status,
-      .fv-day-name, .fv-day-cond, .fv-city-head-name, .fv-city-head-state,
-      .rain-answer-text, .rain-hour-label,
-      .pv-trend-label, .pv-class, .pv-unit, .sum-temp,
-      .alert-row-msg, .alert-row-time, .log-entry-loc {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        letter-spacing: 0 !important;
-      }
-      /* Large temperature — ultra-light system font, very app-like */
-      .temp-numeral {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 100 !important;
-        letter-spacing: -0.03em !important;
-      }
-      .feels-val, .reading-val, .pv-hpa {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 200 !important;
-        letter-spacing: -0.02em !important;
-      }
-      .fv-day-hi, .fv-hi, .hv-temp, .fv-day-lo, .fv-lo {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 300 !important;
-        letter-spacing: 0 !important;
-      }
-      /* Keep Cormorant ONLY for city name — the one brand element */
-      .greeting-city { font-family: 'Cormorant Garamond', serif !important; }
+      /* ── BROADSHEET TYPE ─────────────────────────────────────────────── */
+      /* Editorial faces everywhere; sizing handled per-element below. */
+      /* Large temperature — old-style serif numeral, front-page style */
+      .temp-numeral { font-family:'Cormorant Garamond',serif !important; font-weight:300 !important; letter-spacing:0 !important; }
       /* Rain answer — readable prose */
       .rain-answer-text {
         font-size: 16px !important;
@@ -1690,12 +1660,12 @@
         background:#fff !important;
       }
       /* Clean separator between cards */
-      .card + .card { border-top:1px solid rgba(11,37,69,0.06) !important; }
+      .card + .card { border-top:1px solid rgba(11,37,69,0.14) !important; }
       /* Kill the grid texture inside cards */
       .card::before { display:none !important; }
       .card:hover { transform:none !important; box-shadow:none !important; }
-      /* Hide card-bar */
-      .card-bar { display:none; }
+      /* Card bar returns — printed section rule */
+      .card-bar { display:block; }
       /* Hide section label */
       .section-label { display:none; }
       /* Primary card head hidden — greeting handles it */
@@ -1722,170 +1692,137 @@
       .hv-strip { scrollbar-width:none !important; }
       .hv-strip::-webkit-scrollbar { display:none !important; }
 
-      /* ── VERTICAL SCROLL NOW VIEW ────────────────────────────────────────── */
+      /* ── VERTICAL SCROLL NOW VIEW (paper) ─────────────────────────────── */
       .now-temp-section { padding: 8px 20px 20px; }
-      .now-temp-section .temp-numeral { font-size:96px !important; font-weight:100 !important; letter-spacing:-0.03em !important; color:rgba(255,255,255,0.96) !important; line-height:1 !important; }
-      .now-temp-section .temp-degree { font-size:36px !important; color:rgba(255,255,255,0.5) !important; vertical-align:super; margin-left:2px; }
-      .now-hi-lo { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:15px; color:rgba(255,255,255,0.4); margin-top:4px; }
+      .now-temp-section .temp-numeral { font-family:'Cormorant Garamond',serif !important; font-size:96px !important; font-weight:300 !important; letter-spacing:0 !important; color:var(--navy) !important; line-height:1 !important; }
+      .now-temp-section .temp-degree { font-size:36px !important; color:var(--ink4) !important; vertical-align:super; margin-left:2px; }
+      .now-hi-lo { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; color:var(--ink3); margin-top:4px; }
 
-      .now-section-card { margin:0 16px 12px; background:rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); }
-      .now-section-label { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,0.3); padding:12px 16px 8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+      .now-section-card { margin:0 14px 14px; background:var(--white); border:1px solid rgba(11,37,69,0.16); overflow:hidden; }
+      .now-section-label { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3); padding:10px 14px 8px; border-bottom:1px solid rgba(11,37,69,0.1); }
 
       .now-section-card .hv-strip { display:flex; overflow-x:auto; scrollbar-width:none; padding:4px 0; }
       .now-section-card .hv-strip::-webkit-scrollbar { display:none; }
-      .now-section-card .hv-slot { min-width:56px; padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; border-right:1px solid rgba(255,255,255,0.05); }
+      .now-section-card .hv-slot { min-width:56px; padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; border-right:1px solid rgba(11,37,69,0.08); }
       .now-section-card .hv-slot:last-child { border-right:none; }
-      .now-section-card .hv-slot.now { background:rgba(255,255,255,0.06); }
-      .now-section-card .hv-time { font-size:11px; color:rgba(255,255,255,0.35); font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-slot.now .hv-time { color:rgba(200,100,30,0.9); }
+      .now-section-card .hv-slot.now { background:rgba(11,37,69,0.05); }
+      .now-section-card .hv-time { font-size:9px; letter-spacing:.06em; color:var(--ink4); font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-slot.now .hv-time { color:var(--orange); }
       .now-section-card .hv-icon { font-size:20px; }
-      .now-section-card .hv-temp { font-size:14px; font-weight:300; color:rgba(255,255,255,0.88); font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-precip-pct { font-size:10px; color:#5b9ec9; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-precip-pct.zero { color:rgba(255,255,255,0.15); }
+      .now-section-card .hv-temp { font-size:13px; color:var(--ink); font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-precip-pct { font-size:9px; color:#3f6d99; font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-precip-pct.zero { color:rgba(11,37,69,0.18); }
       .now-section-card .hv-precip-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
-      .now-section-card .hv-precip-bar-bg { width:32px; height:2px; background:rgba(255,255,255,0.08); border-radius:1px; }
-      .now-section-card .hv-precip-bar { height:100%; background:#5b9ec9; border-radius:1px; }
+      .now-section-card .hv-precip-bar-bg { width:32px; height:2px; background:rgba(11,37,69,0.1); border-radius:0; }
+      .now-section-card .hv-precip-bar { height:100%; background:#3f6d99; border-radius:0; }
 
       .vfc-list { padding:4px 0; }
-      .vfc-row { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:12px; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+      .vfc-row { display:flex; align-items:center; padding:11px 14px; border-bottom:1px solid rgba(11,37,69,0.08); gap:12px; }
       .vfc-row:last-child { border-bottom:none; }
-      .vfc-row.vfc-today { background:rgba(255,255,255,0.04); }
-      .vfc-day { font-size:15px; font-weight:500; color:rgba(255,255,255,0.88); width:80px; flex-shrink:0; }
-      .vfc-row.vfc-today .vfc-day { color:rgba(200,100,30,0.9); }
+      .vfc-row.vfc-today { background:rgba(11,37,69,0.04); }
+      .vfc-day { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink2); width:80px; flex-shrink:0; }
+      .vfc-row.vfc-today .vfc-day { color:var(--orange); }
       .vfc-icon { font-size:22px; flex-shrink:0; width:28px; text-align:center; }
-      .vfc-cond { font-size:13px; color:rgba(255,255,255,0.35); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .vfc-cond { font-family:'Spectral',serif; font-size:12px; color:var(--ink3); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
       .vfc-temps { display:flex; gap:10px; align-items:center; flex-shrink:0; }
-      .vfc-hi { font-size:15px; font-weight:500; color:rgba(255,255,255,0.88); }
-      .vfc-lo { font-size:15px; color:rgba(255,255,255,0.3); }
-      .vfc-rain { font-size:11px; color:#5b9ec9; }
+      .vfc-hi { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); }
+      .vfc-lo { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink4); }
+      .vfc-rain { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3f6d99; }
 
-      .now-readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 16px 12px; }
-      .now-reading-card { background:rgba(255,255,255,0.07); border-radius:16px; border:1px solid rgba(255,255,255,0.08); padding:14px 16px; }
-      .now-reading-label { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:6px; }
-      .now-reading-val { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:28px; font-weight:200; color:rgba(255,255,255,0.9); line-height:1; letter-spacing:-0.02em; }
-      .now-reading-unit { font-size:14px; color:rgba(255,255,255,0.4); font-weight:300; }
-      .now-reading-sub { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:12px; color:rgba(255,255,255,0.3); margin-top:4px; }
+      .now-readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 14px 14px; }
+      .now-reading-card { background:var(--white); border:1px solid rgba(11,37,69,0.16); padding:12px 14px; }
+      .now-reading-label { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+      .now-reading-val { font-family:'IBM Plex Mono',monospace; font-size:24px; color:var(--ink); line-height:1; }
+      .now-reading-unit { font-size:13px; color:var(--ink4); }
+      .now-reading-sub { font-family:'Spectral',serif; font-size:11px; color:var(--ink3); margin-top:4px; }
 
-      .rain-answer { margin:0 16px 12px; background:rgba(255,255,255,0.07) !important; border-radius:16px !important; border:1px solid rgba(255,255,255,0.08) !important; padding:14px 16px !important; }
+      .rain-answer { margin:0 14px 14px; background:var(--white) !important; border:1px solid rgba(11,37,69,0.16) !important; border-radius:0 !important; padding:14px 16px !important; }
+      .rain-answer-text { font-family:'Spectral',serif !important; font-size:14px !important; line-height:1.55 !important; }
 
-      /* ── DARK ATMOSPHERIC REDESIGN ──────────────────────────────────────── */
-
-      /* Base dark background */
+      /* ── THE PAPER (broadsheet ground) ─────────────────────────────────── */
       body {
-        background: linear-gradient(180deg, #0d1f3c 0%, #060d1a 100%) !important;
+        background: #f0ede8 !important;
         background-attachment: fixed !important;
-        color: rgba(255,255,255,0.92) !important;
+        color: var(--ink) !important;
       }
+      /* Condition-responsive paper tints — barely-there */
+      body.sky-clear  { background: #f2efe7 !important; }
+      body.sky-cloudy { background: #efedea !important; }
+      body.sky-rain   { background: #ecedee !important; }
+      body.sky-snow   { background: #f1f1f2 !important; }
+      body.sky-fog    { background: #eeedeb !important; }
+      body.sky-storm  { background: #eae9ec !important; }
 
-      /* Condition-responsive sky */
-      body.sky-clear  { background: linear-gradient(180deg, #0d2244 0%, #060d1c 100%) !important; }
-      body.sky-cloudy { background: linear-gradient(180deg, #111827 0%, #070b12 100%) !important; }
-      body.sky-rain   { background: linear-gradient(180deg, #0a1520 0%, #040b14 100%) !important; }
-      body.sky-snow   { background: linear-gradient(180deg, #141c2e 0%, #090e1a 100%) !important; }
-      body.sky-fog    { background: linear-gradient(180deg, #141920 0%, #0a0d12 100%) !important; }
-      body.sky-storm  { background: linear-gradient(180deg, #0d0d20 0%, #060612 100%) !important; }
-
-      /* Sticky bar — dark glass */
-      .sticky-bar {
-        background: rgba(6,13,26,0.85) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-      }
-      .sticky-wordmark { color: rgba(255,255,255,0.9) !important; }
-      .sticky-status, .sticky-sep { color: rgba(255,255,255,0.3) !important; }
-
-      /* Cards — frosted dark glass */
       .card {
-        background: rgba(255,255,255,0.05) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
+        background: var(--white) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
-      .card + .card { border-top: 1px solid rgba(255,255,255,0.06) !important; }
 
-      /* Greeting */
-      .greeting-line { color: var(--orange2) !important; }
-      .greeting-city { color: rgba(255,255,255,0.95) !important; }
-      .greeting-sub  { color: rgba(255,255,255,0.4) !important; }
-      .greeting-wrap { border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+      .greeting-line { color: var(--orange) !important; }
+      .greeting-city { color: var(--navy) !important; }
+      .greeting-sub  { color: var(--ink3) !important; }
+      .greeting-wrap { border-bottom: 1px solid rgba(11,37,69,0.1) !important; }
 
-      /* Temperature — bigger, bolder presence */
-      .temp-numeral {
-        font-size: 100px !important;
-        color: rgba(255,255,255,0.96) !important;
-        font-weight: 100 !important;
-      }
-      .temp-degree { color: rgba(255,255,255,0.5) !important; }
-      .temp-right { border-left-color: rgba(255,255,255,0.08) !important; }
-      .temp-hero { border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+      .temp-numeral { font-size: 96px !important; color: var(--navy) !important; }
+      .temp-degree { color: var(--ink4) !important; }
+      .temp-right { border-left-color: rgba(11,37,69,0.1) !important; }
+      .temp-hero { border-bottom: 1px solid rgba(11,37,69,0.1) !important; }
 
-      /* Feels like */
-      .feels-label { color: rgba(255,255,255,0.35) !important; }
-      .feels-val   { color: rgba(255,255,255,0.85) !important; }
-      .obs-time    { color: rgba(255,255,255,0.25) !important; }
+      .feels-label { color: var(--ink4) !important; }
+      .feels-val   { color: var(--ink) !important; }
+      .obs-time    { color: var(--ink4) !important; }
 
-      /* Readings grid */
-      .readings { border-top: 1px solid rgba(255,255,255,0.06) !important; }
-      .reading  { border-color: rgba(255,255,255,0.06) !important; background: transparent !important; }
-      .reading-label { color: rgba(255,255,255,0.35) !important; }
-      .reading-val   { color: rgba(255,255,255,0.92) !important; }
-      .reading-unit  { color: rgba(255,255,255,0.35) !important; }
-      .reading-note  { color: rgba(255,255,255,0.3) !important; }
+      .readings { border-top: 1px solid rgba(11,37,69,0.1) !important; }
+      .reading  { border-color: rgba(11,37,69,0.1) !important; background: transparent !important; }
+      .reading-label { color: var(--ink3) !important; }
+      .reading-val   { color: var(--ink) !important; }
+      .reading-unit  { color: var(--ink4) !important; }
+      .reading-note  { color: var(--ink4) !important; }
 
-      /* 7-day forecast strip */
-      .forecast { border-top: 1px solid rgba(255,255,255,0.06) !important; }
-      .fc-day { background: transparent !important; border-right-color: rgba(255,255,255,0.06) !important; }
-      .fc-day.today { background: rgba(255,255,255,0.07) !important; border-top: none !important; }
-      .fc-name { color: rgba(255,255,255,0.35) !important; }
-      .fc-day.today .fc-name { color: rgba(255,255,255,0.7) !important; }
-      .fc-hi   { color: rgba(255,255,255,0.92) !important; }
-      .fc-lo   { color: rgba(255,255,255,0.35) !important; }
-      .fc-rain { color: #5b9ec9 !important; }
+      .forecast { border-top: 1px solid rgba(11,37,69,0.1) !important; }
+      .fc-day { background: transparent !important; border-right-color: rgba(11,37,69,0.08) !important; }
+      .fc-day.today { background: rgba(11,37,69,0.05) !important; border-top: none !important; }
+      .fc-name { color: var(--ink4) !important; }
+      .fc-day.today .fc-name { color: var(--orange) !important; }
+      .fc-hi   { color: var(--ink) !important; }
+      .fc-lo   { color: var(--ink4) !important; }
+      .fc-rain { color: #3f6d99 !important; }
 
-      /* Rain answer */
-      .rain-answer { border-bottom: 1px solid rgba(255,255,255,0.06) !important; background: transparent !important; }
-      .rain-answer-text { color: rgba(255,255,255,0.88) !important; }
-      .rain-answer-text strong { color: #fff !important; }
-      .rain-hour-slot { opacity: 0.7; }
-      .rain-hour-label { color: rgba(255,255,255,0.25) !important; }
-      .rain-answer-clear { color: rgba(255,255,255,0.4) !important; }
+      .rain-answer-text strong { color: var(--navy) !important; }
+      .rain-hour-slot { opacity: 0.85; }
+      .rain-hour-label { color: var(--ink4) !important; }
+      .rain-answer-clear { color: var(--ink3) !important; }
 
-      /* Sunrise/sunset/UV row */
-      .reading-label, .fv-lo { color: rgba(255,255,255,0.35) !important; }
+      .fv-city-card { background: var(--white) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+      .fv-city-head { background: rgba(11,37,69,0.04) !important; }
+      .fv-city-head-name { color: var(--navy) !important; }
+      .fv-city-head-state { color: var(--ink4) !important; }
+      .fv-day-row { border-bottom-color: rgba(11,37,69,0.08) !important; }
+      .fv-day-row.fv-today { background: rgba(11,37,69,0.05) !important; }
+      .fv-day-name { color: var(--ink2) !important; }
+      .fv-day-cond { color: var(--ink3) !important; }
+      .fv-day-hi   { color: var(--ink) !important; }
+      .fv-day-lo   { color: var(--ink4) !important; }
+      .fv-day-precip { color: #3f6d99 !important; }
 
-      /* Forecast list view (7-day page) */
-      .fv-city-card { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
-      .fv-city-head { background: rgba(255,255,255,0.07) !important; }
-      .fv-city-head-name { color: rgba(255,255,255,0.95) !important; }
-      .fv-city-head-state { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-row { border-bottom-color: rgba(255,255,255,0.06) !important; }
-      .fv-day-row.fv-today { background: rgba(255,255,255,0.07) !important; }
-      .fv-day-name { color: rgba(255,255,255,0.88) !important; }
-      .fv-day-cond { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-hi   { color: rgba(255,255,255,0.92) !important; }
-      .fv-day-lo   { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-precip { color: #5b9ec9 !important; }
+      .hv-card { background: var(--white) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+      .hv-slot { border-right-color: rgba(11,37,69,0.08) !important; }
+      .hv-slot.now { background: rgba(11,37,69,0.05) !important; }
+      .hv-slot.now::after { background: var(--orange) !important; }
+      .hv-time { color: var(--ink4) !important; }
+      .hv-slot.now .hv-time { color: var(--orange) !important; }
+      .hv-temp { color: var(--ink) !important; }
+      .hv-precip-pct { color: #3f6d99 !important; }
+      .hv-precip-pct.zero { color: rgba(11,37,69,0.18) !important; }
+      .hv-precip-bar-bg { background: rgba(11,37,69,0.1) !important; }
 
-      /* Hourly view */
-      .hv-card { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
-      .hv-slot { border-right-color: rgba(255,255,255,0.06) !important; }
-      .hv-slot.now { background: rgba(255,255,255,0.08) !important; }
-      .hv-slot.now::after { background: rgba(200,75,17,0.9) !important; }
-      .hv-time { color: rgba(255,255,255,0.35) !important; }
-      .hv-slot.now .hv-time { color: rgba(255,255,255,0.7) !important; }
-      .hv-temp { color: rgba(255,255,255,0.92) !important; }
-      .hv-precip-pct { color: #5b9ec9 !important; }
-      .hv-precip-pct.zero { color: rgba(255,255,255,0.2) !important; }
-      .hv-precip-bar-bg { background: rgba(255,255,255,0.08) !important; }
+      .location-name { color: var(--navy) !important; }
+      .location-sub  { color: var(--ink4) !important; }
+      .card-cond     { color: var(--ink3) !important; }
 
-      /* Location name on secondary cards */
-      .location-name { color: rgba(255,255,255,0.92) !important; }
-      .location-sub  { color: rgba(255,255,255,0.35) !important; }
-      .card-cond     { color: rgba(255,255,255,0.4) !important; }
-
-      /* Empty state */
-      .empty-title { color: rgba(255,255,255,0.7) !important; }
-      .empty-sub   { color: rgba(255,255,255,0.25) !important; }
+      .empty-title { color: var(--ink2) !important; }
+      .empty-sub   { color: var(--ink4) !important; }
 
       /* ── ONBOARDING ──────────────────────────────────────────────────────── */
       .onboarding {
@@ -1905,7 +1842,7 @@
         font-size: 72px;
         font-weight: 300;
         letter-spacing: 0.04em;
-        color: rgba(255,255,255,0.95);
+        color: var(--navy);
         line-height: 1;
       }
       .onboarding-tagline {
@@ -1926,7 +1863,7 @@
         font-size: 26px;
         font-weight: 300;
         line-height: 1.5;
-        color: rgba(255,255,255,0.55);
+        color: var(--ink2);
         margin: 0;
       }
       .onboarding-actions {
@@ -1981,26 +1918,25 @@
         letter-spacing: 0.04em;
       }
 
-      /* ── LOG VIEW DARK ──────────────────────────────────────────────────── */
-      .log-stream { background:rgba(255,255,255,0.04) !important; border-radius:12px !important; border:1px solid rgba(255,255,255,0.07) !important; margin-bottom:10px; overflow:hidden; }
-      .log-stream-header { background:rgba(255,255,255,0.04) !important; border-bottom:1px solid rgba(255,255,255,0.07) !important; }
-      .log-sh, .log-sh-r { color:rgba(255,255,255,0.25) !important; }
-      .log-entry { border-bottom-color:rgba(255,255,255,0.06) !important; background:transparent !important; }
-      .log-entry:hover { background:rgba(255,255,255,0.03) !important; }
-      .log-entry-time { color:rgba(255,255,255,0.35) !important; }
-      .log-entry-time-date { color:rgba(255,255,255,0.2) !important; }
-      .log-entry-loc { color:rgba(255,255,255,0.88) !important; }
-      .log-entry-state { color:rgba(255,255,255,0.3) !important; }
-      .log-entry-sep { color:rgba(255,255,255,0.15) !important; }
-      .log-entry-cond { color:rgba(255,255,255,0.4) !important; }
-      .log-entry-val { color:rgba(255,255,255,0.75) !important; }
-      .log-entry-unit { color:rgba(255,255,255,0.3) !important; }
-      .log-count { color:rgba(255,255,255,0.3) !important; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif !important; }
-      .log-toolbar { border-bottom-color:rgba(255,255,255,0.07) !important; background:transparent !important; }
-      .log-export-btn, .log-clear-btn { background:rgba(255,255,255,0.06) !important; border-color:rgba(255,255,255,0.1) !important; color:rgba(255,255,255,0.5) !important; }
+      /* ── LOG VIEW (paper) ─────────────────────────────────────────────── */
+      .log-stream { background:var(--white) !important; border-radius:0 !important; border:1px solid rgba(11,37,69,0.16) !important; margin-bottom:12px; overflow:hidden; }
+      .log-stream-header { background:rgba(11,37,69,0.04) !important; border-bottom:1px solid rgba(11,37,69,0.1) !important; }
+      .log-sh, .log-sh-r { color:var(--ink3) !important; }
+      .log-entry { border-bottom-color:rgba(11,37,69,0.08) !important; background:transparent !important; }
+      .log-entry:hover { background:rgba(11,37,69,0.03) !important; }
+      .log-entry-time { color:var(--ink3) !important; }
+      .log-entry-time-date { color:var(--ink4) !important; }
+      .log-entry-loc { color:var(--ink) !important; }
+      .log-entry-state { color:var(--ink4) !important; }
+      .log-entry-sep { color:rgba(11,37,69,0.18) !important; }
+      .log-entry-cond { color:var(--ink3) !important; }
+      .log-entry-val { color:var(--ink2) !important; }
+      .log-entry-unit { color:var(--ink4) !important; }
+      .log-count { color:var(--ink3) !important; font-family:'IBM Plex Mono',monospace !important; }
+      .log-toolbar { border-bottom-color:rgba(11,37,69,0.1) !important; background:transparent !important; }
+      .log-export-btn, .log-clear-btn { background:transparent !important; border-color:rgba(11,37,69,0.25) !important; color:var(--ink2) !important; }
       .log-note-row { background:transparent !important; }
-      .empty-sub   { color: rgba(255,255,255,0.3) !important; }
-      .empty-btn   { background: rgba(255,255,255,0.1) !important; border: 1px solid rgba(255,255,255,0.12) !important; color: rgba(255,255,255,0.8) !important; }
+      .empty-btn   { background: var(--navy) !important; border: 1px solid var(--navy) !important; color: #fff !important; }
 
       /* Main area — no padding so background shows through */
       main { background: transparent !important; }
@@ -2021,14 +1957,6 @@
         opacity:0.6 !important;
       }
       /* Greeting — keep Cormorant for city name (it's the brand), system for everything else */
-      .greeting-line { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; font-size:9px !important; }
-      .greeting-sub { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      /* Rain answer — system font, not monospace */
-      .rain-answer-text { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; font-size:15px !important; letter-spacing:0 !important; }
-      /* Reading labels — tighten */
-      .reading-label { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      .feels-label { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      .obs-time { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
       /* Station ID — hide on mobile, it's noise */
       .station-id { display:none !important; }
       .readings { border-top: 1px solid rgba(11,37,69,0.07) !important; }
@@ -2210,31 +2138,32 @@
 
     /* Log entry redesign — ship's log style */
     .log-entry-card {
-      background:rgba(255,255,255,0.04);
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.07);
+      background:var(--white);
+      border-radius:0;
+      border:1px solid rgba(11,37,69,0.16);
+      border-left:3px solid var(--orange);
       padding:16px;
       margin-bottom:10px;
     }
     .log-entry-card-mood {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-      color:var(--orange2);margin-bottom:6px;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--orange);margin-bottom:6px;
     }
     .log-entry-card-note {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:16px;line-height:1.5;color:rgba(255,255,255,0.88);
+      font-family:'Spectral',serif;
+      font-size:15px;line-height:1.55;color:var(--ink);
       margin-bottom:10px;
     }
     .log-entry-card-context {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.04em;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:9px;color:var(--ink4);letter-spacing:.04em;
       display:flex;gap:12px;flex-wrap:wrap;
     }
     .log-entry-card-timestamp {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+      font-family:'IBM Plex Mono',monospace;
       font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-      color:rgba(255,255,255,0.2);margin-top:8px;
+      color:var(--ink4);margin-top:8px;
     }
     /* ── FORECAST DISCUSSION (NWS AFD via Iowa State IEM) ─────────────────── */
     .afd-section { margin-top:28px; }
@@ -4855,7 +4784,7 @@ function renderLogView() {
           <div class="log-entry-card-timestamp">${timeStr}</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0;padding:4px 0 0">
-          <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(255,255,255,0.2);font-size:12px;background:none;border:none;cursor:pointer;padding:4px 6px;">✕</button>
+          <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;">✕</button>
         </div>
       </div>`;
     }
@@ -5277,7 +5206,10 @@ function ensureLeadStory() {
 // Pull a headline from the synopsis: first sentence if it reads like a head,
 // else first clause; else no head (kicker acts as the standing slug).
 function afdHeadline(synopsis) {
-  const s = (synopsis || '').trim();
+  const s = (synopsis || '').trim()
+    .replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)/i, '')
+    .replace(/^\d+[.)]\s+/, '')
+    .replace(/^[.\u2026:\-\s]+/, '');
   const stop = s.search(/[.!?](\s|$)/);
   let head = stop > 0 ? s.slice(0, stop) : s;
   let rest = stop > 0 ? s.slice(stop + 1).trim() : '';
@@ -5299,6 +5231,7 @@ function fillLeadStory(wfo, synopsis, full) {
   const ls = ensureLeadStory();
   if (!ls) return;
   document.getElementById('ls-kicker').textContent = 'The Forecast Discussion · NWS ' + wfo;
+  synopsis = synopsis.replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)/i, '').replace(/^\d+[.)]\s+/, '');
   const { head, rest } = afdHeadline(synopsis);
   const hEl = document.getElementById('ls-head');
   const bEl = document.getElementById('ls-body');
