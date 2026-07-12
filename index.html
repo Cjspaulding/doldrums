@@ -5252,11 +5252,11 @@ function readableAFD(raw, unabridged) {
     .replace(/^Area Forecast Discussion.*\n/mi, '')
     .replace(/^\.*National Weather Service.*\n/mi, '')
     .replace(/^[A-Za-z .\/-]+ [A-Z]{2} \d{3,4} (AM|PM) [A-Z]{2,4} .*\n/m, '');
-  const parts = text.split(/\n(?=\.[A-Z][A-Z /&.]*\.\.\.)/);
+  const parts = text.split(/\n(?=\.[A-Z][A-Z0-9 /&.\-]*\.\.\.)/);
   let out = '';
   for (let p of parts) {
     let title = null;
-    const m = p.match(/^\.([A-Z][A-Z /&.]*?)\.\.\./);
+    const m = p.match(/^\.([A-Z][A-Z0-9 /&.\-]*?)\.\.\./);
     if (m) { title = m[1].replace(/\//g, ' ').trim(); p = p.slice(m[0].length); }
     if (title && dropSec.test(title)) continue;
     if (title && !unabridged && editCut.test(title)) continue;
