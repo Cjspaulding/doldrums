@@ -214,6 +214,8 @@
     @keyframes spin { to{transform:rotate(360deg);} }
 
     /* STICKY BAR */
+    .np-masthead { display:none; }
+
     .sticky-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -1555,6 +1557,53 @@
       .summary-bar { display:none !important; }
       .section-head { display:none !important; }
 
+      /* ── BROADSHEET NAMEPLATE (1.2) ────────────────────────────────────── */
+      .sticky-bar { display:none; }
+      main { top: calc(118px + env(safe-area-inset-top)); } /* fallback; JS refines */
+
+      .np-masthead {
+        display:block; position:fixed; top:0; left:0; right:0; z-index:200;
+        background:var(--navy); border-bottom:3px solid var(--orange);
+        padding-top: calc(6px + env(safe-area-inset-top));
+      }
+      body.dark .np-masthead { background:var(--navy); }
+      .np-location {
+        text-align:center; font-family:'IBM Plex Mono',monospace;
+        font-size:8px; letter-spacing:.22em; text-transform:uppercase;
+        color:var(--orange2); padding:2px 16px 0; cursor:pointer;
+        -webkit-tap-highlight-color:transparent;
+      }
+      .np-location-caret { margin-left:5px; opacity:.7; font-size:7px; }
+      .np-wordmark {
+        text-align:center; font-family:'Cormorant Garamond',serif; font-weight:300;
+        font-size:34px; line-height:1; letter-spacing:.08em; text-transform:lowercase;
+        color:#fff; padding:2px 0 8px;
+      }
+      .np-sections {
+        display:flex; justify-content:center;
+        border-top:2px solid rgba(255,255,255,0.85);
+        border-bottom:1px solid rgba(255,255,255,0.12);
+        margin:0 14px;
+      }
+      .np-section {
+        font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+        letter-spacing:.18em; text-transform:uppercase;
+        color:rgba(255,255,255,0.4); padding:9px 14px; cursor:pointer;
+        -webkit-tap-highlight-color:transparent; transition:color .2s;
+      }
+      .np-section.active { color:#fff; box-shadow:inset 0 -2px 0 #fff; }
+      .np-dateline {
+        display:flex; justify-content:space-between; align-items:center;
+        font-family:'IBM Plex Mono',monospace; font-size:7.5px;
+        letter-spacing:.12em; text-transform:uppercase;
+        color:rgba(255,255,255,0.35); padding:6px 14px 7px;
+      }
+      .np-dateline-right { display:flex; align-items:center; gap:8px; }
+      .np-moon {
+        background:none; border:none; color:rgba(255,255,255,0.5);
+        font-size:12px; padding:0 2px; cursor:pointer; line-height:1;
+      }
+
       /* ── NATIVE APP FEEL ─────────────────────────────────────────────── */
       /* System font everywhere — kill IBM Plex Mono on mobile */
       body, button, input,
@@ -2332,6 +2381,24 @@
   </div>
 </div>
 
+<!-- BROADSHEET NAMEPLATE (mobile only) — 1.2 front page, step one -->
+<div class="np-masthead" id="np-masthead">
+  <div class="np-location" onclick="openCitySheet()">
+    <span id="np-location-name">—</span><span class="np-location-caret">▾</span>
+  </div>
+  <div class="np-wordmark">doldrums</div>
+  <div class="np-sections">
+    <div class="np-section active" data-view="conditions" onclick="navTo('conditions')">Front Page</div>
+    <div class="np-section" data-view="radar" onclick="navTo('radar')">Radar</div>
+    <div class="np-section" data-view="log" onclick="navTo('log')">Field Notes</div>
+  </div>
+  <div class="np-dateline">
+    <span id="np-date"></span>
+    <span id="np-edition"></span>
+    <span class="np-dateline-right"><span id="np-updated"></span><button class="np-moon" onclick="toggleDark()" title="Toggle dark mode">☽</button></span>
+  </div>
+</div>
+
 <!-- SUMMARY -->
 <div class="summary-bar">
   <div class="summary-scroll" id="summary-scroll">
@@ -3061,9 +3128,12 @@ async function refreshAll(){
   }
 
   await Promise.all(LOCATIONS.map((loc,i)=>fetchWeather(loc,i)));
+  updateNameplate();
   const now=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   const u=document.getElementById('last-updated');
   if(u)u.textContent=`Obs. ${now}`;
+  const u2=document.getElementById('np-updated');
+  if(u2)u2.textContent=`Obs. ${now}`;
   if(btn)btn.disabled=false;
   if(icon){icon.classList.remove('spin');icon.textContent='↺';}
   haptic('medium');
@@ -3326,6 +3396,34 @@ function haptic(style) {
   navigator.vibrate(patterns[style] || 10);
 }
 
+// ── BROADSHEET NAMEPLATE (mobile) ─────────────────────────────────────────────
+function updateNameplate() {
+  const nameEl = document.getElementById('np-location-name');
+  if(!nameEl) return;
+  const loc = LOCATIONS[0];
+  nameEl.textContent = loc ? (loc.name + (loc.state ? ', ' + loc.state : '')) : 'Add a city';
+  const now = new Date();
+  const d = document.getElementById('np-date');
+  if(d) d.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const ed = document.getElementById('np-edition');
+  if(ed) {
+    const h = now.getHours();
+    ed.textContent = (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' Edition';
+  }
+  sizeNameplate();
+}
+
+// Keep <main>'s top edge aligned to the nameplate's real rendered height
+function sizeNameplate() {
+  const np = document.getElementById('np-masthead');
+  const m = document.querySelector('main');
+  if(!np || !m) return;
+  if(getComputedStyle(np).display === 'none') { m.style.top = ''; return; }
+  m.style.top = np.offsetHeight + 'px';
+}
+window.addEventListener('resize', sizeNameplate);
+window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplate, 600); });
+
 // ── NAVIGATION HISTORY ────────────────────────────────────────────────────────
 const _navHistory = [];
 const _viewLabels = {
@@ -3375,6 +3473,10 @@ function setView(view, isBack) {
   });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  // Sync broadsheet nameplate sections
+  document.querySelectorAll('.np-section').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
   updateBackButton();
