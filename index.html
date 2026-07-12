@@ -5211,11 +5211,23 @@ function readableAFD(raw) {
     [/\bovrngt\b/gi,'overnight'], [/\btwd\b/gi,'toward'], [/\btemps\b/gi,'temperatures'],
     [/\bdwpts\b/gi,'dewpoints'], [/\bwx\b/gi,'weather']
   ];
-  const jargon = s => { for (const [re, sub] of gloss) s = s.replace(re, sub); return s; };
+  const jargon = s => {
+    s = s.replace(/^key\s+messages?\s*\d*\s*[:.\u2026-]*\s*/i, '');
+    for (const [re, sub] of gloss) s = s.replace(re, sub);
+    return s;
+  };
   const titleCase = t => t.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
   const dropSec = /^(AVIATION|FIRE WEATHER|HYDROLOGY|CLIMATE|EQUIPMENT|PRELIMINARY POINT|TIDES)/i;
 
-  let text = raw.replace(/\$\$[\s\S]*$/, '').replace(/\n&&\s*/g, '\n\n');
+  let text = raw.replace(/\$\$[\s\S]*$/, '').replace(/\n&&\s*/g, '\n\n')
+    // WMO/product header lines: "744", "FXUS61 KBOX 121202", "AFDBOX",
+    // "Area Forecast Discussion", "National Weather Service ...", office dateline
+    .replace(/^\s*\d{3}\s*\n/, '')
+    .replace(/^FXUS\d{2}\s+[A-Z]{4}\s+\d{6}.*\n/m, '')
+    .replace(/^AFD[A-Z]{2,4}\s*\n/m, '')
+    .replace(/^Area Forecast Discussion.*\n/mi, '')
+    .replace(/^\.*National Weather Service.*\n/mi, '')
+    .replace(/^[A-Za-z .\/-]+ [A-Z]{2} \d{3,4} (AM|PM) [A-Z]{2,4} .*\n/m, '');
   const parts = text.split(/\n(?=\.[A-Z][A-Z /&.]*\.\.\.)/);
   let out = '';
   for (let p of parts) {
