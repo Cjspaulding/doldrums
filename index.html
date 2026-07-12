@@ -1262,6 +1262,12 @@
     .note-save-btn:disabled { opacity:.4;cursor:not-allowed; }
 
     /* Note entries in log */
+    .fn-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding:6px 0 8px; margin-bottom:14px; }
+    .fn-kicker { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink); font-weight:600; }
+    .fn-count { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); }
+    .fn-empty { padding:44px 8px; text-align:center; }
+    .fn-empty-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink2); margin-bottom:8px; }
+    .fn-empty-sub { font-family:'Spectral',serif; font-size:13px; color:var(--ink3); line-height:1.5; max-width:260px; margin:0 auto; }
     .log-note-row {
       display:flex;align-items:flex-start;gap:14px;
       padding:12px 16px;background:var(--white);
@@ -1622,7 +1628,9 @@
         font-family:'Spectral',serif; font-size:12.5px;
         line-height:1.62; color:var(--ink2);
       }
-      .ls-body.ls-full { font-size:11px; line-height:1.55; white-space:pre-wrap; color:var(--ink3); }
+      .ls-body.ls-full { font-size:12px; }
+      .ls-body.ls-full p { margin:0 0 10px; font-family:'Spectral',serif; font-size:12px; line-height:1.6; color:var(--ink2); }
+      .afd-sec-head { font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--orange); margin:14px 0 6px; }
       .ls-toggle {
         background:none; border:none; padding:8px 0 0; cursor:pointer;
         font-family:'IBM Plex Mono',monospace; font-size:8px;
@@ -4701,79 +4709,28 @@ function updateNoteCount() {
 
 function renderLogView() {
   const main = document.querySelector('main');
+  if(!main) return;
 
-  const obs   = getObsLog().map(e => ({...e, type:'obs'}));
-  const notes = getNotes();
-  const all   = [...obs, ...notes].sort((a,b) => b.ts - a.ts);
+  const notes = getNotes().slice().sort((a,b) => b.ts - a.ts);
+  const count = notes.length;
 
-  const composerHTML = ''; // Composer is now the FAB sheet — removed from log view
-
-  if(all.length === 0) {
-    main.innerHTML = `<div style="padding:40px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh">
-      <div style="font-size:48px;margin-bottom:20px;opacity:0.3">⚓</div>
-      <div class="empty-title">Your weather journal</div>
-      <div class="empty-sub" style="max-width:280px;text-align:center;margin-top:8px">
-        Tap ✏ to log a moment — mood, note, and current conditions are captured automatically.
-      </div>
+  let out = `<div class="log-view" style="padding:0 14px 40px;">
+    <div class="fn-head">
+      <span class="fn-kicker">Field Notes</span>
+      <span class="fn-count">${count ? count + (count === 1 ? ' dispatch' : ' dispatches') : ''}</span>
     </div>`;
-    return;
-  }
 
-  const obsCount  = obs.length;
-  const noteCount = notes.length;
-  const totalLabel = obsCount + ' observation' + (obsCount !== 1 ? 's' : '') + (noteCount > 0 ? ' · ' + noteCount + ' note' + (noteCount !== 1 ? 's' : '') : '');
-
-  let streamHTML = '';
-  let obsBuffer  = [];
-
-  function flushObs() {
-    if(!obsBuffer.length) return;
-    streamHTML += `<div class="log-stream">
-      <div class="log-stream-header">
-        <span class="log-sh">Time</span>
-        <span class="log-sh">Location · Condition</span>
-        <div class="log-sh-right">
-          <span class="log-sh-r">Temp</span>
-          <span class="log-sh-r">Wind</span>
-          <span class="log-sh-r" style="min-width:44px">Pressure</span>
-        </div>
-      </div>`;
-    obsBuffer.forEach(e => {
+  if(count === 0) {
+    out += `<div class="fn-empty">
+      <div class="fn-empty-title">Nothing on record.</div>
+      <div class="fn-empty-sub">What's the sky doing right now? Tap the pencil and file the first dispatch.</div>
+    </div>`;
+  } else {
+    notes.forEach(e => {
       const d = new Date(e.ts);
-      const timeStr = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
-      const dateStr = d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
-      const stateStr = e.state ? (STATE_ABBR[e.state] || e.state.slice(0,3).toUpperCase()) : 'INTL';
-      streamHTML += `<div class="log-entry">
-        <div class="log-entry-time">
-          ${timeStr}
-          <span class="log-entry-time-date">${dateStr}</span>
-        </div>
-        <div class="log-entry-mid">
-          <span class="log-entry-loc">${e.name}</span>
-          <span class="log-entry-state">${stateStr}</span>
-          <span class="log-entry-sep">·</span>
-          <span class="log-entry-cond">${e.condition || '—'}</span>
-        </div>
-        <div class="log-entry-data">
-          <span class="log-entry-val">${e.temp != null ? e.temp+(e.sym||'°') : '<span class="log-entry-nil">—</span>'}</span>
-          <span class="log-entry-val">${e.wind != null ? e.wind+'<span class="log-entry-unit"> '+(e.windUnit||'')+'</span>' : '<span class="log-entry-nil">—</span>'}</span>
-          <span class="log-entry-val" style="min-width:44px">${e.pressure ? e.pressure+'<span class="log-entry-unit"> hPa</span>' : '<span class="log-entry-nil">—</span>'}</span>
-        </div>
-      </div>`;
-    });
-    streamHTML += `</div>`;
-    obsBuffer = [];
-  }
-
-  all.forEach(e => {
-    if(e.type === 'obs') {
-      obsBuffer.push(e);
-    } else {
-      flushObs();
-      const d = new Date(e.ts);
-      const timeStr = d.toLocaleString('en-US',{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
-      streamHTML += `<div class="log-note-row">
-        <div class="log-entry-card">
+      const timeStr = d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+      out += `<div class="log-note-row" style="border:none;background:transparent;padding:0;margin-bottom:12px;">
+        <div class="log-entry-card" style="flex:1;margin-bottom:0;">
           ${e.mood ? `<div class="log-entry-card-mood">${e.mood}</div>` : ''}
           ${e.text ? `<div class="log-entry-card-note">${e.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
           ${e.context ? `<div class="log-entry-card-context">
@@ -4783,26 +4740,15 @@ function renderLogView() {
           </div>` : ''}
           <div class="log-entry-card-timestamp">${timeStr}</div>
         </div>
-        <div style="display:flex;gap:6px;flex-shrink:0;padding:4px 0 0">
-          <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;">✕</button>
-        </div>
+        <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;flex-shrink:0;">✕</button>
       </div>`;
-    }
-  });
-  flushObs();
+    });
+  }
 
-  main.innerHTML = `<div class="log-view" style="padding:0 16px 40px;display:flex;flex-direction:column;gap:12px;">
-    ${composerHTML}
-    <div class="log-toolbar">
-      <span class="log-count">${totalLabel}</span>
-      <div style="display:flex;gap:8px;">
-        <button class="log-export-btn" onclick="exportLog()">↓ CSV</button>
-        <button class="log-clear-btn" onclick="clearLog()">Clear data</button>
-      </div>
-    </div>
-    ${streamHTML}
-  </div>`;
+  out += '</div>';
+  main.innerHTML = out;
 }
+
 
 // ── PWA INSTALL PROMPT ────────────────────────────────────────────────────────
 let _deferredInstall = null;
@@ -5245,11 +5191,44 @@ function fillLeadStory(wfo, synopsis, full) {
   tgl.textContent = 'Continued — full discussion';
   tgl.onclick = function () {
     expanded = !expanded;
-    bEl.textContent = expanded ? full : collapsed;
+    if (expanded) { bEl.innerHTML = readableAFD(full); }
+    else { bEl.textContent = collapsed; }
     bEl.classList.toggle('ls-full', expanded);
-    tgl.textContent = expanded ? 'Return to synopsis' : 'Continued — full discussion';
+    tgl.textContent = expanded ? 'Return to the synopsis' : 'Continued — full discussion';
   };
   ls.classList.add('ls-ready');
+}
+
+// Turn the raw AFD into readable copy: keep narrative sections, unwrap
+// hard line breaks into paragraphs, expand the worst of the jargon.
+function readableAFD(raw) {
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const gloss = [
+    [/\bkt\b/gi,'knots'], [/\bsfc\b/gi,'surface'], [/\bcigs\b/gi,'ceilings'],
+    [/\bcig\b/gi,'ceiling'], [/\bvsby\b/gi,'visibility'], [/\bpcpn\b/gi,'precipitation'],
+    [/\btstms\b/gi,'thunderstorms'], [/\btstm\b/gi,'thunderstorm'], [/\bshwrs\b/gi,'showers'],
+    [/\bfcst\b/gi,'forecast'], [/\bthru\b/gi,'through'], [/\baftn\b/gi,'afternoon'],
+    [/\bovrngt\b/gi,'overnight'], [/\btwd\b/gi,'toward'], [/\btemps\b/gi,'temperatures'],
+    [/\bdwpts\b/gi,'dewpoints'], [/\bwx\b/gi,'weather']
+  ];
+  const jargon = s => { for (const [re, sub] of gloss) s = s.replace(re, sub); return s; };
+  const titleCase = t => t.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
+  const dropSec = /^(AVIATION|FIRE WEATHER|HYDROLOGY|CLIMATE|EQUIPMENT|PRELIMINARY POINT|TIDES)/i;
+
+  let text = raw.replace(/\$\$[\s\S]*$/, '').replace(/\n&&\s*/g, '\n\n');
+  const parts = text.split(/\n(?=\.[A-Z][A-Z /&.]*\.\.\.)/);
+  let out = '';
+  for (let p of parts) {
+    let title = null;
+    const m = p.match(/^\.([A-Z][A-Z /&.]*?)\.\.\./);
+    if (m) { title = m[1].replace(/\//g, ' ').trim(); p = p.slice(m[0].length); }
+    if (title && dropSec.test(title)) continue;
+    const paras = p.split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
+    if (!paras.length) continue;
+    if (title) out += '<div class="afd-sec-head">' + esc(titleCase(title)) + '</div>';
+    out += paras.map(x => '<p>' + esc(jargon(x)) + '</p>').join('');
+  }
+  return out || '<p>' + esc(raw) + '</p>';
 }
 
 function compass(deg) {
