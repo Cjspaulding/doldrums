@@ -1632,6 +1632,9 @@
       .ls-body.ls-full { font-size:12px; }
       .ls-body.ls-full p { margin:0 0 10px; font-family:'Spectral',serif; font-size:12px; line-height:1.6; color:var(--ink2); }
       .afd-sec-head { font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--orange); margin:14px 0 6px; }
+      .ls-body.ls-full p.afd-bullet { padding-left:14px; position:relative; margin-bottom:7px; }
+      .ls-body.ls-full p.afd-bullet::before { content:'\2014'; position:absolute; left:0; color:var(--orange); }
+      .ls-unabridged { display:block; background:none; border:none; padding:10px 0 0; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink4); text-decoration:underline; text-underline-offset:2px; }
       .ls-toggle {
         background:none; border:none; padding:8px 0 0; cursor:pointer;
         font-family:'IBM Plex Mono',monospace; font-size:8px;
@@ -5196,9 +5199,20 @@ function fillLeadStory(wfo, synopsis, full) {
   let expanded = false;
   const tgl = document.getElementById('ls-toggle');
   tgl.textContent = 'Continued — full discussion';
+  function renderExpanded(unabridged) {
+    bEl.innerHTML = readableAFD(full, unabridged);
+    if (!unabridged) {
+      const more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'ls-unabridged';
+      more.textContent = 'Read the unabridged discussion';
+      more.onclick = () => renderExpanded(true);
+      bEl.appendChild(more);
+    }
+  }
   tgl.onclick = function () {
     expanded = !expanded;
-    if (expanded) { bEl.innerHTML = readableAFD(full); }
+    if (expanded) { renderExpanded(false); }
     else { bEl.textContent = collapsed; }
     bEl.classList.toggle('ls-full', expanded);
     tgl.textContent = expanded ? 'Return to the synopsis' : 'Continued — full discussion';
@@ -5208,7 +5222,7 @@ function fillLeadStory(wfo, synopsis, full) {
 
 // Turn the raw AFD into readable copy: keep narrative sections, unwrap
 // hard line breaks into paragraphs, expand the worst of the jargon.
-function readableAFD(raw) {
+function readableAFD(raw, unabridged) {
   const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const gloss = [
     [/\bkt\b/gi,'knots'], [/\bsfc\b/gi,'surface'], [/\bcigs\b/gi,'ceilings'],
@@ -5225,6 +5239,9 @@ function readableAFD(raw) {
   };
   const titleCase = t => t.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
   const dropSec = /^(AVIATION|FIRE WEATHER|HYDROLOGY|CLIMATE|EQUIPMENT|PRELIMINARY POINT|TIDES)/i;
+  // The edited read also cuts the period-by-period retelling — Key Messages
+  // and the Discussion already carry the story.
+  const editCut = /^(NEAR TERM|SHORT TERM|LONG TERM|UPDATE AS OF|WATCHES|OVERNIGHT|REST OF)/i;
 
   let text = raw.replace(/\$\$[\s\S]*$/, '').replace(/\n&&\s*/g, '\n\n')
     // WMO/product header lines: "744", "FXUS61 KBOX 121202", "AFDBOX",
@@ -5242,10 +5259,15 @@ function readableAFD(raw) {
     const m = p.match(/^\.([A-Z][A-Z /&.]*?)\.\.\./);
     if (m) { title = m[1].replace(/\//g, ' ').trim(); p = p.slice(m[0].length); }
     if (title && dropSec.test(title)) continue;
+    if (title && !unabridged && editCut.test(title)) continue;
     const paras = p.split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
     if (!paras.length) continue;
     if (title) out += '<div class="afd-sec-head">' + esc(titleCase(title)) + '</div>';
-    out += paras.map(x => '<p>' + esc(jargon(x)) + '</p>').join('');
+    out += paras.map(x => {
+      const b = /^[-*]\s+/.test(x);
+      const body = esc(jargon(x.replace(/^[-*]\s+/, '')));
+      return b ? '<p class="afd-bullet">' + body + '</p>' : '<p>' + body + '</p>';
+    }).join('');
   }
   return out || '<p>' + esc(raw) + '</p>';
 }
