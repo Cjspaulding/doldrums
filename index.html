@@ -214,6 +214,9 @@
     @keyframes spin { to{transform:rotate(360deg);} }
 
     /* STICKY BAR */
+    .np-masthead { display:none; }
+    .lead-story { display:none; }
+
     .sticky-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -304,7 +307,8 @@
       position: fixed;
       top: calc(44px + env(safe-area-inset-top));
       left: 0; right: 0;
-      bottom: calc(80px + env(safe-area-inset-bottom));
+      bottom: 0;
+      padding-bottom: env(safe-area-inset-bottom);
       overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       padding: 0 0 20px;
@@ -1259,6 +1263,12 @@
     .note-save-btn:disabled { opacity:.4;cursor:not-allowed; }
 
     /* Note entries in log */
+    .fn-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding:6px 0 8px; margin-bottom:14px; }
+    .fn-kicker { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink); font-weight:600; }
+    .fn-count { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); }
+    .fn-empty { padding:44px 8px; text-align:center; }
+    .fn-empty-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink2); margin-bottom:8px; }
+    .fn-empty-sub { font-family:'Spectral',serif; font-size:13px; color:var(--ink3); line-height:1.5; max-width:260px; margin:0 auto; }
     .log-note-row {
       display:flex;align-items:flex-start;gap:14px;
       padding:12px 16px;background:var(--white);
@@ -1555,40 +1565,91 @@
       .summary-bar { display:none !important; }
       .section-head { display:none !important; }
 
-      /* ── NATIVE APP FEEL ─────────────────────────────────────────────── */
-      /* System font everywhere — kill IBM Plex Mono on mobile */
-      body, button, input,
-      .location-name, .location-sub, .card-cond,
-      .reading-label, .reading-unit, .reading-note,
-      .feels-label, .obs-time,
-      .fc-name, .fc-hi, .fc-lo, .fc-rain,
-      .forecast-label, .hv-time, .hv-precip-pct,
-      .bottom-nav-label, .sticky-status,
-      .fv-day-name, .fv-day-cond, .fv-city-head-name, .fv-city-head-state,
-      .rain-answer-text, .rain-hour-label,
-      .pv-trend-label, .pv-class, .pv-unit, .sum-temp,
-      .alert-row-msg, .alert-row-time, .log-entry-loc {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        letter-spacing: 0 !important;
+      /* ── BROADSHEET NAMEPLATE (1.2) ────────────────────────────────────── */
+      .sticky-bar { display:none; }
+      main { top: calc(118px + env(safe-area-inset-top)); } /* fallback; JS refines */
+
+      .np-masthead {
+        display:block; position:fixed; top:0; left:0; right:0; z-index:200;
+        background:var(--navy); border-bottom:3px solid var(--orange);
+        padding-top: calc(6px + env(safe-area-inset-top));
       }
-      /* Large temperature — ultra-light system font, very app-like */
-      .temp-numeral {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 100 !important;
-        letter-spacing: -0.03em !important;
+      body.dark .np-masthead { background:var(--navy); }
+      .np-location {
+        text-align:center; font-family:'IBM Plex Mono',monospace;
+        font-size:8px; letter-spacing:.22em; text-transform:uppercase;
+        color:var(--orange2); padding:2px 16px 0; cursor:pointer;
+        -webkit-tap-highlight-color:transparent;
       }
-      .feels-val, .reading-val, .pv-hpa {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 200 !important;
-        letter-spacing: -0.02em !important;
+      .np-location-caret { margin-left:5px; opacity:.7; font-size:7px; }
+      .np-wordmark {
+        text-align:center; font-family:'Cormorant Garamond',serif; font-weight:300;
+        font-size:34px; line-height:1; letter-spacing:.08em; text-transform:lowercase;
+        color:#fff; padding:2px 0 8px;
       }
-      .fv-day-hi, .fv-hi, .hv-temp, .fv-day-lo, .fv-lo {
-        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important;
-        font-weight: 300 !important;
-        letter-spacing: 0 !important;
+      .np-sections {
+        display:flex; justify-content:center;
+        border-top:2px solid rgba(255,255,255,0.85);
+        border-bottom:1px solid rgba(255,255,255,0.12);
+        margin:0 14px;
       }
-      /* Keep Cormorant ONLY for city name — the one brand element */
-      .greeting-city { font-family: 'Cormorant Garamond', serif !important; }
+      .np-section {
+        font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+        letter-spacing:.18em; text-transform:uppercase;
+        color:rgba(255,255,255,0.4); padding:9px 14px; cursor:pointer;
+        -webkit-tap-highlight-color:transparent; transition:color .2s;
+      }
+      .np-section.active { color:#fff; box-shadow:inset 0 -2px 0 #fff; }
+      .np-dateline {
+        display:flex; justify-content:space-between; align-items:center;
+        font-family:'IBM Plex Mono',monospace; font-size:7.5px;
+        letter-spacing:.12em; text-transform:uppercase;
+        color:rgba(255,255,255,0.35); padding:6px 14px 7px;
+      }
+      .np-dateline-right { display:flex; align-items:center; gap:8px; }
+      .np-moon {
+        background:none; border:none; color:rgba(255,255,255,0.5);
+        font-size:12px; padding:0 2px; cursor:pointer; line-height:1;
+      }
+
+      /* ── FRONT PAGE LEAD STORY (1.2) ───────────────────────────────────── */
+      .afd-section { display:none !important; } /* content promoted to the lead */
+      .lead-story.ls-ready { display:block; margin:16px 14px 6px; padding-bottom:16px; border-bottom:2px solid var(--navy); }
+      .ls-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,.82fr); gap:14px; }
+      .ls-kicker {
+        font-family:'IBM Plex Mono',monospace; font-size:7.5px;
+        letter-spacing:.2em; text-transform:uppercase;
+        color:var(--orange); margin-bottom:7px;
+      }
+      .ls-head {
+        font-family:'Cormorant Garamond',serif; font-weight:500;
+        font-size:25px; line-height:1.12; color:var(--navy); margin-bottom:8px;
+      }
+      .ls-body {
+        font-family:'Spectral',serif; font-size:12.5px;
+        line-height:1.62; color:var(--ink2);
+      }
+      .ls-body.ls-full { font-size:12px; }
+      .ls-body.ls-full p { margin:0 0 10px; font-family:'Spectral',serif; font-size:12px; line-height:1.6; color:var(--ink2); }
+      .afd-sec-head { font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--orange); margin:14px 0 6px; }
+      .ls-toggle {
+        background:none; border:none; padding:8px 0 0; cursor:pointer;
+        font-family:'IBM Plex Mono',monospace; font-size:8px;
+        letter-spacing:.14em; text-transform:uppercase; color:var(--orange);
+      }
+      .ls-rail { border-left:1px solid rgba(11,37,69,0.18); padding-left:12px; display:flex; flex-direction:column; gap:11px; }
+      .ls-stat-label {
+        font-family:'IBM Plex Mono',monospace; font-size:7px;
+        letter-spacing:.16em; text-transform:uppercase; color:var(--ink4); margin-bottom:2px;
+      }
+      .ls-stat-value { font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink); }
+      .ls-stat-value.ls-now { font-size:21px; font-weight:300; }
+      .ls-stat-sub { font-family:'Spectral',serif; font-size:10.5px; color:var(--ink3); margin-top:1px; }
+
+      /* ── BROADSHEET TYPE ─────────────────────────────────────────────── */
+      /* Editorial faces everywhere; sizing handled per-element below. */
+      /* Large temperature — old-style serif numeral, front-page style */
+      .temp-numeral { font-family:'Cormorant Garamond',serif !important; font-weight:300 !important; letter-spacing:0 !important; }
       /* Rain answer — readable prose */
       .rain-answer-text {
         font-size: 16px !important;
@@ -1608,12 +1669,12 @@
         background:#fff !important;
       }
       /* Clean separator between cards */
-      .card + .card { border-top:1px solid rgba(11,37,69,0.06) !important; }
+      .card + .card { border-top:1px solid rgba(11,37,69,0.14) !important; }
       /* Kill the grid texture inside cards */
       .card::before { display:none !important; }
       .card:hover { transform:none !important; box-shadow:none !important; }
-      /* Hide card-bar */
-      .card-bar { display:none; }
+      /* Card bar returns — printed section rule */
+      .card-bar { display:block; }
       /* Hide section label */
       .section-label { display:none; }
       /* Primary card head hidden — greeting handles it */
@@ -1640,170 +1701,137 @@
       .hv-strip { scrollbar-width:none !important; }
       .hv-strip::-webkit-scrollbar { display:none !important; }
 
-      /* ── VERTICAL SCROLL NOW VIEW ────────────────────────────────────────── */
+      /* ── VERTICAL SCROLL NOW VIEW (paper) ─────────────────────────────── */
       .now-temp-section { padding: 8px 20px 20px; }
-      .now-temp-section .temp-numeral { font-size:96px !important; font-weight:100 !important; letter-spacing:-0.03em !important; color:rgba(255,255,255,0.96) !important; line-height:1 !important; }
-      .now-temp-section .temp-degree { font-size:36px !important; color:rgba(255,255,255,0.5) !important; vertical-align:super; margin-left:2px; }
-      .now-hi-lo { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:15px; color:rgba(255,255,255,0.4); margin-top:4px; }
+      .now-temp-section .temp-numeral { font-family:'Cormorant Garamond',serif !important; font-size:96px !important; font-weight:300 !important; letter-spacing:0 !important; color:var(--navy) !important; line-height:1 !important; }
+      .now-temp-section .temp-degree { font-size:36px !important; color:var(--ink4) !important; vertical-align:super; margin-left:2px; }
+      .now-hi-lo { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; color:var(--ink3); margin-top:4px; }
 
-      .now-section-card { margin:0 16px 12px; background:rgba(255,255,255,0.07); border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); }
-      .now-section-label { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,0.3); padding:12px 16px 8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+      .now-section-card { margin:0 14px 14px; background:var(--white); border:1px solid rgba(11,37,69,0.16); overflow:hidden; }
+      .now-section-label { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3); padding:10px 14px 8px; border-bottom:1px solid rgba(11,37,69,0.1); }
 
       .now-section-card .hv-strip { display:flex; overflow-x:auto; scrollbar-width:none; padding:4px 0; }
       .now-section-card .hv-strip::-webkit-scrollbar { display:none; }
-      .now-section-card .hv-slot { min-width:56px; padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; border-right:1px solid rgba(255,255,255,0.05); }
+      .now-section-card .hv-slot { min-width:56px; padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; border-right:1px solid rgba(11,37,69,0.08); }
       .now-section-card .hv-slot:last-child { border-right:none; }
-      .now-section-card .hv-slot.now { background:rgba(255,255,255,0.06); }
-      .now-section-card .hv-time { font-size:11px; color:rgba(255,255,255,0.35); font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-slot.now .hv-time { color:rgba(200,100,30,0.9); }
+      .now-section-card .hv-slot.now { background:rgba(11,37,69,0.05); }
+      .now-section-card .hv-time { font-size:9px; letter-spacing:.06em; color:var(--ink4); font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-slot.now .hv-time { color:var(--orange); }
       .now-section-card .hv-icon { font-size:20px; }
-      .now-section-card .hv-temp { font-size:14px; font-weight:300; color:rgba(255,255,255,0.88); font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-precip-pct { font-size:10px; color:#5b9ec9; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
-      .now-section-card .hv-precip-pct.zero { color:rgba(255,255,255,0.15); }
+      .now-section-card .hv-temp { font-size:13px; color:var(--ink); font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-precip-pct { font-size:9px; color:#3f6d99; font-family:'IBM Plex Mono',monospace; }
+      .now-section-card .hv-precip-pct.zero { color:rgba(11,37,69,0.18); }
       .now-section-card .hv-precip-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
-      .now-section-card .hv-precip-bar-bg { width:32px; height:2px; background:rgba(255,255,255,0.08); border-radius:1px; }
-      .now-section-card .hv-precip-bar { height:100%; background:#5b9ec9; border-radius:1px; }
+      .now-section-card .hv-precip-bar-bg { width:32px; height:2px; background:rgba(11,37,69,0.1); border-radius:0; }
+      .now-section-card .hv-precip-bar { height:100%; background:#3f6d99; border-radius:0; }
 
       .vfc-list { padding:4px 0; }
-      .vfc-row { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:12px; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; }
+      .vfc-row { display:flex; align-items:center; padding:11px 14px; border-bottom:1px solid rgba(11,37,69,0.08); gap:12px; }
       .vfc-row:last-child { border-bottom:none; }
-      .vfc-row.vfc-today { background:rgba(255,255,255,0.04); }
-      .vfc-day { font-size:15px; font-weight:500; color:rgba(255,255,255,0.88); width:80px; flex-shrink:0; }
-      .vfc-row.vfc-today .vfc-day { color:rgba(200,100,30,0.9); }
+      .vfc-row.vfc-today { background:rgba(11,37,69,0.04); }
+      .vfc-day { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink2); width:80px; flex-shrink:0; }
+      .vfc-row.vfc-today .vfc-day { color:var(--orange); }
       .vfc-icon { font-size:22px; flex-shrink:0; width:28px; text-align:center; }
-      .vfc-cond { font-size:13px; color:rgba(255,255,255,0.35); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .vfc-cond { font-family:'Spectral',serif; font-size:12px; color:var(--ink3); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
       .vfc-temps { display:flex; gap:10px; align-items:center; flex-shrink:0; }
-      .vfc-hi { font-size:15px; font-weight:500; color:rgba(255,255,255,0.88); }
-      .vfc-lo { font-size:15px; color:rgba(255,255,255,0.3); }
-      .vfc-rain { font-size:11px; color:#5b9ec9; }
+      .vfc-hi { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); }
+      .vfc-lo { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink4); }
+      .vfc-rain { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3f6d99; }
 
-      .now-readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 16px 12px; }
-      .now-reading-card { background:rgba(255,255,255,0.07); border-radius:16px; border:1px solid rgba(255,255,255,0.08); padding:14px 16px; }
-      .now-reading-label { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:6px; }
-      .now-reading-val { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:28px; font-weight:200; color:rgba(255,255,255,0.9); line-height:1; letter-spacing:-0.02em; }
-      .now-reading-unit { font-size:14px; color:rgba(255,255,255,0.4); font-weight:300; }
-      .now-reading-sub { font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif; font-size:12px; color:rgba(255,255,255,0.3); margin-top:4px; }
+      .now-readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 14px 14px; }
+      .now-reading-card { background:var(--white); border:1px solid rgba(11,37,69,0.16); padding:12px 14px; }
+      .now-reading-label { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+      .now-reading-val { font-family:'IBM Plex Mono',monospace; font-size:24px; color:var(--ink); line-height:1; }
+      .now-reading-unit { font-size:13px; color:var(--ink4); }
+      .now-reading-sub { font-family:'Spectral',serif; font-size:11px; color:var(--ink3); margin-top:4px; }
 
-      .rain-answer { margin:0 16px 12px; background:rgba(255,255,255,0.07) !important; border-radius:16px !important; border:1px solid rgba(255,255,255,0.08) !important; padding:14px 16px !important; }
+      .rain-answer { margin:0 14px 14px; background:var(--white) !important; border:1px solid rgba(11,37,69,0.16) !important; border-radius:0 !important; padding:14px 16px !important; }
+      .rain-answer-text { font-family:'Spectral',serif !important; font-size:14px !important; line-height:1.55 !important; }
 
-      /* ── DARK ATMOSPHERIC REDESIGN ──────────────────────────────────────── */
-
-      /* Base dark background */
+      /* ── THE PAPER (broadsheet ground) ─────────────────────────────────── */
       body {
-        background: linear-gradient(180deg, #0d1f3c 0%, #060d1a 100%) !important;
+        background: #f0ede8 !important;
         background-attachment: fixed !important;
-        color: rgba(255,255,255,0.92) !important;
+        color: var(--ink) !important;
       }
+      /* Condition-responsive paper tints — barely-there */
+      body.sky-clear  { background: #f2efe7 !important; }
+      body.sky-cloudy { background: #efedea !important; }
+      body.sky-rain   { background: #ecedee !important; }
+      body.sky-snow   { background: #f1f1f2 !important; }
+      body.sky-fog    { background: #eeedeb !important; }
+      body.sky-storm  { background: #eae9ec !important; }
 
-      /* Condition-responsive sky */
-      body.sky-clear  { background: linear-gradient(180deg, #0d2244 0%, #060d1c 100%) !important; }
-      body.sky-cloudy { background: linear-gradient(180deg, #111827 0%, #070b12 100%) !important; }
-      body.sky-rain   { background: linear-gradient(180deg, #0a1520 0%, #040b14 100%) !important; }
-      body.sky-snow   { background: linear-gradient(180deg, #141c2e 0%, #090e1a 100%) !important; }
-      body.sky-fog    { background: linear-gradient(180deg, #141920 0%, #0a0d12 100%) !important; }
-      body.sky-storm  { background: linear-gradient(180deg, #0d0d20 0%, #060612 100%) !important; }
-
-      /* Sticky bar — dark glass */
-      .sticky-bar {
-        background: rgba(6,13,26,0.85) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-      }
-      .sticky-wordmark { color: rgba(255,255,255,0.9) !important; }
-      .sticky-status, .sticky-sep { color: rgba(255,255,255,0.3) !important; }
-
-      /* Cards — frosted dark glass */
       .card {
-        background: rgba(255,255,255,0.05) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
+        background: var(--white) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
-      .card + .card { border-top: 1px solid rgba(255,255,255,0.06) !important; }
 
-      /* Greeting */
-      .greeting-line { color: var(--orange2) !important; }
-      .greeting-city { color: rgba(255,255,255,0.95) !important; }
-      .greeting-sub  { color: rgba(255,255,255,0.4) !important; }
-      .greeting-wrap { border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+      .greeting-line { color: var(--orange) !important; }
+      .greeting-city { color: var(--navy) !important; }
+      .greeting-sub  { color: var(--ink3) !important; }
+      .greeting-wrap { border-bottom: 1px solid rgba(11,37,69,0.1) !important; }
 
-      /* Temperature — bigger, bolder presence */
-      .temp-numeral {
-        font-size: 100px !important;
-        color: rgba(255,255,255,0.96) !important;
-        font-weight: 100 !important;
-      }
-      .temp-degree { color: rgba(255,255,255,0.5) !important; }
-      .temp-right { border-left-color: rgba(255,255,255,0.08) !important; }
-      .temp-hero { border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
+      .temp-numeral { font-size: 96px !important; color: var(--navy) !important; }
+      .temp-degree { color: var(--ink4) !important; }
+      .temp-right { border-left-color: rgba(11,37,69,0.1) !important; }
+      .temp-hero { border-bottom: 1px solid rgba(11,37,69,0.1) !important; }
 
-      /* Feels like */
-      .feels-label { color: rgba(255,255,255,0.35) !important; }
-      .feels-val   { color: rgba(255,255,255,0.85) !important; }
-      .obs-time    { color: rgba(255,255,255,0.25) !important; }
+      .feels-label { color: var(--ink4) !important; }
+      .feels-val   { color: var(--ink) !important; }
+      .obs-time    { color: var(--ink4) !important; }
 
-      /* Readings grid */
-      .readings { border-top: 1px solid rgba(255,255,255,0.06) !important; }
-      .reading  { border-color: rgba(255,255,255,0.06) !important; background: transparent !important; }
-      .reading-label { color: rgba(255,255,255,0.35) !important; }
-      .reading-val   { color: rgba(255,255,255,0.92) !important; }
-      .reading-unit  { color: rgba(255,255,255,0.35) !important; }
-      .reading-note  { color: rgba(255,255,255,0.3) !important; }
+      .readings { border-top: 1px solid rgba(11,37,69,0.1) !important; }
+      .reading  { border-color: rgba(11,37,69,0.1) !important; background: transparent !important; }
+      .reading-label { color: var(--ink3) !important; }
+      .reading-val   { color: var(--ink) !important; }
+      .reading-unit  { color: var(--ink4) !important; }
+      .reading-note  { color: var(--ink4) !important; }
 
-      /* 7-day forecast strip */
-      .forecast { border-top: 1px solid rgba(255,255,255,0.06) !important; }
-      .fc-day { background: transparent !important; border-right-color: rgba(255,255,255,0.06) !important; }
-      .fc-day.today { background: rgba(255,255,255,0.07) !important; border-top: none !important; }
-      .fc-name { color: rgba(255,255,255,0.35) !important; }
-      .fc-day.today .fc-name { color: rgba(255,255,255,0.7) !important; }
-      .fc-hi   { color: rgba(255,255,255,0.92) !important; }
-      .fc-lo   { color: rgba(255,255,255,0.35) !important; }
-      .fc-rain { color: #5b9ec9 !important; }
+      .forecast { border-top: 1px solid rgba(11,37,69,0.1) !important; }
+      .fc-day { background: transparent !important; border-right-color: rgba(11,37,69,0.08) !important; }
+      .fc-day.today { background: rgba(11,37,69,0.05) !important; border-top: none !important; }
+      .fc-name { color: var(--ink4) !important; }
+      .fc-day.today .fc-name { color: var(--orange) !important; }
+      .fc-hi   { color: var(--ink) !important; }
+      .fc-lo   { color: var(--ink4) !important; }
+      .fc-rain { color: #3f6d99 !important; }
 
-      /* Rain answer */
-      .rain-answer { border-bottom: 1px solid rgba(255,255,255,0.06) !important; background: transparent !important; }
-      .rain-answer-text { color: rgba(255,255,255,0.88) !important; }
-      .rain-answer-text strong { color: #fff !important; }
-      .rain-hour-slot { opacity: 0.7; }
-      .rain-hour-label { color: rgba(255,255,255,0.25) !important; }
-      .rain-answer-clear { color: rgba(255,255,255,0.4) !important; }
+      .rain-answer-text strong { color: var(--navy) !important; }
+      .rain-hour-slot { opacity: 0.85; }
+      .rain-hour-label { color: var(--ink4) !important; }
+      .rain-answer-clear { color: var(--ink3) !important; }
 
-      /* Sunrise/sunset/UV row */
-      .reading-label, .fv-lo { color: rgba(255,255,255,0.35) !important; }
+      .fv-city-card { background: var(--white) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+      .fv-city-head { background: rgba(11,37,69,0.04) !important; }
+      .fv-city-head-name { color: var(--navy) !important; }
+      .fv-city-head-state { color: var(--ink4) !important; }
+      .fv-day-row { border-bottom-color: rgba(11,37,69,0.08) !important; }
+      .fv-day-row.fv-today { background: rgba(11,37,69,0.05) !important; }
+      .fv-day-name { color: var(--ink2) !important; }
+      .fv-day-cond { color: var(--ink3) !important; }
+      .fv-day-hi   { color: var(--ink) !important; }
+      .fv-day-lo   { color: var(--ink4) !important; }
+      .fv-day-precip { color: #3f6d99 !important; }
 
-      /* Forecast list view (7-day page) */
-      .fv-city-card { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
-      .fv-city-head { background: rgba(255,255,255,0.07) !important; }
-      .fv-city-head-name { color: rgba(255,255,255,0.95) !important; }
-      .fv-city-head-state { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-row { border-bottom-color: rgba(255,255,255,0.06) !important; }
-      .fv-day-row.fv-today { background: rgba(255,255,255,0.07) !important; }
-      .fv-day-name { color: rgba(255,255,255,0.88) !important; }
-      .fv-day-cond { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-hi   { color: rgba(255,255,255,0.92) !important; }
-      .fv-day-lo   { color: rgba(255,255,255,0.35) !important; }
-      .fv-day-precip { color: #5b9ec9 !important; }
+      .hv-card { background: var(--white) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+      .hv-slot { border-right-color: rgba(11,37,69,0.08) !important; }
+      .hv-slot.now { background: rgba(11,37,69,0.05) !important; }
+      .hv-slot.now::after { background: var(--orange) !important; }
+      .hv-time { color: var(--ink4) !important; }
+      .hv-slot.now .hv-time { color: var(--orange) !important; }
+      .hv-temp { color: var(--ink) !important; }
+      .hv-precip-pct { color: #3f6d99 !important; }
+      .hv-precip-pct.zero { color: rgba(11,37,69,0.18) !important; }
+      .hv-precip-bar-bg { background: rgba(11,37,69,0.1) !important; }
 
-      /* Hourly view */
-      .hv-card { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
-      .hv-slot { border-right-color: rgba(255,255,255,0.06) !important; }
-      .hv-slot.now { background: rgba(255,255,255,0.08) !important; }
-      .hv-slot.now::after { background: rgba(200,75,17,0.9) !important; }
-      .hv-time { color: rgba(255,255,255,0.35) !important; }
-      .hv-slot.now .hv-time { color: rgba(255,255,255,0.7) !important; }
-      .hv-temp { color: rgba(255,255,255,0.92) !important; }
-      .hv-precip-pct { color: #5b9ec9 !important; }
-      .hv-precip-pct.zero { color: rgba(255,255,255,0.2) !important; }
-      .hv-precip-bar-bg { background: rgba(255,255,255,0.08) !important; }
+      .location-name { color: var(--navy) !important; }
+      .location-sub  { color: var(--ink4) !important; }
+      .card-cond     { color: var(--ink3) !important; }
 
-      /* Location name on secondary cards */
-      .location-name { color: rgba(255,255,255,0.92) !important; }
-      .location-sub  { color: rgba(255,255,255,0.35) !important; }
-      .card-cond     { color: rgba(255,255,255,0.4) !important; }
-
-      /* Empty state */
-      .empty-title { color: rgba(255,255,255,0.7) !important; }
-      .empty-sub   { color: rgba(255,255,255,0.25) !important; }
+      .empty-title { color: var(--ink2) !important; }
+      .empty-sub   { color: var(--ink4) !important; }
 
       /* ── ONBOARDING ──────────────────────────────────────────────────────── */
       .onboarding {
@@ -1823,7 +1851,7 @@
         font-size: 72px;
         font-weight: 300;
         letter-spacing: 0.04em;
-        color: rgba(255,255,255,0.95);
+        color: var(--navy);
         line-height: 1;
       }
       .onboarding-tagline {
@@ -1844,7 +1872,7 @@
         font-size: 26px;
         font-weight: 300;
         line-height: 1.5;
-        color: rgba(255,255,255,0.55);
+        color: var(--ink2);
         margin: 0;
       }
       .onboarding-actions {
@@ -1899,26 +1927,25 @@
         letter-spacing: 0.04em;
       }
 
-      /* ── LOG VIEW DARK ──────────────────────────────────────────────────── */
-      .log-stream { background:rgba(255,255,255,0.04) !important; border-radius:12px !important; border:1px solid rgba(255,255,255,0.07) !important; margin-bottom:10px; overflow:hidden; }
-      .log-stream-header { background:rgba(255,255,255,0.04) !important; border-bottom:1px solid rgba(255,255,255,0.07) !important; }
-      .log-sh, .log-sh-r { color:rgba(255,255,255,0.25) !important; }
-      .log-entry { border-bottom-color:rgba(255,255,255,0.06) !important; background:transparent !important; }
-      .log-entry:hover { background:rgba(255,255,255,0.03) !important; }
-      .log-entry-time { color:rgba(255,255,255,0.35) !important; }
-      .log-entry-time-date { color:rgba(255,255,255,0.2) !important; }
-      .log-entry-loc { color:rgba(255,255,255,0.88) !important; }
-      .log-entry-state { color:rgba(255,255,255,0.3) !important; }
-      .log-entry-sep { color:rgba(255,255,255,0.15) !important; }
-      .log-entry-cond { color:rgba(255,255,255,0.4) !important; }
-      .log-entry-val { color:rgba(255,255,255,0.75) !important; }
-      .log-entry-unit { color:rgba(255,255,255,0.3) !important; }
-      .log-count { color:rgba(255,255,255,0.3) !important; font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif !important; }
-      .log-toolbar { border-bottom-color:rgba(255,255,255,0.07) !important; background:transparent !important; }
-      .log-export-btn, .log-clear-btn { background:rgba(255,255,255,0.06) !important; border-color:rgba(255,255,255,0.1) !important; color:rgba(255,255,255,0.5) !important; }
+      /* ── LOG VIEW (paper) ─────────────────────────────────────────────── */
+      .log-stream { background:var(--white) !important; border-radius:0 !important; border:1px solid rgba(11,37,69,0.16) !important; margin-bottom:12px; overflow:hidden; }
+      .log-stream-header { background:rgba(11,37,69,0.04) !important; border-bottom:1px solid rgba(11,37,69,0.1) !important; }
+      .log-sh, .log-sh-r { color:var(--ink3) !important; }
+      .log-entry { border-bottom-color:rgba(11,37,69,0.08) !important; background:transparent !important; }
+      .log-entry:hover { background:rgba(11,37,69,0.03) !important; }
+      .log-entry-time { color:var(--ink3) !important; }
+      .log-entry-time-date { color:var(--ink4) !important; }
+      .log-entry-loc { color:var(--ink) !important; }
+      .log-entry-state { color:var(--ink4) !important; }
+      .log-entry-sep { color:rgba(11,37,69,0.18) !important; }
+      .log-entry-cond { color:var(--ink3) !important; }
+      .log-entry-val { color:var(--ink2) !important; }
+      .log-entry-unit { color:var(--ink4) !important; }
+      .log-count { color:var(--ink3) !important; font-family:'IBM Plex Mono',monospace !important; }
+      .log-toolbar { border-bottom-color:rgba(11,37,69,0.1) !important; background:transparent !important; }
+      .log-export-btn, .log-clear-btn { background:transparent !important; border-color:rgba(11,37,69,0.25) !important; color:var(--ink2) !important; }
       .log-note-row { background:transparent !important; }
-      .empty-sub   { color: rgba(255,255,255,0.3) !important; }
-      .empty-btn   { background: rgba(255,255,255,0.1) !important; border: 1px solid rgba(255,255,255,0.12) !important; color: rgba(255,255,255,0.8) !important; }
+      .empty-btn   { background: var(--navy) !important; border: 1px solid var(--navy) !important; color: #fff !important; }
 
       /* Main area — no padding so background shows through */
       main { background: transparent !important; }
@@ -1939,14 +1966,6 @@
         opacity:0.6 !important;
       }
       /* Greeting — keep Cormorant for city name (it's the brand), system for everything else */
-      .greeting-line { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; font-size:9px !important; }
-      .greeting-sub { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      /* Rain answer — system font, not monospace */
-      .rain-answer-text { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; font-size:15px !important; letter-spacing:0 !important; }
-      /* Reading labels — tighten */
-      .reading-label { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      .feels-label { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
-      .obs-time { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif !important; }
       /* Station ID — hide on mobile, it's noise */
       .station-id { display:none !important; }
       .readings { border-top: 1px solid rgba(11,37,69,0.07) !important; }
@@ -1961,7 +1980,7 @@
       /* Rain answer cleaner */
       .rain-answer { border-bottom: 1px solid rgba(11,37,69,0.07) !important; }
       .bottom-nav {
-        display:flex;
+        display:none; /* 1.2: section strip in the nameplate is the nav */
         position:fixed;
         bottom:0;left:0;right:0;
         z-index:1000;
@@ -1999,9 +2018,9 @@
       }
       .bottom-nav-item.active .bottom-nav-label { color:#fff; }
 
-      body { padding-bottom:calc(60px + env(safe-area-inset-bottom)); }
+      body { padding-bottom:0; }
       footer { display:none; }
-      .fab { bottom:calc(76px + env(safe-area-inset-bottom)) !important; right:16px !important; left:auto !important; width:44px; height:44px; font-size:18px; border-width:1.5px; }
+      .fab { bottom:calc(24px + env(safe-area-inset-bottom)) !important; right:16px !important; left:auto !important; width:44px; height:44px; font-size:18px; border-width:1.5px; }
     }
 
     /* ── FAB MOBILE SAFE AREA ─────────────────────────────────────────────── */
@@ -2029,7 +2048,7 @@
 
     /* ── LOG ENTRY COMPOSER ──────────────────────────────────────────────── */
     .quick-note-overlay {
-      position:fixed;inset:0;z-index:500;
+      position:fixed;inset:0;z-index:1100;
       background:rgba(4,10,20,0.75);
       backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
       display:flex;align-items:flex-end;justify-content:center;
@@ -2043,7 +2062,7 @@
       border-top:2px solid var(--orange);
       transform:translateY(100%);
       transition:transform .28s cubic-bezier(.22,1,.36,1);
-      position:fixed;bottom:0;left:0;right:0;z-index:501;
+      position:fixed;bottom:0;left:0;right:0;z-index:1101;
       max-height:80vh;display:flex;flex-direction:column;
       padding-bottom:env(safe-area-inset-bottom);
       pointer-events:none;
@@ -2128,31 +2147,32 @@
 
     /* Log entry redesign — ship's log style */
     .log-entry-card {
-      background:rgba(255,255,255,0.04);
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.07);
+      background:var(--white);
+      border-radius:0;
+      border:1px solid rgba(11,37,69,0.16);
+      border-left:3px solid var(--orange);
       padding:16px;
       margin-bottom:10px;
     }
     .log-entry-card-mood {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-      color:var(--orange2);margin-bottom:6px;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--orange);margin-bottom:6px;
     }
     .log-entry-card-note {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:16px;line-height:1.5;color:rgba(255,255,255,0.88);
+      font-family:'Spectral',serif;
+      font-size:15px;line-height:1.55;color:var(--ink);
       margin-bottom:10px;
     }
     .log-entry-card-context {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.04em;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:9px;color:var(--ink4);letter-spacing:.04em;
       display:flex;gap:12px;flex-wrap:wrap;
     }
     .log-entry-card-timestamp {
-      font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+      font-family:'IBM Plex Mono',monospace;
       font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-      color:rgba(255,255,255,0.2);margin-top:8px;
+      color:var(--ink4);margin-top:8px;
     }
     /* ── FORECAST DISCUSSION (NWS AFD via Iowa State IEM) ─────────────────── */
     .afd-section { margin-top:28px; }
@@ -2329,6 +2349,24 @@
     <button onclick="openModal()" class="sticky-add-btn" style="background:none;border:none;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-size:16px;cursor:pointer;padding:2px 6px;display:none">+</button>
     <button onclick="toggleDark()" class="dark-toggle" id="dark-toggle-btn" title="Toggle dark mode">☽</button>
     <button onclick="shareUrl()" class="sticky-share-btn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">↗ Share</button>
+  </div>
+</div>
+
+<!-- BROADSHEET NAMEPLATE (mobile only) — 1.2 front page, step one -->
+<div class="np-masthead" id="np-masthead">
+  <div class="np-location" onclick="openCitySheet()">
+    <span id="np-location-name">—</span><span class="np-location-caret">▾</span>
+  </div>
+  <div class="np-wordmark">doldrums</div>
+  <div class="np-sections">
+    <div class="np-section active" data-view="conditions" onclick="navTo('conditions')">Front Page</div>
+    <div class="np-section" data-view="radar" onclick="navTo('radar')">Radar</div>
+    <div class="np-section" data-view="log" onclick="navTo('log')">Field Notes</div>
+  </div>
+  <div class="np-dateline">
+    <span id="np-date"></span>
+    <span id="np-edition"></span>
+    <span class="np-dateline-right"><span id="np-updated"></span></span>
   </div>
 </div>
 
@@ -2884,6 +2922,8 @@ function renderCard(i, loc, data) {
     document.body.classList.add(skyClass);
   }
 
+  if(i === 0 && typeof railFill === 'function') railFill(loc, c, daily);
+
   const iconEl=document.getElementById(`icon-${i}`);if(iconEl)iconEl.innerHTML=w.icon;
   const condEl=document.getElementById(`cond-${i}`);if(condEl)condEl.textContent=w.label;
   const metaEl=document.getElementById(`meta-${i}`);if(metaEl)metaEl.textContent=localTime(loc.tz);
@@ -3061,9 +3101,12 @@ async function refreshAll(){
   }
 
   await Promise.all(LOCATIONS.map((loc,i)=>fetchWeather(loc,i)));
+  updateNameplate();
   const now=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   const u=document.getElementById('last-updated');
   if(u)u.textContent=`Obs. ${now}`;
+  const u2=document.getElementById('np-updated');
+  if(u2)u2.textContent=`Obs. ${now}`;
   if(btn)btn.disabled=false;
   if(icon){icon.classList.remove('spin');icon.textContent='↺';}
   haptic('medium');
@@ -3326,6 +3369,34 @@ function haptic(style) {
   navigator.vibrate(patterns[style] || 10);
 }
 
+// ── BROADSHEET NAMEPLATE (mobile) ─────────────────────────────────────────────
+function updateNameplate() {
+  const nameEl = document.getElementById('np-location-name');
+  if(!nameEl) return;
+  const loc = LOCATIONS[0];
+  nameEl.textContent = loc ? (loc.name + (loc.state ? ', ' + loc.state : '')) : 'Add a city';
+  const now = new Date();
+  const d = document.getElementById('np-date');
+  if(d) d.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const ed = document.getElementById('np-edition');
+  if(ed) {
+    const h = now.getHours();
+    ed.textContent = (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' Edition';
+  }
+  sizeNameplate();
+}
+
+// Keep <main>'s top edge aligned to the nameplate's real rendered height
+function sizeNameplate() {
+  const np = document.getElementById('np-masthead');
+  const m = document.querySelector('main');
+  if(!np || !m) return;
+  if(getComputedStyle(np).display === 'none') { m.style.top = ''; return; }
+  m.style.top = np.offsetHeight + 'px';
+}
+window.addEventListener('resize', sizeNameplate);
+window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplate, 600); });
+
 // ── NAVIGATION HISTORY ────────────────────────────────────────────────────────
 const _navHistory = [];
 const _viewLabels = {
@@ -3375,6 +3446,10 @@ function setView(view, isBack) {
   });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  // Sync broadsheet nameplate sections
+  document.querySelectorAll('.np-section').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
   updateBackButton();
@@ -3848,6 +3923,12 @@ function toggleDark() {
   if(btn) btn.textContent = isDark ? '☀' : '☽';
 }
 (function initDark() {
+  // Mobile broadsheet is paper-only — a stored dark preference would
+  // half-apply and break contrast, so it only honors dark on desktop.
+  if(window.matchMedia('(max-width:600px)').matches) {
+    document.body.classList.remove('dark');
+    return;
+  }
   if(localStorage.getItem('doldrums_dark') === '1') {
     document.body.classList.add('dark');
     const btn = document.getElementById('dark-toggle-btn');
@@ -4635,79 +4716,28 @@ function updateNoteCount() {
 
 function renderLogView() {
   const main = document.querySelector('main');
+  if(!main) return;
 
-  const obs   = getObsLog().map(e => ({...e, type:'obs'}));
-  const notes = getNotes();
-  const all   = [...obs, ...notes].sort((a,b) => b.ts - a.ts);
+  const notes = getNotes().slice().sort((a,b) => b.ts - a.ts);
+  const count = notes.length;
 
-  const composerHTML = ''; // Composer is now the FAB sheet — removed from log view
-
-  if(all.length === 0) {
-    main.innerHTML = `<div style="padding:40px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh">
-      <div style="font-size:48px;margin-bottom:20px;opacity:0.3">⚓</div>
-      <div class="empty-title">Your weather journal</div>
-      <div class="empty-sub" style="max-width:280px;text-align:center;margin-top:8px">
-        Tap ✏ to log a moment — mood, note, and current conditions are captured automatically.
-      </div>
+  let out = `<div class="log-view" style="padding:0 14px 40px;">
+    <div class="fn-head">
+      <span class="fn-kicker">Field Notes</span>
+      <span class="fn-count">${count ? count + (count === 1 ? ' dispatch' : ' dispatches') : ''}</span>
     </div>`;
-    return;
-  }
 
-  const obsCount  = obs.length;
-  const noteCount = notes.length;
-  const totalLabel = obsCount + ' observation' + (obsCount !== 1 ? 's' : '') + (noteCount > 0 ? ' · ' + noteCount + ' note' + (noteCount !== 1 ? 's' : '') : '');
-
-  let streamHTML = '';
-  let obsBuffer  = [];
-
-  function flushObs() {
-    if(!obsBuffer.length) return;
-    streamHTML += `<div class="log-stream">
-      <div class="log-stream-header">
-        <span class="log-sh">Time</span>
-        <span class="log-sh">Location · Condition</span>
-        <div class="log-sh-right">
-          <span class="log-sh-r">Temp</span>
-          <span class="log-sh-r">Wind</span>
-          <span class="log-sh-r" style="min-width:44px">Pressure</span>
-        </div>
-      </div>`;
-    obsBuffer.forEach(e => {
+  if(count === 0) {
+    out += `<div class="fn-empty">
+      <div class="fn-empty-title">Nothing on record.</div>
+      <div class="fn-empty-sub">What's the sky doing right now? Tap the pencil and file the first dispatch.</div>
+    </div>`;
+  } else {
+    notes.forEach(e => {
       const d = new Date(e.ts);
-      const timeStr = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
-      const dateStr = d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
-      const stateStr = e.state ? (STATE_ABBR[e.state] || e.state.slice(0,3).toUpperCase()) : 'INTL';
-      streamHTML += `<div class="log-entry">
-        <div class="log-entry-time">
-          ${timeStr}
-          <span class="log-entry-time-date">${dateStr}</span>
-        </div>
-        <div class="log-entry-mid">
-          <span class="log-entry-loc">${e.name}</span>
-          <span class="log-entry-state">${stateStr}</span>
-          <span class="log-entry-sep">·</span>
-          <span class="log-entry-cond">${e.condition || '—'}</span>
-        </div>
-        <div class="log-entry-data">
-          <span class="log-entry-val">${e.temp != null ? e.temp+(e.sym||'°') : '<span class="log-entry-nil">—</span>'}</span>
-          <span class="log-entry-val">${e.wind != null ? e.wind+'<span class="log-entry-unit"> '+(e.windUnit||'')+'</span>' : '<span class="log-entry-nil">—</span>'}</span>
-          <span class="log-entry-val" style="min-width:44px">${e.pressure ? e.pressure+'<span class="log-entry-unit"> hPa</span>' : '<span class="log-entry-nil">—</span>'}</span>
-        </div>
-      </div>`;
-    });
-    streamHTML += `</div>`;
-    obsBuffer = [];
-  }
-
-  all.forEach(e => {
-    if(e.type === 'obs') {
-      obsBuffer.push(e);
-    } else {
-      flushObs();
-      const d = new Date(e.ts);
-      const timeStr = d.toLocaleString('en-US',{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
-      streamHTML += `<div class="log-note-row">
-        <div class="log-entry-card">
+      const timeStr = d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+      out += `<div class="log-note-row" style="border:none;background:transparent;padding:0;margin-bottom:12px;">
+        <div class="log-entry-card" style="flex:1;margin-bottom:0;">
           ${e.mood ? `<div class="log-entry-card-mood">${e.mood}</div>` : ''}
           ${e.text ? `<div class="log-entry-card-note">${e.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
           ${e.context ? `<div class="log-entry-card-context">
@@ -4717,26 +4747,15 @@ function renderLogView() {
           </div>` : ''}
           <div class="log-entry-card-timestamp">${timeStr}</div>
         </div>
-        <div style="display:flex;gap:6px;flex-shrink:0;padding:4px 0 0">
-          <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(255,255,255,0.2);font-size:12px;background:none;border:none;cursor:pointer;padding:4px 6px;">✕</button>
-        </div>
+        <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;flex-shrink:0;">✕</button>
       </div>`;
-    }
-  });
-  flushObs();
+    });
+  }
 
-  main.innerHTML = `<div class="log-view" style="padding:0 16px 40px;display:flex;flex-direction:column;gap:12px;">
-    ${composerHTML}
-    <div class="log-toolbar">
-      <span class="log-count">${totalLabel}</span>
-      <div style="display:flex;gap:8px;">
-        <button class="log-export-btn" onclick="exportLog()">↓ CSV</button>
-        <button class="log-clear-btn" onclick="clearLog()">Clear data</button>
-      </div>
-    </div>
-    ${streamHTML}
-  </div>`;
+  out += '</div>';
+  main.innerHTML = out;
 }
+
 
 // ── PWA INSTALL PROMPT ────────────────────────────────────────────────────────
 let _deferredInstall = null;
@@ -4856,7 +4875,7 @@ function dismissQuickNote() {
   _qnMood = null;
   window._editingNoteTs = null;
   const saveBtn = document.getElementById('qn-save');
-  if(saveBtn) saveBtn.textContent = 'Save';
+  if(saveBtn) saveBtn.textContent = 'File it';
   document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
 }
 
@@ -4886,7 +4905,7 @@ function saveQuickNote() {
     ta.value = '';
     window._editingNoteTs = null;
     const saveBtn = document.getElementById('qn-save');
-    if(saveBtn) saveBtn.textContent = 'Save';
+    if(saveBtn) saveBtn.textContent = 'File it';
     qnInput();
     dismissQuickNote();
     if(currentView === 'log') renderLogView();
@@ -4982,7 +5001,7 @@ async function preloadRadar() {
 
 // Preload radar when user hovers/touches the radar nav item
 document.addEventListener('DOMContentLoaded', () => {
-  const radarBtn = document.querySelector('.bottom-nav-item[data-view="radar"], .nav-item[onclick*="radar"]');
+  const radarBtn = document.querySelector('.np-section[data-view="radar"], .bottom-nav-item[data-view="radar"], .nav-item[onclick*="radar"]');
   if(radarBtn) {
     radarBtn.addEventListener('mouseenter', preloadRadar, {once:true});
     radarBtn.addEventListener('touchstart', preloadRadar, {once:true, passive:true});
@@ -5054,7 +5073,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="quick-note-head">
       <div class="quick-note-title">
         <div class="quick-note-dot"></div>
-        Log Entry
+        Field Note
       </div>
       <button class="quick-note-close" onclick="closeQuickNote()">✕</button>
     </div>
@@ -5070,13 +5089,13 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="mood-chip" data-mood="still" onclick="selectMood('still')">Still</button>
     </div>
     <textarea class="quick-note-ta" id="qn-ta"
-      placeholder="Note something… (optional)"
+      placeholder="What’s the sky doing? (optional)"
       spellcheck="true" autocorrect="on"
       oninput="qnInput()"
       onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){saveQuickNote();event.preventDefault();}"></textarea>
     <div class="quick-note-foot">
       <div class="quick-note-meta" id="qn-meta" style="cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="qnCycleCity()" title="Tap to switch city"></div>
-      <button class="quick-note-save" id="qn-save" onclick="saveQuickNote()" disabled>Log it</button>
+      <button class="quick-note-save" id="qn-save" onclick="saveQuickNote()" disabled>File it</button>
     </div>
   </div>
 </div>
@@ -5105,6 +5124,151 @@ document.addEventListener('DOMContentLoaded', () => {
    Iowa State University's IEM (mesonet.agron.iastate.edu). Fails silently:
    if the primary city isn't near a US forecast office, or the fetch errors,
    nothing renders and the app is unchanged. */
+
+/* ── FRONT PAGE LEAD STORY (mobile broadsheet, 1.2) ─────────────────────────
+   Self-inserts before the weather grid; hidden until the AFD arrives, so a
+   failed/absent discussion degrades to the existing layout untouched. */
+
+function ensureLeadStory() {
+  let ls = document.getElementById('lead-story');
+  if (ls) return ls;
+  const grid = document.getElementById('weather-grid');
+  if (!grid || !grid.parentNode) return null;
+  ls = document.createElement('div');
+  ls.id = 'lead-story'; ls.className = 'lead-story';
+  ls.innerHTML =
+    '<div class="ls-grid">' +
+      '<div class="ls-story">' +
+        '<div class="ls-kicker" id="ls-kicker"></div>' +
+        '<div class="ls-head" id="ls-head"></div>' +
+        '<div class="ls-body" id="ls-body"></div>' +
+        '<button class="ls-toggle" id="ls-toggle" type="button">Continued — full discussion</button>' +
+      '</div>' +
+      '<div class="ls-rail">' +
+        '<div><div class="ls-stat-label">Now</div><div class="ls-stat-value ls-now" id="ls-now">—</div><div class="ls-stat-sub" id="ls-cond"></div></div>' +
+        '<div><div class="ls-stat-label">High / Low</div><div class="ls-stat-value" id="ls-hilo">—</div></div>' +
+        '<div><div class="ls-stat-label">Wind</div><div class="ls-stat-value" id="ls-wind">—</div></div>' +
+        '<div><div class="ls-stat-label">Rain chance</div><div class="ls-stat-value" id="ls-rain">—</div></div>' +
+        '<div><div class="ls-stat-label">Sun</div><div class="ls-stat-value" id="ls-sun">—</div></div>' +
+      '</div>' +
+    '</div>';
+  grid.parentNode.insertBefore(ls, grid);
+  return ls;
+}
+
+// Pull a headline from the synopsis: first sentence if it reads like a head,
+// else first clause; else no head (kicker acts as the standing slug).
+function afdHeadline(synopsis) {
+  const s = (synopsis || '').trim()
+    .replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)/i, '')
+    .replace(/^\d+[.)]\s+/, '')
+    .replace(/^[.\u2026:\-\s]+/, '');
+  const stop = s.search(/[.!?](\s|$)/);
+  let head = stop > 0 ? s.slice(0, stop) : s;
+  let rest = stop > 0 ? s.slice(stop + 1).trim() : '';
+  if (head.length > 110) {
+    const cut = head.slice(0, 110);
+    const cl = Math.max(cut.lastIndexOf(', '), cut.lastIndexOf('; '));
+    if (cl > 40) {
+      rest = (head.slice(cl + 1).trim().replace(/^[,;]\s*/, '') + ' ' + rest).trim();
+      head = cut.slice(0, cl);
+    } else {
+      return { head: null, rest: s };
+    }
+  }
+  if (head.length < 25) return { head: null, rest: s };
+  return { head: head.replace(/\.$/, ''), rest };
+}
+
+function fillLeadStory(wfo, synopsis, full) {
+  const ls = ensureLeadStory();
+  if (!ls) return;
+  document.getElementById('ls-kicker').textContent = 'The Forecast Discussion · NWS ' + wfo;
+  synopsis = synopsis.replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)/i, '').replace(/^\d+[.)]\s+/, '');
+  const { head, rest } = afdHeadline(synopsis);
+  const hEl = document.getElementById('ls-head');
+  const bEl = document.getElementById('ls-body');
+  const collapsed = head ? (rest || '') : synopsis;
+  if (head) { hEl.style.display = ''; hEl.textContent = head; }
+  else { hEl.style.display = 'none'; }
+  bEl.textContent = collapsed;
+  bEl.classList.remove('ls-full');
+  let expanded = false;
+  const tgl = document.getElementById('ls-toggle');
+  tgl.textContent = 'Continued — full discussion';
+  tgl.onclick = function () {
+    expanded = !expanded;
+    if (expanded) { bEl.innerHTML = readableAFD(full); }
+    else { bEl.textContent = collapsed; }
+    bEl.classList.toggle('ls-full', expanded);
+    tgl.textContent = expanded ? 'Return to the synopsis' : 'Continued — full discussion';
+  };
+  ls.classList.add('ls-ready');
+}
+
+// Turn the raw AFD into readable copy: keep narrative sections, unwrap
+// hard line breaks into paragraphs, expand the worst of the jargon.
+function readableAFD(raw) {
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const gloss = [
+    [/\bkt\b/gi,'knots'], [/\bsfc\b/gi,'surface'], [/\bcigs\b/gi,'ceilings'],
+    [/\bcig\b/gi,'ceiling'], [/\bvsby\b/gi,'visibility'], [/\bpcpn\b/gi,'precipitation'],
+    [/\btstms\b/gi,'thunderstorms'], [/\btstm\b/gi,'thunderstorm'], [/\bshwrs\b/gi,'showers'],
+    [/\bfcst\b/gi,'forecast'], [/\bthru\b/gi,'through'], [/\baftn\b/gi,'afternoon'],
+    [/\bovrngt\b/gi,'overnight'], [/\btwd\b/gi,'toward'], [/\btemps\b/gi,'temperatures'],
+    [/\bdwpts\b/gi,'dewpoints'], [/\bwx\b/gi,'weather']
+  ];
+  const jargon = s => {
+    s = s.replace(/^key\s+messages?\s*\d*\s*[:.\u2026-]*\s*/i, '');
+    for (const [re, sub] of gloss) s = s.replace(re, sub);
+    return s;
+  };
+  const titleCase = t => t.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
+  const dropSec = /^(AVIATION|FIRE WEATHER|HYDROLOGY|CLIMATE|EQUIPMENT|PRELIMINARY POINT|TIDES)/i;
+
+  let text = raw.replace(/\$\$[\s\S]*$/, '').replace(/\n&&\s*/g, '\n\n')
+    // WMO/product header lines: "744", "FXUS61 KBOX 121202", "AFDBOX",
+    // "Area Forecast Discussion", "National Weather Service ...", office dateline
+    .replace(/^\s*\d{3}\s*\n/, '')
+    .replace(/^FXUS\d{2}\s+[A-Z]{4}\s+\d{6}.*\n/m, '')
+    .replace(/^AFD[A-Z]{2,4}\s*\n/m, '')
+    .replace(/^Area Forecast Discussion.*\n/mi, '')
+    .replace(/^\.*National Weather Service.*\n/mi, '')
+    .replace(/^[A-Za-z .\/-]+ [A-Z]{2} \d{3,4} (AM|PM) [A-Z]{2,4} .*\n/m, '');
+  const parts = text.split(/\n(?=\.[A-Z][A-Z /&.]*\.\.\.)/);
+  let out = '';
+  for (let p of parts) {
+    let title = null;
+    const m = p.match(/^\.([A-Z][A-Z /&.]*?)\.\.\./);
+    if (m) { title = m[1].replace(/\//g, ' ').trim(); p = p.slice(m[0].length); }
+    if (title && dropSec.test(title)) continue;
+    const paras = p.split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
+    if (!paras.length) continue;
+    if (title) out += '<div class="afd-sec-head">' + esc(titleCase(title)) + '</div>';
+    out += paras.map(x => '<p>' + esc(jargon(x)) + '</p>').join('');
+  }
+  return out || '<p>' + esc(raw) + '</p>';
+}
+
+function compass(deg) {
+  const pts = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return pts[Math.round(((deg % 360) / 22.5)) % 16];
+}
+
+// Rail numbers for the primary city — called from renderCard(0)
+function railFill(loc, c, daily) {
+  const ls = ensureLeadStory();
+  if (!ls) return;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('ls-now', Math.round(c.temperature_2m) + loc.sym);
+  const tempC = loc.unit === 'fahrenheit' ? (c.temperature_2m - 32) * 5 / 9 : c.temperature_2m;
+  set('ls-cond', wmo(c.weather_code, tempC).label);
+  set('ls-hilo', Math.round(daily.temperature_2m_max[0]) + '\u00b0 / ' + Math.round(daily.temperature_2m_min[0]) + '\u00b0');
+  set('ls-wind', compass(c.wind_direction_10m) + ' ' + Math.round(c.wind_speed_10m) + ' ' + loc.windUnit);
+  set('ls-rain', (daily.precipitation_probability_max && daily.precipitation_probability_max[0] != null ? daily.precipitation_probability_max[0] : 0) + '%');
+  const fmt = t => { const hm = t.split('T')[1].split(':'); let h = +hm[0]; const ap = h >= 12 ? 'p' : 'a'; h = h % 12 || 12; return h + ':' + hm[1] + ap; };
+  set('ls-sun', fmt(daily.sunrise[0]) + ' / ' + fmt(daily.sunset[0]));
+}
 
 const WFO_SITES = [
 ["BOX",41.95,-71.13],["OKX",40.87,-72.86],["ALY",42.68,-73.83],["BGM",42.20,-75.98],
@@ -5226,6 +5390,7 @@ async function loadForecastDiscussion() {
     const { synopsis, full } = parseAFD(raw);
     if (!synopsis) return;
     renderAFD(wfo, synopsis, full);
+    fillLeadStory(wfo, synopsis, full);
   } catch (e) { /* silent — app unchanged on any failure */ }
 }
 
