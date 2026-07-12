@@ -1416,12 +1416,24 @@
 
     /* ── PULL TO REFRESH ─────────────────────────────────────────────────── */
     #ptr-indicator {
-      display: none !important;
+      position: fixed; left: 50%; top: 130px;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 7px;
+      background: var(--white); border: 1px solid rgba(11,37,69,0.22);
+      color: var(--navy);
+      font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+      letter-spacing: .14em; text-transform: uppercase;
+      padding: 7px 12px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      z-index: 180;
+      transition: opacity .15s;
     }
+    #ptr-indicator.ptr-visible { opacity: 1; visibility: visible; }
+    #ptr-indicator.ptr-loading .ptr-arrow { animation: spin 0.8s linear infinite; }
     .ptr-spinner {
       width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+      border: 2px solid rgba(11,37,69,0.2);
+      border-top-color: var(--navy);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -1632,6 +1644,7 @@
       .ls-body.ls-full { font-size:12px; }
       .ls-body.ls-full p { margin:0 0 10px; font-family:'Spectral',serif; font-size:12px; line-height:1.6; color:var(--ink2); }
       .afd-sec-head { font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--orange); margin:14px 0 6px; }
+      .ls-body.ls-full strong { font-weight:600; color:var(--navy); }
       .ls-body.ls-full p.afd-bullet { padding-left:14px; position:relative; margin-bottom:7px; }
       .ls-body.ls-full p.afd-bullet::before { content:'\2014'; position:absolute; left:0; color:var(--orange); }
       .ls-unabridged { display:block; background:none; border:none; padding:10px 0 0; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink4); text-decoration:underline; text-underline-offset:2px; }
@@ -3396,6 +3409,8 @@ function sizeNameplate() {
   if(!np || !m) return;
   if(getComputedStyle(np).display === 'none') { m.style.top = ''; return; }
   m.style.top = np.offsetHeight + 'px';
+  const ind = document.getElementById('ptr-indicator');
+  if(ind) ind.style.top = (np.offsetHeight + 12) + 'px';
 }
 window.addEventListener('resize', sizeNameplate);
 window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplate, 600); });
@@ -5115,9 +5130,55 @@ document.addEventListener('DOMContentLoaded', () => {
 // coordinate touchend hijacker, and an invisible z-index:99999 "touch catcher"
 // div covering the bottom 80px of every view — it was swallowing taps on the
 // note composer's save button and anything else near the bottom of the screen.)
+// ── PULL TO REFRESH ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  const m = document.querySelector('main');
   const ind = document.getElementById('ptr-indicator');
-  if(ind) ind.style.display = 'none';
+  const arrow = document.getElementById('ptr-arrow');
+  const label = document.getElementById('ptr-label');
+  if(!m || !ind) return;
+  const THRESH = 70;
+  let startY = null, dist = 0, active = false, busy = false;
+
+  m.addEventListener('touchstart', e => {
+    if(busy) return;
+    active = m.scrollTop <= 0;
+    startY = active ? e.touches[0].clientY : null;
+    dist = 0;
+  }, { passive: true });
+
+  m.addEventListener('touchmove', e => {
+    if(!active || startY === null || busy) return;
+    dist = e.touches[0].clientY - startY;
+    if(dist > 10 && m.scrollTop <= 0) {
+      e.preventDefault();
+      ind.classList.add('ptr-visible');
+      const armed = dist >= THRESH;
+      if(arrow) arrow.style.transform = armed ? 'rotate(180deg)' : '';
+      if(label) label.textContent = armed ? 'Release for the latest' : 'Pull to refresh';
+    }
+  }, { passive: false });
+
+  m.addEventListener('touchend', () => {
+    if(!active || busy) { active = false; return; }
+    active = false;
+    if(dist >= THRESH) {
+      busy = true;
+      haptic('medium');
+      if(label) label.textContent = 'Updating\u2026';
+      if(arrow) arrow.style.transform = '';
+      ind.classList.add('ptr-loading');
+      Promise.resolve(refreshAll()).finally(() => {
+        setTimeout(() => {
+          ind.classList.remove('ptr-loading', 'ptr-visible');
+          busy = false;
+        }, 500);
+      });
+    } else {
+      ind.classList.remove('ptr-visible');
+    }
+    startY = null; dist = 0;
+  });
 });
 </script>
 
@@ -5263,9 +5324,12 @@ function readableAFD(raw, unabridged) {
     const paras = p.split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
     if (!paras.length) continue;
     if (title) out += '<div class="afd-sec-head">' + esc(titleCase(title)) + '</div>';
+    const boldDays = s => s
+      .replace(/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)((?:\s+(?:night|morning|afternoon|evening))?)\b/gi, '<strong>$1$2</strong>')
+      .replace(/\b(tonight|today|overnight|this (?:morning|afternoon|evening|weekend))\b/gi, '<strong>$1</strong>');
     out += paras.map(x => {
       const b = /^[-*]\s+/.test(x);
-      const body = esc(jargon(x.replace(/^[-*]\s+/, '')));
+      const body = boldDays(esc(jargon(x.replace(/^[-*]\s+/, ''))));
       return b ? '<p class="afd-bullet">' + body + '</p>' : '<p>' + body + '</p>';
     }).join('');
   }
