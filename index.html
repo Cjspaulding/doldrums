@@ -214,6 +214,9 @@
     @keyframes spin { to{transform:rotate(360deg);} }
 
     /* STICKY BAR */
+    .np-masthead { display:none; }
+    .lead-story { display:none; }
+
     .sticky-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -1555,6 +1558,85 @@
       .summary-bar { display:none !important; }
       .section-head { display:none !important; }
 
+      /* ── BROADSHEET NAMEPLATE (1.2) ────────────────────────────────────── */
+      .sticky-bar { display:none; }
+      main { top: calc(118px + env(safe-area-inset-top)); } /* fallback; JS refines */
+
+      .np-masthead {
+        display:block; position:fixed; top:0; left:0; right:0; z-index:200;
+        background:var(--navy); border-bottom:3px solid var(--orange);
+        padding-top: calc(6px + env(safe-area-inset-top));
+      }
+      body.dark .np-masthead { background:var(--navy); }
+      .np-location {
+        text-align:center; font-family:'IBM Plex Mono',monospace;
+        font-size:8px; letter-spacing:.22em; text-transform:uppercase;
+        color:var(--orange2); padding:2px 16px 0; cursor:pointer;
+        -webkit-tap-highlight-color:transparent;
+      }
+      .np-location-caret { margin-left:5px; opacity:.7; font-size:7px; }
+      .np-wordmark {
+        text-align:center; font-family:'Cormorant Garamond',serif; font-weight:300;
+        font-size:34px; line-height:1; letter-spacing:.08em; text-transform:lowercase;
+        color:#fff; padding:2px 0 8px;
+      }
+      .np-sections {
+        display:flex; justify-content:center;
+        border-top:2px solid rgba(255,255,255,0.85);
+        border-bottom:1px solid rgba(255,255,255,0.12);
+        margin:0 14px;
+      }
+      .np-section {
+        font-family:'IBM Plex Mono',monospace; font-size:8.5px;
+        letter-spacing:.18em; text-transform:uppercase;
+        color:rgba(255,255,255,0.4); padding:9px 14px; cursor:pointer;
+        -webkit-tap-highlight-color:transparent; transition:color .2s;
+      }
+      .np-section.active { color:#fff; box-shadow:inset 0 -2px 0 #fff; }
+      .np-dateline {
+        display:flex; justify-content:space-between; align-items:center;
+        font-family:'IBM Plex Mono',monospace; font-size:7.5px;
+        letter-spacing:.12em; text-transform:uppercase;
+        color:rgba(255,255,255,0.35); padding:6px 14px 7px;
+      }
+      .np-dateline-right { display:flex; align-items:center; gap:8px; }
+      .np-moon {
+        background:none; border:none; color:rgba(255,255,255,0.5);
+        font-size:12px; padding:0 2px; cursor:pointer; line-height:1;
+      }
+
+      /* ── FRONT PAGE LEAD STORY (1.2) ───────────────────────────────────── */
+      .afd-section { display:none !important; } /* content promoted to the lead */
+      .lead-story.ls-ready { display:block; margin:16px 14px 6px; padding-bottom:16px; border-bottom:1px solid var(--rule); }
+      .ls-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,.82fr); gap:14px; }
+      .ls-kicker {
+        font-family:'IBM Plex Mono',monospace; font-size:7.5px;
+        letter-spacing:.2em; text-transform:uppercase;
+        color:var(--orange2); margin-bottom:7px;
+      }
+      .ls-head {
+        font-family:'Cormorant Garamond',serif; font-weight:500;
+        font-size:25px; line-height:1.12; color:var(--ink); margin-bottom:8px;
+      }
+      .ls-body {
+        font-family:'Spectral',serif; font-size:12.5px;
+        line-height:1.62; color:var(--ink2);
+      }
+      .ls-body.ls-full { font-size:11px; line-height:1.55; white-space:pre-wrap; color:var(--ink3); }
+      .ls-toggle {
+        background:none; border:none; padding:8px 0 0; cursor:pointer;
+        font-family:'IBM Plex Mono',monospace; font-size:8px;
+        letter-spacing:.14em; text-transform:uppercase; color:var(--orange2);
+      }
+      .ls-rail { border-left:1px solid var(--rule); padding-left:12px; display:flex; flex-direction:column; gap:11px; }
+      .ls-stat-label {
+        font-family:'IBM Plex Mono',monospace; font-size:7px;
+        letter-spacing:.16em; text-transform:uppercase; color:var(--ink4); margin-bottom:2px;
+      }
+      .ls-stat-value { font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink); }
+      .ls-stat-value.ls-now { font-size:21px; font-weight:300; }
+      .ls-stat-sub { font-family:'Spectral',serif; font-size:10.5px; color:var(--ink3); margin-top:1px; }
+
       /* ── NATIVE APP FEEL ─────────────────────────────────────────────── */
       /* System font everywhere — kill IBM Plex Mono on mobile */
       body, button, input,
@@ -2332,6 +2414,24 @@
   </div>
 </div>
 
+<!-- BROADSHEET NAMEPLATE (mobile only) — 1.2 front page, step one -->
+<div class="np-masthead" id="np-masthead">
+  <div class="np-location" onclick="openCitySheet()">
+    <span id="np-location-name">—</span><span class="np-location-caret">▾</span>
+  </div>
+  <div class="np-wordmark">doldrums</div>
+  <div class="np-sections">
+    <div class="np-section active" data-view="conditions" onclick="navTo('conditions')">Front Page</div>
+    <div class="np-section" data-view="radar" onclick="navTo('radar')">Radar</div>
+    <div class="np-section" data-view="log" onclick="navTo('log')">Field Notes</div>
+  </div>
+  <div class="np-dateline">
+    <span id="np-date"></span>
+    <span id="np-edition"></span>
+    <span class="np-dateline-right"><span id="np-updated"></span><button class="np-moon" onclick="toggleDark()" title="Toggle dark mode">☽</button></span>
+  </div>
+</div>
+
 <!-- SUMMARY -->
 <div class="summary-bar">
   <div class="summary-scroll" id="summary-scroll">
@@ -2884,6 +2984,8 @@ function renderCard(i, loc, data) {
     document.body.classList.add(skyClass);
   }
 
+  if(i === 0 && typeof railFill === 'function') railFill(loc, c, daily);
+
   const iconEl=document.getElementById(`icon-${i}`);if(iconEl)iconEl.innerHTML=w.icon;
   const condEl=document.getElementById(`cond-${i}`);if(condEl)condEl.textContent=w.label;
   const metaEl=document.getElementById(`meta-${i}`);if(metaEl)metaEl.textContent=localTime(loc.tz);
@@ -3061,9 +3163,12 @@ async function refreshAll(){
   }
 
   await Promise.all(LOCATIONS.map((loc,i)=>fetchWeather(loc,i)));
+  updateNameplate();
   const now=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   const u=document.getElementById('last-updated');
   if(u)u.textContent=`Obs. ${now}`;
+  const u2=document.getElementById('np-updated');
+  if(u2)u2.textContent=`Obs. ${now}`;
   if(btn)btn.disabled=false;
   if(icon){icon.classList.remove('spin');icon.textContent='↺';}
   haptic('medium');
@@ -3326,6 +3431,34 @@ function haptic(style) {
   navigator.vibrate(patterns[style] || 10);
 }
 
+// ── BROADSHEET NAMEPLATE (mobile) ─────────────────────────────────────────────
+function updateNameplate() {
+  const nameEl = document.getElementById('np-location-name');
+  if(!nameEl) return;
+  const loc = LOCATIONS[0];
+  nameEl.textContent = loc ? (loc.name + (loc.state ? ', ' + loc.state : '')) : 'Add a city';
+  const now = new Date();
+  const d = document.getElementById('np-date');
+  if(d) d.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const ed = document.getElementById('np-edition');
+  if(ed) {
+    const h = now.getHours();
+    ed.textContent = (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' Edition';
+  }
+  sizeNameplate();
+}
+
+// Keep <main>'s top edge aligned to the nameplate's real rendered height
+function sizeNameplate() {
+  const np = document.getElementById('np-masthead');
+  const m = document.querySelector('main');
+  if(!np || !m) return;
+  if(getComputedStyle(np).display === 'none') { m.style.top = ''; return; }
+  m.style.top = np.offsetHeight + 'px';
+}
+window.addEventListener('resize', sizeNameplate);
+window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplate, 600); });
+
 // ── NAVIGATION HISTORY ────────────────────────────────────────────────────────
 const _navHistory = [];
 const _viewLabels = {
@@ -3375,6 +3508,10 @@ function setView(view, isBack) {
   });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  // Sync broadsheet nameplate sections
+  document.querySelectorAll('.np-section').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
   updateBackButton();
@@ -5106,6 +5243,102 @@ document.addEventListener('DOMContentLoaded', () => {
    if the primary city isn't near a US forecast office, or the fetch errors,
    nothing renders and the app is unchanged. */
 
+/* ── FRONT PAGE LEAD STORY (mobile broadsheet, 1.2) ─────────────────────────
+   Self-inserts before the weather grid; hidden until the AFD arrives, so a
+   failed/absent discussion degrades to the existing layout untouched. */
+
+function ensureLeadStory() {
+  let ls = document.getElementById('lead-story');
+  if (ls) return ls;
+  const grid = document.getElementById('weather-grid');
+  if (!grid || !grid.parentNode) return null;
+  ls = document.createElement('div');
+  ls.id = 'lead-story'; ls.className = 'lead-story';
+  ls.innerHTML =
+    '<div class="ls-grid">' +
+      '<div class="ls-story">' +
+        '<div class="ls-kicker" id="ls-kicker"></div>' +
+        '<div class="ls-head" id="ls-head"></div>' +
+        '<div class="ls-body" id="ls-body"></div>' +
+        '<button class="ls-toggle" id="ls-toggle" type="button">Continued — full discussion</button>' +
+      '</div>' +
+      '<div class="ls-rail">' +
+        '<div><div class="ls-stat-label">Now</div><div class="ls-stat-value ls-now" id="ls-now">—</div><div class="ls-stat-sub" id="ls-cond"></div></div>' +
+        '<div><div class="ls-stat-label">High / Low</div><div class="ls-stat-value" id="ls-hilo">—</div></div>' +
+        '<div><div class="ls-stat-label">Wind</div><div class="ls-stat-value" id="ls-wind">—</div></div>' +
+        '<div><div class="ls-stat-label">Rain chance</div><div class="ls-stat-value" id="ls-rain">—</div></div>' +
+        '<div><div class="ls-stat-label">Sun</div><div class="ls-stat-value" id="ls-sun">—</div></div>' +
+      '</div>' +
+    '</div>';
+  grid.parentNode.insertBefore(ls, grid);
+  return ls;
+}
+
+// Pull a headline from the synopsis: first sentence if it reads like a head,
+// else first clause; else no head (kicker acts as the standing slug).
+function afdHeadline(synopsis) {
+  const s = (synopsis || '').trim();
+  const stop = s.search(/[.!?](\s|$)/);
+  let head = stop > 0 ? s.slice(0, stop) : s;
+  let rest = stop > 0 ? s.slice(stop + 1).trim() : '';
+  if (head.length > 110) {
+    const cut = head.slice(0, 110);
+    const cl = Math.max(cut.lastIndexOf(', '), cut.lastIndexOf('; '));
+    if (cl > 40) {
+      rest = (head.slice(cl + 1).trim().replace(/^[,;]\s*/, '') + ' ' + rest).trim();
+      head = cut.slice(0, cl);
+    } else {
+      return { head: null, rest: s };
+    }
+  }
+  if (head.length < 25) return { head: null, rest: s };
+  return { head: head.replace(/\.$/, ''), rest };
+}
+
+function fillLeadStory(wfo, synopsis, full) {
+  const ls = ensureLeadStory();
+  if (!ls) return;
+  document.getElementById('ls-kicker').textContent = 'The Forecast Discussion · NWS ' + wfo;
+  const { head, rest } = afdHeadline(synopsis);
+  const hEl = document.getElementById('ls-head');
+  const bEl = document.getElementById('ls-body');
+  const collapsed = head ? (rest || '') : synopsis;
+  if (head) { hEl.style.display = ''; hEl.textContent = head; }
+  else { hEl.style.display = 'none'; }
+  bEl.textContent = collapsed;
+  bEl.classList.remove('ls-full');
+  let expanded = false;
+  const tgl = document.getElementById('ls-toggle');
+  tgl.textContent = 'Continued — full discussion';
+  tgl.onclick = function () {
+    expanded = !expanded;
+    bEl.textContent = expanded ? full : collapsed;
+    bEl.classList.toggle('ls-full', expanded);
+    tgl.textContent = expanded ? 'Return to synopsis' : 'Continued — full discussion';
+  };
+  ls.classList.add('ls-ready');
+}
+
+function compass(deg) {
+  const pts = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return pts[Math.round(((deg % 360) / 22.5)) % 16];
+}
+
+// Rail numbers for the primary city — called from renderCard(0)
+function railFill(loc, c, daily) {
+  const ls = ensureLeadStory();
+  if (!ls) return;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('ls-now', Math.round(c.temperature_2m) + loc.sym);
+  const tempC = loc.unit === 'fahrenheit' ? (c.temperature_2m - 32) * 5 / 9 : c.temperature_2m;
+  set('ls-cond', wmo(c.weather_code, tempC).label);
+  set('ls-hilo', Math.round(daily.temperature_2m_max[0]) + '\u00b0 / ' + Math.round(daily.temperature_2m_min[0]) + '\u00b0');
+  set('ls-wind', compass(c.wind_direction_10m) + ' ' + Math.round(c.wind_speed_10m) + ' ' + loc.windUnit);
+  set('ls-rain', (daily.precipitation_probability_max && daily.precipitation_probability_max[0] != null ? daily.precipitation_probability_max[0] : 0) + '%');
+  const fmt = t => { const hm = t.split('T')[1].split(':'); let h = +hm[0]; const ap = h >= 12 ? 'p' : 'a'; h = h % 12 || 12; return h + ':' + hm[1] + ap; };
+  set('ls-sun', fmt(daily.sunrise[0]) + ' / ' + fmt(daily.sunset[0]));
+}
+
 const WFO_SITES = [
 ["BOX",41.95,-71.13],["OKX",40.87,-72.86],["ALY",42.68,-73.83],["BGM",42.20,-75.98],
 ["BUF",42.94,-78.72],["GYX",43.89,-70.25],["CAR",46.87,-68.02],["BTV",44.47,-73.15],
@@ -5226,6 +5459,7 @@ async function loadForecastDiscussion() {
     const { synopsis, full } = parseAFD(raw);
     if (!synopsis) return;
     renderAFD(wfo, synopsis, full);
+    fillLeadStory(wfo, synopsis, full);
   } catch (e) { /* silent — app unchanged on any failure */ }
 }
 
