@@ -4868,7 +4868,7 @@ function dismissQuickNote() {
   _qnMood = null;
   window._editingNoteTs = null;
   const saveBtn = document.getElementById('qn-save');
-  if(saveBtn) saveBtn.textContent = 'Save';
+  if(saveBtn) saveBtn.textContent = 'File it';
   document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
 }
 
@@ -4898,7 +4898,7 @@ function saveQuickNote() {
     ta.value = '';
     window._editingNoteTs = null;
     const saveBtn = document.getElementById('qn-save');
-    if(saveBtn) saveBtn.textContent = 'Save';
+    if(saveBtn) saveBtn.textContent = 'File it';
     qnInput();
     dismissQuickNote();
     if(currentView === 'log') renderLogView();
@@ -5066,7 +5066,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="quick-note-head">
       <div class="quick-note-title">
         <div class="quick-note-dot"></div>
-        Log Entry
+        Field Note
       </div>
       <button class="quick-note-close" onclick="closeQuickNote()">✕</button>
     </div>
@@ -5082,13 +5082,13 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="mood-chip" data-mood="still" onclick="selectMood('still')">Still</button>
     </div>
     <textarea class="quick-note-ta" id="qn-ta"
-      placeholder="Note something… (optional)"
+      placeholder="What’s the sky doing? (optional)"
       spellcheck="true" autocorrect="on"
       oninput="qnInput()"
       onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){saveQuickNote();event.preventDefault();}"></textarea>
     <div class="quick-note-foot">
       <div class="quick-note-meta" id="qn-meta" style="cursor:pointer;-webkit-tap-highlight-color:transparent" onclick="qnCycleCity()" title="Tap to switch city"></div>
-      <button class="quick-note-save" id="qn-save" onclick="saveQuickNote()" disabled>Log it</button>
+      <button class="quick-note-save" id="qn-save" onclick="saveQuickNote()" disabled>File it</button>
     </div>
   </div>
 </div>
