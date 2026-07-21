@@ -1497,6 +1497,14 @@
       }
       .city-sheet.open { transform:translateY(0); pointer-events:all; }
 
+      #city-sheet-editions { padding: 2px 0 10px; }
+      .cs-ed-label { font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin:2px 0 6px; }
+      .cs-ed-row { display:flex; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); }
+      .cs-ed-row:last-child { border-bottom:none; }
+      .cs-ed-city { flex:1; padding:11px 0; font-family:'Spectral',serif; font-size:15px; color:#fff; cursor:pointer; display:flex; align-items:center; gap:8px; }
+      .cs-ed-tag { font-family:'IBM Plex Mono',monospace; font-size:7px; letter-spacing:.16em; text-transform:uppercase; color:var(--orange2); border:1px solid rgba(255,255,255,0.25); padding:2px 6px; }
+      .cs-ed-del { background:none; border:none; color:rgba(255,255,255,0.35); font-size:13px; padding:8px 2px 8px 14px; cursor:pointer; }
+
       .city-sheet-head {
         background:rgba(255,255,255,0.04);padding:16px 20px;
         display:flex;align-items:center;justify-content:space-between;
@@ -2515,6 +2523,7 @@ setTimeout(firstLaunchLocate, 800);
 
 // ── SVG WEATHER ICONS ─────────────────────────────────────────────────────────
 const ICON_SVG = {
+  'clear-night': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 5.8a11 11 0 1 0 6.2 19.6c-7.9 1.2-14.2-5-12.6-12.7a11 11 0 0 1 6.4-6.9Z" stroke="#3d5878" stroke-width="1.8"/><circle cx="24.5" cy="7.5" r="0.9" fill="#c84b11"/></svg>`,
   clear: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="5.5" stroke="#c84b11" stroke-width="1.8"/><line x1="16" y1="2.5" x2="16" y2="6" stroke="#c84b11" stroke-width="1.8"/><line x1="16" y1="26" x2="16" y2="29.5" stroke="#c84b11" stroke-width="1.8"/><line x1="2.5" y1="16" x2="6" y2="16" stroke="#c84b11" stroke-width="1.8"/><line x1="26" y1="16" x2="29.5" y2="16" stroke="#c84b11" stroke-width="1.8"/><line x1="6.5" y1="6.5" x2="8.8" y2="8.8" stroke="#c84b11" stroke-width="1.8"/><line x1="23.2" y1="23.2" x2="25.5" y2="25.5" stroke="#c84b11" stroke-width="1.8"/><line x1="25.5" y1="6.5" x2="23.2" y2="8.8" stroke="#c84b11" stroke-width="1.8"/><line x1="8.8" y1="23.2" x2="6.5" y2="25.5" stroke="#c84b11" stroke-width="1.8"/></svg>`,
 
   'mostly-clear': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><circle cx="21" cy="11" r="5" stroke="#c84b11" stroke-width="1.6"/><line x1="21" y1="3" x2="21" y2="5.3" stroke="#c84b11" stroke-width="1.6"/><line x1="21" y1="16.7" x2="21" y2="19" stroke="#c84b11" stroke-width="1.6"/><line x1="13" y1="11" x2="15.3" y2="11" stroke="#c84b11" stroke-width="1.6"/><line x1="26.7" y1="11" x2="29" y2="11" stroke="#c84b11" stroke-width="1.6"/><line x1="15.5" y1="5.5" x2="17.2" y2="7.2" stroke="#c84b11" stroke-width="1.6"/><line x1="24.8" y1="14.8" x2="26.5" y2="16.5" stroke="#c84b11" stroke-width="1.6"/><line x1="26.5" y1="5.5" x2="24.8" y2="7.2" stroke="#c84b11" stroke-width="1.6"/><path d="M2,28 Q0,28 0,26 Q0,23.5 2.5,23 Q3,20.5 6.5,20.5 Q9,18.5 12.5,20.5 Q16,20.5 16,23.5 Q18.5,24 18.5,26 Q18.5,28 16,28 Z" stroke="#0b2545" stroke-width="1.5" fill="white"/></svg>`,
@@ -2772,7 +2781,22 @@ function stateAbbr(s) {
   return STATE_ABBR[s] || s.slice(0,3).toUpperCase();
 }
 
-function wmo(c){const e=WMO[c]||{label:"Unknown",svg:"fallback",tint:"cloudy"};return{...e,icon:ICON_SVG[e.svg]||ICON_SVG.fallback};}
+function wmo(c, tempC, night){
+  const e=WMO[c]||{label:"Unknown",svg:"fallback",tint:"cloudy"};
+  const svg = (night && (e.svg==='clear'||e.svg==='mostly-clear')) ? 'clear-night' : e.svg;
+  return{...e,icon:ICON_SVG[svg]||ICON_SVG.fallback};
+}
+const _sunCache = {};
+function isNightHour(t, i){
+  const s = _sunCache[i];
+  if(!s || !t) return false;
+  const date = t.slice(0,10);
+  const di = s.time ? s.time.indexOf(date) : -1;
+  const sr = di >= 0 ? s.sunrise[di] : s.sunrise[0];
+  const ss = di >= 0 ? s.sunset[di]  : s.sunset[0];
+  if(!sr || !ss) return false;
+  return t < sr || t >= ss;
+}
 function compass(d){return['N','NE','E','SE','S','SW','W','NW'][Math.round(d/45)%8];}
 function arrow(d){return['↑','↗','→','↘','↓','↙','←','↖'][Math.round(d/45)%8];}
 function localTime(tz){return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:tz,hour12:true});}
@@ -2938,6 +2962,7 @@ function renderCard(i, loc, data) {
     document.body.classList.add(skyClass);
   }
 
+  if(daily && daily.sunrise) _sunCache[i] = { time: daily.time, sunrise: daily.sunrise, sunset: daily.sunset };
   if(i === 0 && typeof railFill === 'function') railFill(loc, c, daily);
 
   const iconEl=document.getElementById(`icon-${i}`);if(iconEl)iconEl.innerHTML=w.icon;
@@ -3154,11 +3179,45 @@ function openModal(){
 }
 
 // ── CITY BOTTOM SHEET (mobile) ────────────────────────────────────────────────
+function renderEditionsList() {
+  const el = document.getElementById('city-sheet-editions');
+  if(!el) return;
+  if(!LOCATIONS.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="cs-ed-label">Your editions — tap for front page</div>' +
+    LOCATIONS.map((loc, i) => `
+    <div class="cs-ed-row">
+      <div class="cs-ed-city" onclick="makePrimary(${i})">
+        ${loc.name}${loc.state ? ', ' + loc.state : ''}
+        ${i === 0 ? '<span class="cs-ed-tag">Front page</span>' : ''}
+      </div>
+      <button class="cs-ed-del" onclick="removeEdition(${i})" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+function makePrimary(i) {
+  if(i === 0 || !LOCATIONS[i]) { return; }
+  haptic('light');
+  const moved = LOCATIONS.splice(i, 1)[0];
+  LOCATIONS.unshift(moved);
+  saveCities();
+  closeCitySheet();
+  refreshAll();
+  updateNameplate();
+}
+
+function removeEdition(i) {
+  haptic('light');
+  removeCity(i);
+  renderEditionsList();
+  updateNameplate();
+}
+
 function openCitySheet() {
   const overlay = document.getElementById('city-sheet-overlay');
   const sheet   = document.getElementById('city-sheet');
   const input   = document.getElementById('city-sheet-input');
   if(!overlay||!sheet||!input) return;
+  renderEditionsList();
   document.getElementById('city-sheet-results').innerHTML = '';
   input.value = '';
   overlay.classList.add('open');
@@ -3864,7 +3923,7 @@ function fcToggle(el, cardIdx) {
               const hour = parseInt(s.t.slice(11,13));
               const ampm = hour===0?'12a':hour<12?hour+'a':hour===12?'12p':(hour-12)+'p';
               const tempC = loc.unit==='fahrenheit'?(s.temp-32)*5/9:s.temp;
-              const hw = wmo(s.code, tempC);
+              const hw = wmo(s.code, tempC, isNightHour(s.t, cardIdx));
               return `<div class="hv-slot">
                 <div class="hv-time">${ampm}</div>
                 <div class="hv-icon">${hw.icon}</div>
@@ -4197,7 +4256,7 @@ function renderHourlyCard(i, loc) {
     const hourTempC = loc.unit === 'fahrenheit'
       ? (temps[idx] - 32) * 5/9
       : temps[idx];
-    const w = wmo(codes[idx], hourTempC);
+    const w = wmo(codes[idx], hourTempC, isNightHour(t, i));
     const pct = precip[idx] ?? 0;
     const isNow = idx === 0;
 
@@ -5066,10 +5125,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="city-sheet-overlay" id="city-sheet-overlay" onclick="closeCitySheet()"></div>
 <div class="city-sheet" id="city-sheet">
   <div class="city-sheet-head">
-    <div class="city-sheet-title">Add City</div>
+    <div class="city-sheet-title">Editions</div>
     <button class="city-sheet-close" onclick="closeCitySheet()">✕</button>
   </div>
   <div class="city-sheet-body">
+    <div id="city-sheet-editions"></div>
     <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationSheet()">
       <span>◎</span> Use my current location
     </button>
@@ -5213,7 +5273,7 @@ function ensureLeadStory() {
         '<div><div class="ls-stat-label">High / Low</div><div class="ls-stat-value" id="ls-hilo">—</div></div>' +
         '<div><div class="ls-stat-label">Wind</div><div class="ls-stat-value" id="ls-wind">—</div></div>' +
         '<div><div class="ls-stat-label">Rain chance</div><div class="ls-stat-value" id="ls-rain">—</div></div>' +
-        '<div><div class="ls-stat-label">Sun</div><div class="ls-stat-value" id="ls-sun">—</div></div>' +
+        '<div><div class="ls-stat-label">Sunrise / Sunset</div><div class="ls-stat-value" id="ls-sun">—</div></div>' +
       '</div>' +
     '</div>';
   grid.parentNode.insertBefore(ls, grid);
@@ -5419,7 +5479,9 @@ function parseAFD(raw) {
     // Trim the default view to a few sentences (~400 chars), ending cleanly
     if (synopsis.length > 420) {
       const cut = synopsis.slice(0, 420);
-      const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.'));
+      // Only break at sentence-ending punctuation followed by a space, so
+      // decimals and abbreviations ("PM2.5", "e.g.") never get chopped.
+      const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
       synopsis = (lastStop > 150 ? cut.slice(0, lastStop + 1) : cut.trim() + '…');
     }
   }
