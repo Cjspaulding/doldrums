@@ -1627,6 +1627,15 @@
         color:rgba(255,255,255,0.35); padding:6px 14px 7px;
       }
       .np-dateline-right { display:flex; align-items:center; gap:8px; }
+      #colophon {
+        margin: 26px 14px 10px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(11,37,69,0.18);
+        text-align: center;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7px; letter-spacing: .22em; text-transform: uppercase;
+        color: var(--ink4);
+      }
       .np-moon {
         background:none; border:none; color:rgba(255,255,255,0.5);
         font-size:12px; padding:0 2px; cursor:pointer; line-height:1;
@@ -3151,6 +3160,7 @@ async function refreshAll(){
 
   await Promise.all(LOCATIONS.map((loc,i)=>fetchWeather(loc,i)));
   updateNameplate();
+  ensureColophon();
   const now=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   const u=document.getElementById('last-updated');
   if(u)u.textContent=`Obs. ${now}`;
@@ -3452,7 +3462,32 @@ function haptic(style) {
   navigator.vibrate(patterns[style] || 10);
 }
 
+// ── REVIEW PROMPT ───────────────────────────────────────────────────────
+// Ask exactly once, only in the native app, only after the third dispatch.
+// No-op on the web and wherever the plugin isn't installed.
+function maybeRequestReview() {
+  try {
+    if (localStorage.getItem('doldrums_review_asked')) return;
+    if (getNotes().length < 3) return;
+    const cap = window.Capacitor;
+    const iar = cap && cap.Plugins && cap.Plugins.InAppReview;
+    if (!iar || !(cap.isNativePlatform && cap.isNativePlatform())) return;
+    localStorage.setItem('doldrums_review_asked', '1');
+    setTimeout(() => { try { iar.requestReview(); } catch(e) {} }, 1600);
+  } catch(e) {}
+}
+
 // ── BROADSHEET NAMEPLATE (mobile) ─────────────────────────────────────────────
+function ensureColophon() {
+  if (!window.matchMedia || !window.matchMedia('(max-width:600px)').matches) return;
+  const m = document.querySelector('main');
+  if (!m || document.getElementById('colophon')) return;
+  const c = document.createElement('div');
+  c.id = 'colophon';
+  c.innerHTML = 'DOLDRUMS · doldrums.app · v1.2.1';
+  m.appendChild(c);
+}
+
 function updateNameplate() {
   const nameEl = document.getElementById('np-location-name');
   if(!nameEl) return;
@@ -3537,6 +3572,7 @@ function setView(view, isBack) {
   document.querySelectorAll('.np-section').forEach(el => {
     el.classList.toggle('active', el.dataset.view === view);
   });
+  setTimeout(ensureColophon, 50);
   updateBackButton();
 
   const sl = document.querySelector('.section-label');
@@ -5025,6 +5061,7 @@ function saveQuickNote() {
   saveNotes(notes);
   dismissQuickNote();
   if(currentView === 'log') renderLogView();
+  maybeRequestReview();
   const fab = document.getElementById('fab');
   if(fab) {
     fab.textContent = '✓';
