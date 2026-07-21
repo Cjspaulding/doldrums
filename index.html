@@ -1757,10 +1757,10 @@
       .vfc-row.vfc-today .vfc-day { color:var(--orange); }
       .vfc-icon { font-size:22px; flex-shrink:0; width:28px; text-align:center; }
       .vfc-cond { font-family:'Spectral',serif; font-size:12px; color:var(--ink3); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .vfc-temps { display:flex; gap:10px; align-items:center; flex-shrink:0; }
-      .vfc-hi { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); }
-      .vfc-lo { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink4); }
-      .vfc-rain { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3f6d99; }
+      .vfc-temps { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+      .vfc-hi { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); min-width:34px; text-align:right; }
+      .vfc-lo { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink4); min-width:34px; text-align:right; }
+      .vfc-rain { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#3f6d99; min-width:42px; text-align:right; }
 
       .now-readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 14px 14px; }
       .now-reading-card { background:var(--white); border:1px solid rgba(11,37,69,0.16); padding:12px 14px; }
@@ -2676,7 +2676,7 @@ function formatRainHour(hour) {
   return (hour-12) + 'p';
 }
 
-function buildRainAnswer(hourly, loc) {
+function buildRainAnswer(hourly, loc, currentCode) {
   const r = willItRain(hourly, loc);
   if(!r) return '';
 
@@ -2690,8 +2690,16 @@ function buildRainAnswer(hourly, loc) {
     const h = firstRain.hour;
     const timeStr = formatRainHour(h);
     const isNow = firstRain.idx === 0;
-    if(isNow) {
-      answerHTML = `<div class="rain-answer-text"><strong>Raining now.</strong> ${firstRain.prob}% chance this hour.</div>`;
+    // Only claim rain as fact if the current conditions actually report it;
+    // a probability is a forecast, not an observation.
+    const PRECIP_CODES = new Set([51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99]);
+    const SNOW_CODES = new Set([71,73,75,77,85,86]);
+    if(isNow && PRECIP_CODES.has(currentCode)) {
+      answerHTML = `<div class="rain-answer-text"><strong>Raining now.</strong> ${firstRain.prob}% chance it keeps up this hour.</div>`;
+    } else if(isNow && SNOW_CODES.has(currentCode)) {
+      answerHTML = `<div class="rain-answer-text"><strong>Snowing now.</strong> ${firstRain.prob}% chance it keeps up this hour.</div>`;
+    } else if(isNow) {
+      answerHTML = `<div class="rain-answer-text">Rain <strong>possible this hour</strong> — ${firstRain.prob}% chance.</div>`;
     } else {
       answerHTML = `<div class="rain-answer-text">Rain likely <strong>around ${timeStr}</strong> — ${firstRain.prob}% chance.</div>`;
     }
@@ -3024,7 +3032,7 @@ function renderCard(i, loc, data) {
       <div class="vfc-temps">
         <span class="vfc-hi">${hi}°</span>
         <span class="vfc-lo">${lo}°</span>
-        ${hasRain?`<span class="vfc-rain">${rv(precip)}${pu}</span>`:''}
+        <span class="vfc-rain">${hasRain?`${rv(precip)}${pu}`:''}</span>
       </div>
     </div>`;
   }).join('');
@@ -3075,7 +3083,7 @@ function renderCard(i, loc, data) {
         <div class="now-reading-sub">${formatSunTime(daily.sunset?.[0])}</div>
       </div>
     </div>
-    ${buildRainAnswer(data.hourly, loc)}
+    ${buildRainAnswer(data.hourly, loc, data.current?.weather_code)}
   `;
 }
 
