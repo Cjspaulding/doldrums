@@ -2244,11 +2244,27 @@
     body.dark .afd-back:hover { color:var(--ink); }
     .afd-body {
       padding:14px 18px 6px;
-      font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:300;
-      line-height:1.65;color:var(--ink2);white-space:pre-wrap;
+      font-family:'Spectral',Georgia,serif;font-size:14px;font-weight:400;
+      line-height:1.65;color:var(--ink2);
       max-height:none;
     }
-    .afd-body.afd-full { font-size:11px;color:var(--ink3); }
+    .afd-body p { margin:0 0 12px; }
+    .afd-body p:last-child { margin-bottom:0; }
+    .afd-body strong { font-weight:600;color:var(--navy); }
+    .afd-body .afd-sec-head {
+      font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--orange);margin:18px 0 8px;
+    }
+    .afd-body .afd-sec-head:first-child { margin-top:0; }
+    .afd-body p.afd-bullet { padding-left:16px;position:relative;margin-bottom:9px; }
+    .afd-body p.afd-bullet::before { content:'\2014';position:absolute;left:0;color:var(--orange); }
+    .afd-body .ls-unabridged {
+      display:block;background:none;border:none;padding:12px 0 0;cursor:pointer;
+      font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;
+      text-transform:uppercase;color:var(--ink4);text-decoration:underline;
+      text-underline-offset:2px;
+    }
+    .afd-body.afd-full { font-size:13.5px; }
     .afd-foot {
       display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:10px 18px 14px;flex-wrap:wrap;
@@ -5905,21 +5921,34 @@ function renderAFD(wfo, synopsis, full) {
       '</div>' +
     '</div>';
 
-  // textContent everywhere — feed text is never interpreted as HTML
+  // textContent for anything unparsed — HTML only ever comes from readableAFD(),
+  // which escapes every character it emits before wrapping it in markup.
   document.getElementById('afd-office').textContent = 'NWS ' + wfo;
   const body = document.getElementById('afd-body');
-  body.textContent = synopsis;
+  body.innerHTML = readableAFD(synopsis, false);
 
   let expanded = false;
   const toggleBtn = document.getElementById('afd-toggle');
   const backBtn = document.getElementById('afd-back');
+  function renderExpanded(unabridged) {
+    body.innerHTML = readableAFD(full, unabridged);
+    if (!unabridged) {
+      const more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'ls-unabridged';
+      more.textContent = 'Read the unabridged discussion';
+      more.onclick = () => renderExpanded(true);
+      body.appendChild(more);
+    }
+  }
   // Same fix as the mobile lead story (item #3): a long unabridged discussion
   // pushes the only collapse control far down the page. A top-anchored link
   // plus scrolling the card back into view on collapse means you're never
   // stuck hunting for the way out.
   function setExpanded(next) {
     expanded = next;
-    body.textContent = expanded ? full : synopsis;
+    if (expanded) { renderExpanded(false); }
+    else { body.innerHTML = readableAFD(synopsis, false); }
     body.classList.toggle('afd-full', expanded);
     toggleBtn.textContent = expanded ? 'Show synopsis' : 'Read full discussion';
     backBtn.style.display = expanded ? '' : 'none';
