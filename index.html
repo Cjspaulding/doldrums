@@ -5792,8 +5792,25 @@ function parseAFD(raw) {
   const blocks = raw.split(/\n&&\n?/);
   let synopsis = null;
   for (const b of blocks) {
-    const m = b.match(/^\s*\.(SYNOPSIS|UPDATE|DISCUSSION|SHORT TERM)[^\n]*\.{0,3}\s*\n?([\s\S]*)/m);
-    if (m && m[2] && m[2].trim().length > 40) { synopsis = m[2].trim(); break; }
+    // KEY MESSAGES sits before DISCUSSION checks it — offices that write a
+    // Key Messages list but no distinct SYNOPSIS were falling through to
+    // DISCUSSION's opening paragraph, which some forecasters write as a
+    // near-verbatim restatement of Key Message #1. That produced the same
+    // point twice in a three-sentence teaser. Key Messages is *written* to
+    // be the concise version, so prefer it whenever it exists.
+    const m = b.match(/^\s*\.(SYNOPSIS|UPDATE|KEY MESSAGES?|DISCUSSION|SHORT TERM)[^\n]*\.{0,3}\s*\n?([\s\S]*)/m);
+    if (m && m[2] && m[2].trim().length > 40) {
+      synopsis = m[2].trim();
+      if (/^KEY MESSAGES?/i.test(m[1])) {
+        // A numbered/bulleted list of separate points, not one flowing
+        // paragraph — using the whole block just runs every point together.
+        // The first point is exactly what NWS means it to be: the single
+        // most important takeaway.
+        const firstPoint = synopsis.split(/\n\s*\n/)[0];
+        if (firstPoint && firstPoint.trim().length > 20) synopsis = firstPoint.trim();
+      }
+      break;
+    }
   }
   if (!synopsis) {
     // fall back to the first substantial paragraph after the header lines
@@ -5809,10 +5826,11 @@ function parseAFD(raw) {
     // convention, not office-specific quirks — one pattern covers both.
     synopsis = synopsis.replace(/^\s*(?:Issued|Updated)?\s*(?:at|as of)\s+\d{1,4}\s*(AM|PM)?\s+[A-Z]{2,5}\s+[A-Za-z]+(?:\s+[A-Za-z]+\s+\d{1,2}\s+\d{4})?\.{0,3}\s*/i, '');
     // Some offices lead a sub-period straight into an inline bulleted "Key
-    // Messages:" list (as opposed to BOU's separate top-level section) —
-    // after the timestamp strip above, that can leave a stray leading
-    // "* " or "- " marker on what becomes the headline.
-    synopsis = synopsis.replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)?[-*]\s+/i, '');
+    // Messages:" list (as opposed to BOU's separate top-level section), and
+    // a standalone Key Messages point can lead with a number ("1.") instead
+    // of a dash — after the timestamp strip above, either can leave a stray
+    // leading marker on what becomes the headline.
+    synopsis = synopsis.replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)?(?:[-*]|\d+[.)])?\s*/i, '');
     synopsis = synopsis.replace(/\n(?!\n)/g, ' ').replace(/\s{2,}/g, ' ');
     // Trim the default view to a few sentences (~400 chars), ending cleanly
     if (synopsis.length > 420) {
