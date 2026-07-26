@@ -2233,6 +2233,15 @@
       font-family:'IBM Plex Mono',monospace;font-size:9px;
       letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);
     }
+    .afd-back {
+      display:block;background:none;border:none;padding:10px 18px 0;
+      font-family:'IBM Plex Mono',monospace;font-size:8px;
+      letter-spacing:.14em;text-transform:uppercase;color:var(--navy2);
+      cursor:pointer;
+    }
+    .afd-back:hover { color:var(--navy); }
+    body.dark .afd-back { color:var(--ink3); }
+    body.dark .afd-back:hover { color:var(--ink); }
     .afd-body {
       padding:14px 18px 6px;
       font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:300;
@@ -5779,6 +5788,7 @@ function renderAFD(wfo, synopsis, full) {
         '<span class="afd-title">Forecast Discussion</span>' +
         '<span class="afd-office" id="afd-office"></span>' +
       '</div>' +
+      '<button class="afd-back" id="afd-back" type="button" style="display:none">‹ Return to the synopsis</button>' +
       '<div class="afd-body" id="afd-body"></div>' +
       '<div class="afd-foot">' +
         '<button class="afd-toggle" id="afd-toggle" type="button">Read full discussion</button>' +
@@ -5792,12 +5802,22 @@ function renderAFD(wfo, synopsis, full) {
   body.textContent = synopsis;
 
   let expanded = false;
-  document.getElementById('afd-toggle').addEventListener('click', function () {
-    expanded = !expanded;
+  const toggleBtn = document.getElementById('afd-toggle');
+  const backBtn = document.getElementById('afd-back');
+  // Same fix as the mobile lead story (item #3): a long unabridged discussion
+  // pushes the only collapse control far down the page. A top-anchored link
+  // plus scrolling the card back into view on collapse means you're never
+  // stuck hunting for the way out.
+  function setExpanded(next) {
+    expanded = next;
     body.textContent = expanded ? full : synopsis;
     body.classList.toggle('afd-full', expanded);
-    this.textContent = expanded ? 'Show synopsis' : 'Read full discussion';
-  });
+    toggleBtn.textContent = expanded ? 'Show synopsis' : 'Read full discussion';
+    backBtn.style.display = expanded ? '' : 'none';
+    if (!expanded) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  toggleBtn.addEventListener('click', () => setExpanded(!expanded));
+  backBtn.addEventListener('click', () => setExpanded(false));
 }
 </script>
 </body>
