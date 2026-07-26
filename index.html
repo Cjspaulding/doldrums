@@ -3223,6 +3223,7 @@ async function refreshAll(){
   }
   startCountdown();
   if (typeof loadForecastDiscussion === 'function') loadForecastDiscussion();
+  maybeRequestReview();
 }
 
 // ── ADD CITY MODAL ────────────────────────────────────────────────────────────
@@ -4238,7 +4239,45 @@ function toggleDark() {
   }
 })();
 
+// ── NATIVE REVIEW PROMPT (1.3) ──────────────────────────────────────────────
+// Only fires inside the native app (window.Capacitor.isNativePlatform()) —
+// the web build has no App Store to review, so this is a silent no-op there.
+// iOS itself caps SKStoreReviewController at ~3 prompts per 365 days no
+// matter what we do, but that's a ceiling, not a target: this cooldown and
+// usage gate keep the *call* tied to genuine repeated use, not fired on
+// every session.
+function recordAppOpen() {
+  try {
+    if (!localStorage.getItem('doldrums_first_open')) {
+      localStorage.setItem('doldrums_first_open', String(Date.now()));
+    }
+    const opens = parseInt(localStorage.getItem('doldrums_open_count') || '0', 10);
+    localStorage.setItem('doldrums_open_count', String(opens + 1));
+  } catch (e) {}
+}
+
+async function maybeRequestReview() {
+  try {
+    if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
+    const plugin = window.Capacitor.Plugins && window.Capacitor.Plugins.InAppReview;
+    if (!plugin || typeof plugin.requestReview !== 'function') return;
+
+    const lastPrompt = parseInt(localStorage.getItem('doldrums_review_last_prompt') || '0', 10);
+    if (lastPrompt && (Date.now() - lastPrompt) / 86400000 < 90) return;
+
+    const firstOpen = parseInt(localStorage.getItem('doldrums_first_open') || '0', 10);
+    const opens = parseInt(localStorage.getItem('doldrums_open_count') || '0', 10);
+    const daysSinceInstall = firstOpen ? (Date.now() - firstOpen) / 86400000 : 0;
+    // A handful of real sessions across more than one day — not a first look.
+    if (opens < 5 || daysSinceInstall < 2) return;
+
+    await plugin.requestReview();
+    localStorage.setItem('doldrums_review_last_prompt', String(Date.now()));
+  } catch (e) { /* never let this interrupt the app */ }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
+recordAppOpen();
 refreshAll();
 
 
