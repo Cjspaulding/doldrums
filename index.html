@@ -5631,6 +5631,31 @@ function nearestWFO(lat, lon) {
   return bestD <= 400 ? best : null; // outside US coverage → no discussion
 }
 
+// Straight-line distance to an office building is a poor proxy for which WFO
+// actually covers a spot — county warning areas are irregular, and border
+// towns (e.g. southern NH, physically closer to Boston/Norton) can belong to
+// a farther office (Gray, ME covers all of NH). Ask NWS directly which CWA a
+// point falls in; only fall back to the distance guess if that call fails.
+async function resolveWFO(lat, lon) {
+  const key = 'doldrums_cwa_' + lat.toFixed(2) + ',' + lon.toFixed(2);
+  try {
+    const cached = sessionStorage.getItem(key);
+    if (cached) return cached;
+  } catch (e) {}
+  try {
+    const res = await fetch('https://api.weather.gov/points/' + lat.toFixed(4) + ',' + lon.toFixed(4));
+    if (res.ok) {
+      const data = await res.json();
+      const cwa = data?.properties?.cwa;
+      if (cwa) {
+        try { sessionStorage.setItem(key, cwa); } catch (e) {}
+        return cwa;
+      }
+    }
+  } catch (e) {}
+  return nearestWFO(lat, lon); // offline / API hiccup fallback
+}
+
 function parseAFD(raw) {
   // AFD products are section blocks separated by "&&", each starting ".NAME..."
   const blocks = raw.split(/\n&&\n?/);
@@ -5677,7 +5702,7 @@ async function loadForecastDiscussion() {
     const loc = LOCATIONS[0];
     if (typeof loc.lat !== 'number' && typeof loc.latitude !== 'number') return;
     const lat = loc.lat ?? loc.latitude, lon = loc.lon ?? loc.longitude ?? loc.lng;
-    const wfo = nearestWFO(lat, lon);
+    const wfo = await resolveWFO(lat, lon);
     if (!wfo) { removeAFD(); return; }
 
     // 30-minute session cache per office
