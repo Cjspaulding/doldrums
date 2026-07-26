@@ -5682,12 +5682,9 @@ function readableAFD(raw, unabridged) {
     const paras = p.split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
     if (!paras.length) continue;
     if (title) out += '<div class="afd-sec-head">' + esc(titleCase(title)) + '</div>';
-    const boldDays = s => s
-      .replace(/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)((?:\s+(?:night|morning|afternoon|evening))?)\b/gi, '<strong>$1$2</strong>')
-      .replace(/\b(tonight|today|overnight|this (?:morning|afternoon|evening|weekend))\b/gi, '<strong>$1</strong>');
     out += paras.map(x => {
       const b = /^[-*]\s+/.test(x);
-      const body = boldDays(esc(jargon(x.replace(/^[-*]\s+/, ''))));
+      const body = esc(jargon(x.replace(/^[-*]\s+/, '')));
       return b ? '<p class="afd-bullet">' + body + '</p>' : '<p>' + body + '</p>';
     }).join('');
   }
