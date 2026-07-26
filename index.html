@@ -1510,25 +1510,14 @@
         display:flex;align-items:center;justify-content:space-between;
         flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07);
       }
-      .city-sheet-head-left { display:flex; align-items:center; gap:2px; }
       .city-sheet-title {
         font-size:11px;letter-spacing:.22em;text-transform:uppercase;
         color:rgba(255,255,255,0.4);
         font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       }
-      .city-sheet-back {
-        background:none;border:none;color:rgba(255,255,255,0.5);
-        font-size:22px;cursor:pointer;padding:4px 6px 4px 0;line-height:1;
-      }
       .city-sheet-close {
         background:none;border:none;color:rgba(255,255,255,0.3);
         font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;
-      }
-      .cs-manage-link {
-        display:block;width:100%;text-align:center;background:none;border:none;
-        color:rgba(255,255,255,0.35);font-size:11px;letter-spacing:.1em;
-        text-transform:uppercase;padding:14px 0 2px;cursor:pointer;
-        font-family:'IBM Plex Mono',monospace;
       }
 
       .city-sheet-body {
@@ -3260,9 +3249,11 @@ function openCitySheet() {
   const sheet   = document.getElementById('city-sheet');
   const input   = document.getElementById('city-sheet-input');
   if(!overlay||!sheet||!input) return;
-  showSearchView(); // fast path is always the front door
   document.getElementById('city-sheet-results').innerHTML = '';
   input.value = '';
+  const editions = document.getElementById('city-sheet-editions');
+  if(editions) editions.style.display = '';
+  renderEditionsList(); // saved cities are always the front door — no detour to see them
   overlay.classList.add('open');
   sheet.classList.add('open');
   setTimeout(() => input.focus(), 320);
@@ -3273,29 +3264,18 @@ function closeCitySheet() {
   document.getElementById('city-sheet')?.classList.remove('open');
 }
 
-// ── SHEET VIEW SWITCHING (1.4: fast path vs. manage editions) ─────────────────
-function showSearchView() {
-  document.getElementById('cs-view-search').style.display = '';
-  document.getElementById('cs-view-manage').style.display = 'none';
-  document.getElementById('cs-back-btn').style.display = 'none';
-  document.getElementById('cs-title').textContent = 'Switch City';
-  const link = document.getElementById('cs-manage-link');
-  if(link) link.style.display = LOCATIONS.length ? '' : 'none';
-}
-
-function showManageEditions() {
-  renderEditionsList();
-  document.getElementById('cs-view-search').style.display = 'none';
-  document.getElementById('cs-view-manage').style.display = '';
-  document.getElementById('cs-back-btn').style.display = '';
-  document.getElementById('cs-title').textContent = 'Manage Editions';
-}
-
+// ── SHEET LIST TOGGLE (1.4.1: one view — editions by default, search results replace them while typing) ─────
 let _sheetTimer = null;
 function onCitySheetInput() {
   clearTimeout(_sheetTimer);
   const q = document.getElementById('city-sheet-input').value.trim();
-  if(q.length < 2) return;
+  const editions = document.getElementById('city-sheet-editions');
+  if(q.length < 2) {
+    document.getElementById('city-sheet-results').innerHTML = '';
+    if(editions) editions.style.display = '';
+    return;
+  }
+  if(editions) editions.style.display = 'none';
   _sheetTimer = setTimeout(() => searchCitySheet(), 400);
 }
 
@@ -5295,30 +5275,21 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="city-sheet-overlay" id="city-sheet-overlay" onclick="closeCitySheet()"></div>
 <div class="city-sheet" id="city-sheet" role="dialog" aria-modal="true" aria-label="Switch city">
   <div class="city-sheet-head">
-    <div class="city-sheet-head-left">
-      <button class="city-sheet-back" id="cs-back-btn" onclick="showSearchView()" style="display:none" aria-label="Back">‹</button>
-      <div class="city-sheet-title" id="cs-title">Switch City</div>
-    </div>
+    <div class="city-sheet-title">Switch City</div>
     <button class="city-sheet-close" onclick="closeCitySheet()" aria-label="Close">✕</button>
   </div>
   <div class="city-sheet-body">
-    <!-- Fast path: search opens straight away, pick a result and it's the front page -->
-    <div id="cs-view-search">
-      <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationAsPrimary()">
-        <span>◎</span> Use my current location
-      </button>
-      <input class="city-sheet-input" id="city-sheet-input" type="text"
-        inputmode="search" autocomplete="off" autocorrect="off" spellcheck="false"
-        placeholder="City, region, or location…"
-        oninput="onCitySheetInput()"
-        onkeydown="if(event.key==='Enter')searchCitySheet()">
-      <div class="city-sheet-results" id="city-sheet-results"></div>
-      <button class="cs-manage-link" id="cs-manage-link" onclick="showManageEditions()">Manage editions</button>
-    </div>
-    <!-- Secondary: reorder / remove saved editions -->
-    <div id="cs-view-manage" style="display:none">
-      <div id="city-sheet-editions"></div>
-    </div>
+    <!-- One view: saved editions are always visible; search results replace them while typing -->
+    <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationAsPrimary()">
+      <span>◎</span> Use my current location
+    </button>
+    <input class="city-sheet-input" id="city-sheet-input" type="text"
+      inputmode="search" autocomplete="off" autocorrect="off" spellcheck="false"
+      placeholder="City, region, or location…"
+      oninput="onCitySheetInput()"
+      onkeydown="if(event.key==='Enter')searchCitySheet()">
+    <div class="city-sheet-results" id="city-sheet-results"></div>
+    <div id="city-sheet-editions"></div>
   </div>
 </div>
 
