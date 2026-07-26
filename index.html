@@ -33,7 +33,7 @@
   <link rel="apple-touch-icon-precomposed" href="/icon-180.png?v=2">
 
   <!-- PWA -->
-  <link rel="manifest" href='data:application/json,{"name":"Doldrums","short_name":"Doldrums","description":"Know your skies.","start_url":"/doldrums.html","display":"standalone","background_color":"#0b2545","theme_color":"#0b2545","icons":[{"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
+  <link rel="manifest" href='data:application/json,{"name":"Doldrums","short_name":"Doldrums","description":"Know your skies.","start_url":"/","display":"standalone","background_color":"#0b2545","theme_color":"#0b2545","icons":[{"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Doldrums">
@@ -1510,14 +1510,25 @@
         display:flex;align-items:center;justify-content:space-between;
         flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.07);
       }
+      .city-sheet-head-left { display:flex; align-items:center; gap:2px; }
       .city-sheet-title {
         font-size:11px;letter-spacing:.22em;text-transform:uppercase;
         color:rgba(255,255,255,0.4);
         font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       }
+      .city-sheet-back {
+        background:none;border:none;color:rgba(255,255,255,0.5);
+        font-size:22px;cursor:pointer;padding:4px 6px 4px 0;line-height:1;
+      }
       .city-sheet-close {
         background:none;border:none;color:rgba(255,255,255,0.3);
         font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;
+      }
+      .cs-manage-link {
+        display:block;width:100%;text-align:center;background:none;border:none;
+        color:rgba(255,255,255,0.35);font-size:11px;letter-spacing:.1em;
+        text-transform:uppercase;padding:14px 0 2px;cursor:pointer;
+        font-family:'IBM Plex Mono',monospace;
       }
 
       .city-sheet-body {
@@ -1597,11 +1608,11 @@
       body.dark .np-masthead { background:var(--navy); }
       .np-location {
         text-align:center; font-family:'IBM Plex Mono',monospace;
-        font-size:8px; letter-spacing:.22em; text-transform:uppercase;
-        color:var(--orange2); padding:2px 16px 0; cursor:pointer;
+        font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+        color:var(--orange2); padding:7px 16px; cursor:pointer;
         -webkit-tap-highlight-color:transparent;
       }
-      .np-location-caret { margin-left:5px; opacity:.7; font-size:7px; }
+      .np-location-caret { margin-left:6px; opacity:.7; font-size:9px; }
       .np-wordmark {
         text-align:center; font-family:'Cormorant Garamond',serif; font-weight:300;
         font-size:34px; line-height:1; letter-spacing:.08em; text-transform:lowercase;
@@ -1667,6 +1678,11 @@
       .ls-unabridged { display:block; background:none; border:none; padding:10px 0 0; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:7.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink4); text-decoration:underline; text-underline-offset:2px; }
       .ls-toggle {
         background:none; border:none; padding:8px 0 0; cursor:pointer;
+        font-family:'IBM Plex Mono',monospace; font-size:8px;
+        letter-spacing:.14em; text-transform:uppercase; color:var(--orange);
+      }
+      .ls-back {
+        background:none; border:none; padding:0 0 10px; cursor:pointer;
         font-family:'IBM Plex Mono',monospace; font-size:8px;
         letter-spacing:.14em; text-transform:uppercase; color:var(--orange);
       }
@@ -2353,12 +2369,12 @@
   </div>
   <div class="masthead-nav-strip">
     <div class="masthead-nav">
-      <div class="nav-item active" onclick="setView('conditions')">Conditions</div>
-      <div class="nav-item" onclick="setView('forecast')">Forecast</div>
-      <div class="nav-item" onclick="setView('hourly')">Hourly</div>
-      <div class="nav-item" onclick="setView('radar')">Radar</div>
-      <div class="nav-item" onclick="setView('alerts')">Alerts</div>
-      <div class="nav-item" onclick="setView('log')">Field Notes</div>
+      <div class="nav-item active" role="button" tabindex="0" aria-current="page" onclick="setView('conditions')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Conditions</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('forecast')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Forecast</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Hourly</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('radar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Radar</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('alerts')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Alerts</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('log')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Field Notes</div>
     </div>
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
@@ -2380,21 +2396,21 @@
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="sticky-status" id="sticky-count"></div>
     <button onclick="openModal()" class="sticky-add-btn" style="background:none;border:none;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-size:16px;cursor:pointer;padding:2px 6px;display:none">+</button>
-    <button onclick="toggleDark()" class="dark-toggle" id="dark-toggle-btn" title="Toggle dark mode">☽</button>
+    <button onclick="toggleDark()" class="dark-toggle" id="dark-toggle-btn" title="Toggle dark mode" aria-label="Toggle dark mode">☽</button>
     <button onclick="shareUrl()" class="sticky-share-btn" style="background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">↗ Share</button>
   </div>
 </div>
 
 <!-- BROADSHEET NAMEPLATE (mobile only) — 1.2 front page, step one -->
 <div class="np-masthead" id="np-masthead">
-  <div class="np-location" onclick="openCitySheet()">
+  <div class="np-location" role="button" tabindex="0" aria-label="Switch city" onclick="openCitySheet()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
     <span id="np-location-name">—</span><span class="np-location-caret">▾</span>
   </div>
   <div class="np-wordmark">doldrums</div>
   <div class="np-sections">
-    <div class="np-section active" data-view="conditions" onclick="navTo('conditions')">Front Page</div>
-    <div class="np-section" data-view="radar" onclick="navTo('radar')">Radar</div>
-    <div class="np-section" data-view="log" onclick="navTo('log')">Field Notes</div>
+    <div class="np-section active" role="button" tabindex="0" aria-current="page" data-view="conditions" onclick="navTo('conditions')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Front Page</div>
+    <div class="np-section" role="button" tabindex="0" data-view="radar" onclick="navTo('radar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Radar</div>
+    <div class="np-section" role="button" tabindex="0" data-view="log" onclick="navTo('log')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Field Notes</div>
   </div>
   <div class="np-dateline">
     <span id="np-date"></span>
@@ -2407,7 +2423,7 @@
 <div class="summary-bar">
   <div class="summary-scroll" id="summary-scroll">
     <!-- pills injected here -->
-    <div class="add-city-pill" onclick="openModal()">
+    <div class="add-city-pill" role="button" tabindex="0" aria-label="Add city" onclick="openModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
       <span class="add-city-plus">+</span>
       <span>Add City</span>
     </div>
@@ -2443,10 +2459,10 @@
 
 <!-- ADD CITY MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Add city">
     <div class="modal-head">
       <div class="modal-title">Add City</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
     </div>
     <div class="modal-body">
       <button class="geo-btn" id="geo-btn" onclick="addMyLocation()">
@@ -2468,7 +2484,7 @@
 <div class="share-strip" id="share-strip">
   <div class="share-url" id="share-url"></div>
   <button class="share-copy-btn" id="share-copy-btn" onclick="copyShareUrl()">Copy Link</button>
-  <button class="share-close" onclick="closeShare()">✕</button>
+  <button class="share-close" onclick="closeShare()" aria-label="Close">✕</button>
 </div>
 
 <script>
@@ -2888,7 +2904,11 @@ function buildGrid() {
     const pill = document.createElement('div');
     pill.className = 'summary-pill';
     pill.id = `sum-${i}`;
+    pill.setAttribute('role', 'button');
+    pill.tabIndex = 0;
+    pill.setAttribute('aria-label', 'Jump to ' + loc.name);
     pill.onclick = () => scrollToCard(i);
+    pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToCard(i); } };
     pill.innerHTML = `
       <div class="sum-icon" id="sum-icon-${i}"></div>
       <div>
@@ -2900,7 +2920,12 @@ function buildGrid() {
 
   scroll.appendChild(addPill || (() => {
     const p = document.createElement('div');
-    p.className='add-city-pill';p.onclick=openModal;
+    p.className='add-city-pill';
+    p.setAttribute('role', 'button');
+    p.tabIndex = 0;
+    p.setAttribute('aria-label', 'Add city');
+    p.onclick=openModal;
+    p.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); } };
     p.innerHTML='<span class="add-city-plus">+</span><span>Add City</span>';
     return p;
   })());
@@ -2920,7 +2945,7 @@ function buildGrid() {
         <div class="card-head-right">
           <div class="card-icon" id="icon-${i}">—</div>
           <div class="card-cond" id="cond-${i}">—</div>
-          ${`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station">✕</button>`}
+          ${`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>`}
         </div>
       </div>
       <div id="body-${i}">
@@ -3208,7 +3233,7 @@ function renderEditionsList() {
         ${loc.name}${loc.state ? ', ' + loc.state : ''}
         ${i === 0 ? '<span class="cs-ed-tag">Front page</span>' : ''}
       </div>
-      <button class="cs-ed-del" onclick="removeEdition(${i})" title="Remove">✕</button>
+      <button class="cs-ed-del" onclick="removeEdition(${i})" title="Remove" aria-label="Remove ${loc.name}">✕</button>
     </div>`).join('');
 }
 
@@ -3235,7 +3260,7 @@ function openCitySheet() {
   const sheet   = document.getElementById('city-sheet');
   const input   = document.getElementById('city-sheet-input');
   if(!overlay||!sheet||!input) return;
-  renderEditionsList();
+  showSearchView(); // fast path is always the front door
   document.getElementById('city-sheet-results').innerHTML = '';
   input.value = '';
   overlay.classList.add('open');
@@ -3246,6 +3271,24 @@ function openCitySheet() {
 function closeCitySheet() {
   document.getElementById('city-sheet-overlay')?.classList.remove('open');
   document.getElementById('city-sheet')?.classList.remove('open');
+}
+
+// ── SHEET VIEW SWITCHING (1.4: fast path vs. manage editions) ─────────────────
+function showSearchView() {
+  document.getElementById('cs-view-search').style.display = '';
+  document.getElementById('cs-view-manage').style.display = 'none';
+  document.getElementById('cs-back-btn').style.display = 'none';
+  document.getElementById('cs-title').textContent = 'Switch City';
+  const link = document.getElementById('cs-manage-link');
+  if(link) link.style.display = LOCATIONS.length ? '' : 'none';
+}
+
+function showManageEditions() {
+  renderEditionsList();
+  document.getElementById('cs-view-search').style.display = 'none';
+  document.getElementById('cs-view-manage').style.display = '';
+  document.getElementById('cs-back-btn').style.display = '';
+  document.getElementById('cs-title').textContent = 'Manage Editions';
 }
 
 let _sheetTimer = null;
@@ -3271,23 +3314,92 @@ async function searchCitySheet() {
     }
     window._geoResults = data.results;
     results.innerHTML = data.results.map((r,i) => `
-      <div class="city-sheet-result" onclick="addCity(${i});closeCitySheet()">
+      <div class="city-sheet-result" onclick="addCityAsPrimary(${i})">
         <div>
           <div class="city-sheet-result-name">${r.name}</div>
           <div class="city-sheet-result-meta">${[r.admin1,r.country].filter(Boolean).join(' · ')}</div>
         </div>
-        <button class="city-sheet-add" onclick="event.stopPropagation();addCity(${i});closeCitySheet()">+ Add</button>
+        <button class="city-sheet-add" onclick="event.stopPropagation();addCityAsPrimary(${i})">+ Add</button>
       </div>`).join('');
   } catch(e) {
     results.innerHTML = '<div class="modal-status error">Search failed.</div>';
   }
 }
 
-async function addMyLocationSheet() {
-  const btn = document.getElementById('city-sheet-geo-btn');
-  if(btn) btn.textContent = '◎ Locating…';
+// Fast path: picking a result makes it the front page immediately — no
+// separate "confirm" or "set as primary" step. Unshifting (not pushing)
+// changes every existing card's index, so we do a full refreshAll() rather
+// than the incremental appendCard() the desktop "Add City" flow uses.
+function addCityAsPrimary(idx) {
+  const r = window._geoResults[idx];
+  if(!r) return;
+  const units = unitsForTz(r.timezone||'UTC');
+  const loc = {
+    name: r.name,
+    state: r.admin1||r.country_code||'',
+    lat: r.latitude,
+    lon: r.longitude,
+    tz: r.timezone||'UTC',
+    ...units
+  };
+  LOCATIONS.unshift(loc);
+  saveCities();
   closeCitySheet();
-  await addMyLocation();
+  refreshAll();
+  updateNameplate();
+}
+
+// Mobile-only geolocation path. Deliberately not reusing the desktop
+// addMyLocation() — that function targets #geo-btn and #modal-results,
+// which live in the hidden desktop modal, so errors (e.g. permission
+// denied) were silently written somewhere the mobile user could never see.
+async function addMyLocationAsPrimary() {
+  const btn = document.getElementById('city-sheet-geo-btn');
+  const results = document.getElementById('city-sheet-results');
+  if(!navigator.geolocation) {
+    if(results) results.innerHTML = '<div class="modal-status error">Geolocation not supported by your browser.</div>';
+    return;
+  }
+  if(btn) { btn.disabled = true; btn.innerHTML = '<span>◎</span> Locating…'; }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude: lat, longitude: lon } = pos.coords;
+    const finish = (loc) => {
+      LOCATIONS.unshift(loc);
+      saveCities();
+      closeCitySheet();
+      refreshAll();
+      updateNameplate();
+    };
+    try {
+      const [geoRes, tzRes] = await Promise.all([
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&accept-language=en`, {
+          headers: { 'Accept-Language': 'en', 'User-Agent': 'Doldrums/1.0 (doldrums.app)' }
+        }),
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&timezone=auto&daily=weather_code&forecast_days=1`)
+      ]);
+      const geoData = await geoRes.json();
+      const tzData  = await tzRes.json();
+      const addr = geoData.address || {};
+      const name = addr.city || addr.town || addr.village || addr.hamlet || addr.county || geoData.name || `${lat.toFixed(2)}°N`;
+      const state = addr.state || addr.region || addr.country || '';
+      const tz = tzData.timezone || 'UTC';
+      finish({ name, state, lat, lon, tz, ...unitsForTz(tz) });
+    } catch(e) {
+      try {
+        const tzRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&timezone=auto&daily=weather_code&forecast_days=1`);
+        const tzData = await tzRes.json();
+        const tz = tzData.timezone || 'UTC';
+        finish({ name: `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? 'N' : 'S'}`, state: '', lat, lon, tz, ...unitsForTz(tz) });
+      } catch(e2) {
+        if(results) results.innerHTML = '<div class="modal-status error">Could not identify location. Try searching instead.</div>';
+      }
+    }
+    if(btn) { btn.disabled = false; btn.innerHTML = '<span>◎</span> Use my current location'; }
+  }, err => {
+    if(btn) { btn.disabled = false; btn.innerHTML = '<span>◎</span> Use my current location'; }
+    if(results) results.innerHTML = '<div class="modal-status error">Location access denied.</div>';
+  }, { timeout: 10000 });
 }
 
 
@@ -3425,7 +3537,7 @@ function showAlert(msg, icon='⚠️', severity='') {
     `;
     document.body.appendChild(bar);
   }
-  bar.innerHTML = `<span>${icon} ${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
+  bar.innerHTML = `<span>${icon} ${msg}</span><button onclick="this.parentElement.remove()" aria-label="Dismiss" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
   setTimeout(() => bar?.remove(), 8000);
 }
 
@@ -3562,15 +3674,21 @@ function setView(view, isBack) {
   haptic('light');
   // Sync top nav
   document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.textContent.trim().toLowerCase() === view);
+    const isActive = el.textContent.trim().toLowerCase() === view;
+    el.classList.toggle('active', isActive);
+    if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === view);
+    const isActive = el.dataset.view === view;
+    el.classList.toggle('active', isActive);
+    if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   // Sync broadsheet nameplate sections
   document.querySelectorAll('.np-section').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === view);
+    const isActive = el.dataset.view === view;
+    el.classList.toggle('active', isActive);
+    if (isActive) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   setTimeout(ensureColophon, 50);
   updateBackButton();
@@ -3888,7 +4006,7 @@ function appendCard(loc, i) {
       <div class="card-head-right">
         <div class="card-icon" id="icon-${i}">—</div>
         <div class="card-cond" id="cond-${i}">—</div>
-        <button class="remove-btn" onclick="removeCity(${i})" title="Remove station">✕</button>
+        <button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>
       </div>
     </div>
     <div id="body-${i}">
@@ -3903,7 +4021,11 @@ function appendCard(loc, i) {
   const addPill = scroll.querySelector('.add-city-pill');
   const pill = document.createElement('div');
   pill.className = 'summary-pill'; pill.id = `sum-${i}`;
+  pill.setAttribute('role', 'button');
+  pill.tabIndex = 0;
+  pill.setAttribute('aria-label', 'Jump to ' + loc.name);
   pill.onclick = () => scrollToCard(i);
+  pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToCard(i); } };
   pill.innerHTML = `
     <div class="sum-icon" id="sum-icon-${i}"></div>
     <div>
@@ -4336,7 +4458,7 @@ async function renderRadarView() {
   main.innerHTML = `<div class="radar-view" style="touch-action:none;">
     <div id="radar-map"></div>
     <div class="radar-controls">
-      <button class="radar-play-btn" id="radar-play-btn" onclick="radarTogglePlay()" title="Play/Pause">▶</button>
+      <button class="radar-play-btn" id="radar-play-btn" onclick="radarTogglePlay()" title="Play/Pause" aria-label="Play radar animation">▶</button>
       <div class="radar-timeline">
         <div class="radar-frames" id="radar-frames"></div>
         <div class="radar-time-label" id="radar-time-label">—</div>
@@ -4484,7 +4606,10 @@ function radarSeek(idx) {
 function radarTogglePlay() {
   _radarPlaying = !_radarPlaying;
   const btn = document.getElementById('radar-play-btn');
-  if(btn) btn.textContent = _radarPlaying ? '⏸' : '▶';
+  if(btn) {
+    btn.textContent = _radarPlaying ? '⏸' : '▶';
+    btn.setAttribute('aria-label', _radarPlaying ? 'Pause radar animation' : 'Play radar animation');
+  }
 
   if(_radarPlaying) {
     _radarTimer = setInterval(() => {
@@ -4868,7 +4993,7 @@ function renderLogView() {
           </div>` : ''}
           <div class="log-entry-card-timestamp">${timeStr}</div>
         </div>
-        <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;flex-shrink:0;">✕</button>
+        <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" aria-label="Delete note" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;flex-shrink:0;">✕</button>
       </div>`;
     });
   }
@@ -5141,7 +5266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="install-prompt-sub">Add to home screen</div>
   </div>
   <button class="install-btn" id="install-btn">Install</button>
-  <button class="install-dismiss" onclick="dismissInstall()">✕</button>
+  <button class="install-dismiss" onclick="dismissInstall()" aria-label="Dismiss">✕</button>
 </div>
 
 <!-- GLOBAL BACK BUTTON -->
@@ -5168,37 +5293,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- CITY BOTTOM SHEET (mobile) -->
 <div class="city-sheet-overlay" id="city-sheet-overlay" onclick="closeCitySheet()"></div>
-<div class="city-sheet" id="city-sheet">
+<div class="city-sheet" id="city-sheet" role="dialog" aria-modal="true" aria-label="Switch city">
   <div class="city-sheet-head">
-    <div class="city-sheet-title">Editions</div>
-    <button class="city-sheet-close" onclick="closeCitySheet()">✕</button>
+    <div class="city-sheet-head-left">
+      <button class="city-sheet-back" id="cs-back-btn" onclick="showSearchView()" style="display:none" aria-label="Back">‹</button>
+      <div class="city-sheet-title" id="cs-title">Switch City</div>
+    </div>
+    <button class="city-sheet-close" onclick="closeCitySheet()" aria-label="Close">✕</button>
   </div>
   <div class="city-sheet-body">
-    <div id="city-sheet-editions"></div>
-    <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationSheet()">
-      <span>◎</span> Use my current location
-    </button>
-    <input class="city-sheet-input" id="city-sheet-input" type="text"
-      inputmode="search" autocomplete="off" autocorrect="off" spellcheck="false"
-      placeholder="City, region, or location…"
-      oninput="onCitySheetInput()"
-      onkeydown="if(event.key==='Enter')searchCitySheet()">
-    <div class="city-sheet-results" id="city-sheet-results"></div>
+    <!-- Fast path: search opens straight away, pick a result and it's the front page -->
+    <div id="cs-view-search">
+      <button class="city-sheet-geo" id="city-sheet-geo-btn" onclick="addMyLocationAsPrimary()">
+        <span>◎</span> Use my current location
+      </button>
+      <input class="city-sheet-input" id="city-sheet-input" type="text"
+        inputmode="search" autocomplete="off" autocorrect="off" spellcheck="false"
+        placeholder="City, region, or location…"
+        oninput="onCitySheetInput()"
+        onkeydown="if(event.key==='Enter')searchCitySheet()">
+      <div class="city-sheet-results" id="city-sheet-results"></div>
+      <button class="cs-manage-link" id="cs-manage-link" onclick="showManageEditions()">Manage editions</button>
+    </div>
+    <!-- Secondary: reorder / remove saved editions -->
+    <div id="cs-view-manage" style="display:none">
+      <div id="city-sheet-editions"></div>
+    </div>
   </div>
 </div>
 
 <!-- QUICK NOTE FAB -->
-<button class="fab" id="fab" onclick="openQuickNote()" title="Log entry">✏</button>
+<button class="fab" id="fab" onclick="openQuickNote()" title="Log entry" aria-label="Log entry">✏</button>
 
 <!-- LOG ENTRY SHEET -->
 <div class="quick-note-overlay" id="qn-overlay" onclick="handleQnOverlay(event)">
-  <div class="quick-note-sheet" id="qn-sheet">
+  <div class="quick-note-sheet" id="qn-sheet" role="dialog" aria-modal="true" aria-label="Field note">
     <div class="quick-note-head">
       <div class="quick-note-title">
         <div class="quick-note-dot"></div>
         Field Note
       </div>
-      <button class="quick-note-close" onclick="closeQuickNote()">✕</button>
+      <button class="quick-note-close" onclick="closeQuickNote()" aria-label="Close">✕</button>
     </div>
     <!-- Mood selector -->
     <div class="mood-strip" id="qn-mood-strip">
@@ -5309,6 +5444,7 @@ function ensureLeadStory() {
     '<div class="ls-grid">' +
       '<div class="ls-story">' +
         '<div class="ls-kicker" id="ls-kicker"></div>' +
+        '<button class="ls-back" id="ls-back" type="button" style="display:none">‹ Return to the synopsis</button>' +
         '<div class="ls-head" id="ls-head"></div>' +
         '<div class="ls-body" id="ls-body"></div>' +
         '<button class="ls-toggle" id="ls-toggle" type="button">Continued — full discussion</button>' +
@@ -5360,11 +5496,13 @@ function fillLeadStory(wfo, synopsis, full) {
   const collapsed = head ? (rest || '') : synopsis;
   if (head) { hEl.style.display = ''; hEl.textContent = head; }
   else { hEl.style.display = 'none'; }
-  bEl.textContent = collapsed;
+  bEl.innerHTML = readableAFD(collapsed, false);
   bEl.classList.remove('ls-full');
   let expanded = false;
   const tgl = document.getElementById('ls-toggle');
+  const backBtn = document.getElementById('ls-back');
   tgl.textContent = 'Continued — full discussion';
+  backBtn.style.display = 'none';
   function renderExpanded(unabridged) {
     bEl.innerHTML = readableAFD(full, unabridged);
     if (!unabridged) {
@@ -5376,13 +5514,23 @@ function fillLeadStory(wfo, synopsis, full) {
       bEl.appendChild(more);
     }
   }
-  tgl.onclick = function () {
-    expanded = !expanded;
+  // Item #3: the "return to synopsis" control used to live only at the
+  // bottom of the (potentially very long) expanded discussion — easy to
+  // get stuck scrolling to find it. setExpanded() is now the single place
+  // that drives both the top link and the bottom toggle, and collapsing
+  // always scrolls the story back into view so you don't land mid-page
+  // staring at a synopsis that's scrolled off above you.
+  function setExpanded(next) {
+    expanded = next;
     if (expanded) { renderExpanded(false); }
-    else { bEl.textContent = collapsed; }
+    else { bEl.innerHTML = readableAFD(collapsed, false); }
     bEl.classList.toggle('ls-full', expanded);
     tgl.textContent = expanded ? 'Return to the synopsis' : 'Continued — full discussion';
-  };
+    backBtn.style.display = expanded ? '' : 'none';
+    if (!expanded) ls.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  tgl.onclick = function () { setExpanded(!expanded); };
+  backBtn.onclick = function () { setExpanded(false); };
   ls.classList.add('ls-ready');
 }
 
@@ -5396,7 +5544,7 @@ function readableAFD(raw, unabridged) {
     [/\btstms\b/gi,'thunderstorms'], [/\btstm\b/gi,'thunderstorm'], [/\bshwrs\b/gi,'showers'],
     [/\bfcst\b/gi,'forecast'], [/\bthru\b/gi,'through'], [/\baftn\b/gi,'afternoon'],
     [/\bovrngt\b/gi,'overnight'], [/\btwd\b/gi,'toward'], [/\btemps\b/gi,'temperatures'],
-    [/\bdwpts\b/gi,'dewpoints'], [/\bwx\b/gi,'weather']
+    [/\bdwpts\b/gi,'dewpoints'], [/\bwx\b/gi,'weather'], [/\bRH\b/gi,'relative humidity']
   ];
   const jargon = s => {
     s = s.replace(/^key\s+messages?\s*\d*\s*[:.\u2026-]*\s*/i, '');
@@ -5456,7 +5604,13 @@ function railFill(loc, c, daily) {
   set('ls-cond', wmo(c.weather_code, tempC).label);
   set('ls-hilo', Math.round(daily.temperature_2m_max[0]) + '\u00b0 / ' + Math.round(daily.temperature_2m_min[0]) + '\u00b0');
   set('ls-wind', compass(c.wind_direction_10m) + ' ' + Math.round(c.wind_speed_10m) + ' ' + loc.windUnit);
-  set('ls-rain', (daily.precipitation_probability_max && daily.precipitation_probability_max[0] != null ? daily.precipitation_probability_max[0] : 0) + '%');
+  const rainPct = daily.precipitation_probability_max && daily.precipitation_probability_max[0] != null ? daily.precipitation_probability_max[0] : 0;
+  const rainLabel = rainPct >= 70 ? 'Rain expected'
+                   : rainPct >= 50 ? 'Rain likely'
+                   : rainPct >= 30 ? 'Rain possible'
+                   : rainPct >= 10 ? 'Slight chance of rain'
+                   : 'No rain expected';
+  set('ls-rain', rainLabel + ' \u2014 ' + rainPct + '%');
   const fmt = t => { const hm = t.split('T')[1].split(':'); let h = +hm[0]; const ap = h >= 12 ? 'p' : 'a'; h = h % 12 || 12; return h + ':' + hm[1] + ap; };
   set('ls-sun', fmt(daily.sunrise[0]) + ' / ' + fmt(daily.sunset[0]));
 }
@@ -5594,14 +5748,21 @@ function removeAFD() {
 
 function renderAFD(wfo, synopsis, full) {
   const main = document.querySelector('main');
-  if (!main || !document.getElementById('weather-grid')) return;
+  const grid = document.getElementById('weather-grid');
+  if (!main || !grid) return;
 
   let sec = document.getElementById('afd-section');
   if (!sec) {
     sec = document.createElement('div');
     sec.id = 'afd-section';
     sec.className = 'afd-section';
-    main.appendChild(sec);
+    // Item #5 (iPad parity): this used to be appendChild'd to the end of
+    // <main>, landing below every city's weather card. On a multi-city
+    // tablet/desktop view that meant scrolling past the whole grid to find
+    // it — practically invisible in the default view even though it was
+    // technically rendered. Inserting before the grid puts it where the
+    // mobile broadsheet's lead story already sits: first thing, not last.
+    main.insertBefore(sec, grid);
   }
   sec.innerHTML =
     '<div class="afd-card">' +

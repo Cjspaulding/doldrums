@@ -1,4 +1,4 @@
-const CACHE_NAME = 'doldrums-v4';
+const CACHE_NAME = 'doldrums-v5';
 const STATIC_ASSETS = [
   '/icon-512.png',
   '/icon-180.png',
@@ -42,11 +42,19 @@ self.addEventListener('fetch', event => {
     return; // let browser handle it normally
   }
 
-  // HTML / navigation requests — ALWAYS network-first, never serve from cache
+  // HTML / navigation requests — network-first, but keep a fresh copy
+  // cached so offline visits have something real to fall back to (the old
+  // fallback pointed at /doldrums.html, a route this worker never actually
+  // cached, so it silently served nothing when offline).
   if (request.mode === 'navigate' || request.headers.get('Accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request, { cache: 'no-store' })
-        .catch(() => caches.match('/doldrums.html')) // fallback if offline
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put('/', copy));
+          return response;
+        })
+        .catch(() => caches.match('/'))
     );
     return;
   }
