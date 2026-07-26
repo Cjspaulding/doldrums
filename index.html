@@ -2500,6 +2500,23 @@ if (!LOCATIONS || LOCATIONS.length === 0) {
   // Don't save to localStorage — let first-time users choose their own city
 }
 
+// One-time cleanup for anyone who already has a duplicate saved from before
+// the add-city functions checked for one (keeps the first/front occurrence).
+if (Array.isArray(LOCATIONS) && LOCATIONS.length > 1) {
+  const deduped = [];
+  for (const loc of LOCATIONS) {
+    const already = deduped.some(l =>
+      typeof l.lat === 'number' && typeof loc.lat === 'number' &&
+      Math.abs(l.lat - loc.lat) < 0.05 && Math.abs(l.lon - loc.lon) < 0.05
+    );
+    if (!already) deduped.push(loc);
+  }
+  if (deduped.length !== LOCATIONS.length) {
+    LOCATIONS = deduped;
+    localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
+  }
+}
+
 function saveCities() {
   localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
 }
@@ -3319,6 +3336,19 @@ async function searchCitySheet() {
 // separate "confirm" or "set as primary" step. Unshifting (not pushing)
 // changes every existing card's index, so we do a full refreshAll() rather
 // than the incremental appendCard() the desktop "Add City" flow uses.
+// Shared by every "add a city" entry point (mobile fast path, mobile geo,
+// desktop search, desktop geo) — none of them checked for an existing match
+// before, so searching or geolocating into a city you'd already saved just
+// silently duplicated it (e.g. two "Amherst, NH" tabs). Compares by
+// coordinates rather than name string, since name/state formatting can
+// differ slightly between the geocoder and reverse-geocoder.
+function findDuplicateIndex(loc) {
+  return LOCATIONS.findIndex(l =>
+    typeof l.lat === 'number' && typeof loc.lat === 'number' &&
+    Math.abs(l.lat - loc.lat) < 0.05 && Math.abs(l.lon - loc.lon) < 0.05
+  );
+}
+
 function addCityAsPrimary(idx) {
   const r = window._geoResults[idx];
   if(!r) return;
@@ -3331,6 +3361,8 @@ function addCityAsPrimary(idx) {
     tz: r.timezone||'UTC',
     ...units
   };
+  const dupIdx = findDuplicateIndex(loc);
+  if(dupIdx > -1) LOCATIONS.splice(dupIdx, 1);
   LOCATIONS.unshift(loc);
   saveCities();
   closeCitySheet();
@@ -3354,6 +3386,8 @@ async function addMyLocationAsPrimary() {
   navigator.geolocation.getCurrentPosition(async pos => {
     const { latitude: lat, longitude: lon } = pos.coords;
     const finish = (loc) => {
+      const dupIdx = findDuplicateIndex(loc);
+      if(dupIdx > -1) LOCATIONS.splice(dupIdx, 1);
       LOCATIONS.unshift(loc);
       saveCities();
       closeCitySheet();
@@ -3462,9 +3496,25 @@ function addCity(idx){
     ...units
   };
 
+  const dupIdx = findDuplicateIndex(loc);
+  closeModal();
+
+  if(dupIdx > -1) {
+    // Already saved — move it to the end instead of creating a second card.
+    // Indices shift for every card after it, so incremental appendCard()
+    // isn't safe here; rebuild the grid from the deduped array instead.
+    LOCATIONS.splice(dupIdx, 1);
+    LOCATIONS.push(loc);
+    saveCities();
+    buildGrid();
+    LOCATIONS.forEach((l,i)=>fetchWeather(l,i));
+    const i=LOCATIONS.length-1;
+    setTimeout(()=>document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    return;
+  }
+
   LOCATIONS.push(loc);
   saveCities();
-  closeModal();
 
   const i=LOCATIONS.length-1;
 
@@ -3912,6 +3962,17 @@ async function addMyLocation() {
 
       const loc = { name, state, lat, lon, tz, ...units };
       closeModal();
+      const dupIdx = findDuplicateIndex(loc);
+      if(dupIdx > -1) {
+        LOCATIONS.splice(dupIdx, 1);
+        LOCATIONS.push(loc);
+        saveCities();
+        buildGrid();
+        LOCATIONS.forEach((l,i)=>fetchWeather(l,i));
+        const i = LOCATIONS.length - 1;
+        setTimeout(() => document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'}), 100);
+        return;
+      }
       LOCATIONS.push(loc);
       saveCities();
       const i = LOCATIONS.length - 1;
@@ -3927,11 +3988,20 @@ async function addMyLocation() {
         const units = unitsForTz(tz);
         const loc = { name: `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? 'N' : 'S'}`, state: '', lat, lon, tz, ...units };
         closeModal();
-        LOCATIONS.push(loc);
-        saveCities();
-        const i = LOCATIONS.length - 1;
-        appendCard(loc, i);
-        fetchWeather(loc, i);
+        const dupIdx = findDuplicateIndex(loc);
+        if(dupIdx > -1) {
+          LOCATIONS.splice(dupIdx, 1);
+          LOCATIONS.push(loc);
+          saveCities();
+          buildGrid();
+          LOCATIONS.forEach((l,i)=>fetchWeather(l,i));
+        } else {
+          LOCATIONS.push(loc);
+          saveCities();
+          const i = LOCATIONS.length - 1;
+          appendCard(loc, i);
+          fetchWeather(loc, i);
+        }
       } catch(e2) {
         document.getElementById('modal-results').innerHTML =
           '<div class="modal-status error">Could not identify location. Try searching instead.</div>';
