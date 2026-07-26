@@ -5674,6 +5674,18 @@ function parseAFD(raw) {
     synopsis = body ? body.trim() : null;
   }
   if (synopsis) {
+    // Offices without a distinct .SYNOPSIS section (or whose SYNOPSIS is too
+    // short) fall back to a dated sub-period section — NEAR TERM, SHORT TERM,
+    // or DISCUSSION. Different offices phrase that sub-period's opening
+    // timestamp differently ("Issued at 215 AM MDT Sat Jun 13 2026" at BOU,
+    // "As of 242 PM EDT Saturday." at BTV) but it's the same underlying NWS
+    // convention, not office-specific quirks — one pattern covers both.
+    synopsis = synopsis.replace(/^\s*(?:Issued|Updated)?\s*(?:at|as of)\s+\d{1,4}\s*(AM|PM)?\s+[A-Z]{2,5}\s+[A-Za-z]+(?:\s+[A-Za-z]+\s+\d{1,2}\s+\d{4})?\.{0,3}\s*/i, '');
+    // Some offices lead a sub-period straight into an inline bulleted "Key
+    // Messages:" list (as opposed to BOU's separate top-level section) —
+    // after the timestamp strip above, that can leave a stray leading
+    // "* " or "- " marker on what becomes the headline.
+    synopsis = synopsis.replace(/^(key\s+messages?\b[\s\d]*[:.\u2026-]*\s*)?[-*]\s+/i, '');
     synopsis = synopsis.replace(/\n(?!\n)/g, ' ').replace(/\s{2,}/g, ' ');
     // Trim the default view to a few sentences (~400 chars), ending cleanly
     if (synopsis.length > 420) {
