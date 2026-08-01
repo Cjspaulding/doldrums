@@ -213,6 +213,27 @@
     .spin { animation:spin 1.8s linear infinite;display:inline-block; }
     @keyframes spin { to{transform:rotate(360deg);} }
 
+    /* PREVIEW BAR — searched city shown but not yet saved */
+    .preview-bar {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      background: var(--white); border-bottom: 3px solid var(--orange);
+      padding: 10px 28px; font-family: 'Spectral', Georgia, serif;
+      font-size: 13px; color: var(--ink2); font-style: italic;
+    }
+    .preview-bar span { flex: 1 1 auto; }
+    .preview-save {
+      background: var(--orange); border: none; color: var(--white);
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 6px 14px; cursor: pointer; white-space: nowrap; font-style: normal;
+    }
+    .preview-save:hover { background: var(--navy); }
+    .preview-dismiss {
+      background: none; border: none; color: var(--ink4);
+      font-size: 16px; cursor: pointer; padding: 2px 6px; line-height: 1;
+    }
+    .preview-dismiss:hover { color: var(--ink2); }
+
     /* STICKY BAR */
     .np-masthead { display:none; }
     .lead-story { display:none; }
@@ -2598,6 +2619,14 @@ if (Array.isArray(LOCATIONS) && LOCATIONS.length > 1) {
 }
 
 function saveCities() {
+  // An active preview sits at the front of LOCATIONS for rendering, but
+  // hasn't been explicitly kept — never let some other action's save
+  // (removing a different city, editing the list) silently persist it
+  // along the way. savePreview() clears the flag before calling this.
+  if (typeof _previewActive !== 'undefined' && _previewActive && LOCATIONS.length > 0) {
+    localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS.slice(1)));
+    return;
+  }
   localStorage.setItem('doldrums_cities', JSON.stringify(LOCATIONS));
 }
 
@@ -3327,6 +3356,16 @@ function renderEditionsList() {
 function makePrimary(i) {
   if(i === 0 || !LOCATIONS[i]) { return; }
   haptic('light');
+  if (_previewActive) {
+    // Whatever's previewing at the front isn't saved — promoting a
+    // different, already-saved city means we're done "just looking."
+    // Drop it now rather than leave it sitting in the stack until a
+    // reload silently discards it with no explanation.
+    LOCATIONS.shift();
+    i -= 1; // every remaining index shifted down by one
+    clearPreview();
+    if (i === 0 || !LOCATIONS[i]) { refreshAll(); updateNameplate(); return; }
+  }
   const moved = LOCATIONS.splice(i, 1)[0];
   LOCATIONS.unshift(moved);
   saveCities();
@@ -3433,11 +3472,81 @@ function addCityAsPrimary(idx) {
     tz: r.timezone||'UTC',
     ...units
   };
+
+  // Replace, not stack, if already mid-preview — searching again while
+  // just looking should swap what you're looking at, not pile up.
+  if (_previewActive && LOCATIONS.length > 0) LOCATIONS.shift();
+
   const dupIdx = findDuplicateIndex(loc);
-  if(dupIdx > -1) LOCATIONS.splice(dupIdx, 1);
+  const alreadySaved = dupIdx > -1;
+  if (alreadySaved) LOCATIONS.splice(dupIdx, 1);
+
+  // The very first city ever (onboarding, or back down to zero saved
+  // cities) always saves outright — there's nothing to "just look at"
+  // yet, this IS the home city being set. Anything after that defaults
+  // to a preview: it shows immediately, but stays out of localStorage
+  // until explicitly kept, so searching around to see what a place
+  // looks like doesn't silently and permanently grow the saved list.
+  const isFirstEverCity = LOCATIONS.length === 0;
   LOCATIONS.unshift(loc);
-  saveCities();
   closeCitySheet();
+
+  if (alreadySaved || isFirstEverCity) {
+    saveCities();
+    clearPreview();
+  } else {
+    showPreview(loc.name, loc.state);
+  }
+  refreshAll();
+  updateNameplate();
+}
+
+// ── PREVIEW MODE ─────────────────────────────────────────────────────────
+// A searched city (beyond the first) shows immediately but isn't saved
+// until the person explicitly keeps it. saveCities() itself refuses to
+// persist an active preview no matter what triggers the save (removing a
+// different city, editing the list elsewhere) — a single guard rather
+// than patching every call site that happens to save.
+let _previewActive = false;
+
+function ensurePreviewBar() {
+  let el = document.getElementById('preview-bar');
+  if (el) return el;
+  const main = document.querySelector('main');
+  if (!main) return null;
+  el = document.createElement('div');
+  el.id = 'preview-bar';
+  el.className = 'preview-bar';
+  el.innerHTML =
+    '<span id="preview-bar-text"></span>' +
+    '<button type="button" class="preview-save" onclick="savePreview()">Save this edition</button>' +
+    '<button type="button" class="preview-dismiss" onclick="dismissPreview()" aria-label="Return to my edition">\u2715</button>';
+  main.insertBefore(el, main.firstChild);
+  return el;
+}
+
+function showPreview(name, state) {
+  _previewActive = true;
+  const el = ensurePreviewBar();
+  if (!el) return;
+  const txt = document.getElementById('preview-bar-text');
+  if (txt) txt.textContent = 'Previewing ' + name + (state ? ', ' + state : '') + ' — not saved yet';
+}
+
+function clearPreview() {
+  _previewActive = false;
+  const el = document.getElementById('preview-bar');
+  if (el) el.remove();
+}
+
+function savePreview() {
+  saveCities();
+  clearPreview();
+}
+
+function dismissPreview() {
+  if (LOCATIONS.length > 0) LOCATIONS.shift(); // drop the unsaved preview at the front
+  clearPreview();
   refreshAll();
   updateNameplate();
 }
@@ -4035,12 +4144,20 @@ async function addMyLocation() {
 
   // The onboarding empty state replaces <main> entirely, so there's no
   // #weather-grid to append a card into yet — same fix addCity() already
-  // has for its own search-result path.
+  // has for its own search-result path. It also hides the mobile
+  // nameplate (city name, Front Page/Radar/Field Notes tabs) while
+  // onboarding is showing — buildGrid()'s normal path un-hides it again,
+  // but this function's success path never calls buildGrid(), so without
+  // this it stayed hidden indefinitely after using this button from the
+  // onboarding screen. That's what made Radar and Field Notes vanish.
   const ensureGrid = () => {
     const main = document.querySelector('main');
     if (main && !document.getElementById('weather-grid')) {
       main.innerHTML = '<div class="grid" id="weather-grid"></div>';
     }
+    const np = document.getElementById('np-masthead');
+    if (np) np.style.display = '';
+    if (typeof sizeNameplate === 'function') sizeNameplate();
   };
 
   navigator.geolocation.getCurrentPosition(async pos => {
