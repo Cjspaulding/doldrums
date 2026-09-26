@@ -1290,6 +1290,28 @@
     .fn-empty { padding:44px 8px; text-align:center; }
     .fn-empty-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink2); margin-bottom:8px; }
     .fn-empty-sub { font-family:'Spectral',serif; font-size:13px; color:var(--ink3); line-height:1.5; max-width:260px; margin:0 auto; }
+
+    /* Almanac */
+    .alm-view { padding:0 14px 44px; max-width:640px; margin:0 auto; }
+    .alm-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding:6px 0 8px; margin-bottom:4px; }
+    .alm-kicker { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink); font-weight:600; }
+    .alm-place { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); text-align:right; }
+    .alm-lede { font-family:'Spectral',serif; font-style:italic; font-size:13px; color:var(--ink3); line-height:1.5; padding:8px 0 2px; }
+    .alm-section { border-top:1px solid var(--rule); margin-top:16px; padding-top:10px; }
+    .alm-sec-kicker { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.24em; text-transform:uppercase; color:var(--orange2); margin-bottom:10px; font-weight:600; }
+    .alm-figures { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:6px; }
+    .alm-fig { background:var(--white); border:1px solid var(--rule); border-top:2px solid var(--navy3); padding:10px 6px 8px; text-align:center; }
+    .alm-fig-val { font-family:'Cormorant Garamond',serif; font-size:25px; color:var(--ink); line-height:1.1; }
+    .alm-fig-label { font-family:'IBM Plex Mono',monospace; font-size:6.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); margin-top:5px; line-height:1.5; }
+    .alm-line { font-family:'Spectral',serif; font-size:14px; color:var(--ink2); line-height:1.55; padding:7px 0; border-bottom:1px dotted var(--rule); }
+    .alm-line:last-child { border-bottom:none; }
+    .alm-line b, .alm-line strong { color:var(--ink); }
+    .alm-lore { font-style:italic; color:var(--ink3); font-size:13px; }
+    .alm-tide-row { display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:6px 0; border-bottom:1px dotted var(--rule); color:var(--ink2); }
+    .alm-tide-row:last-child { border-bottom:none; }
+    .alm-tide-type { text-transform:uppercase; letter-spacing:.14em; font-size:8px; color:var(--ink4); }
+    .alm-loading { padding:48px 8px; text-align:center; font-family:'Spectral',serif; font-style:italic; font-size:14px; color:var(--ink3); }
+    .alm-foot { margin-top:20px; padding-top:10px; border-top:2px solid var(--ink); font-family:'IBM Plex Mono',monospace; font-size:7px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink5); line-height:1.9; }
     .log-note-row {
       display:flex;align-items:flex-start;gap:14px;
       padding:12px 16px;background:var(--white);
@@ -2475,7 +2497,7 @@
       <div class="nav-item" role="button" tabindex="0" onclick="setView('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Hourly</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('radar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Radar</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('alerts')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Alerts</div>
-      <div class="nav-item" role="button" tabindex="0" onclick="setView('log')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Field Notes</div>
+      <div class="nav-item" role="button" tabindex="0" onclick="setView('almanac')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Almanac</div>
     </div>
     <div class="masthead-actions">
       <div class="countdown-txt" id="countdown"></div>
@@ -2511,7 +2533,7 @@
   <div class="np-sections">
     <div class="np-section active" role="button" tabindex="0" aria-current="page" data-view="conditions" onclick="navTo('conditions')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Front Page</div>
     <div class="np-section" role="button" tabindex="0" data-view="radar" onclick="navTo('radar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Radar</div>
-    <div class="np-section" role="button" tabindex="0" data-view="log" onclick="navTo('log')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Field Notes</div>
+    <div class="np-section" role="button" tabindex="0" data-view="almanac" onclick="navTo('almanac')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Almanac</div>
   </div>
   <div class="np-dateline">
     <span id="np-date"></span>
@@ -2954,7 +2976,7 @@ function buildGrid() {
     if (stickyCount) stickyCount.textContent = '';
     // The fixed mobile nameplate's city switcher would otherwise duplicate
     // the onboarding screen's own "Add a city" button, and its Front Page/
-    // Radar/Field Notes tabs have nothing to navigate to yet either — quiet
+    // Radar/Almanac tabs have nothing to navigate to yet either — quiet
     // the whole strip rather than leave a second, competing set of controls
     // above the one actual decision this screen is asking for.
     const np = document.getElementById('np-masthead');
@@ -3293,7 +3315,7 @@ async function refreshAll(){
 
   // Only rebuild the grid when the Conditions view is actually on screen.
   // Otherwise a background refresh (10-min countdown, add/remove city) would
-  // replace <main> and wipe whatever view the user is on — e.g. Field Notes.
+  // replace <main> and wipe whatever view the user is on — e.g. Almanac.
   if(!gridExists && currentView === 'conditions') {
     buildGrid();
   }
@@ -3862,7 +3884,7 @@ window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplat
 const _navHistory = [];
 const _viewLabels = {
   conditions:'Now', forecast:'Forecast', hourly:'Hourly',
-  radar:'Radar', alerts:'Alerts', log:'Field Notes'
+  radar:'Radar', alerts:'Alerts', almanac:'Almanac'
 };
 
 function goBack() {
@@ -3932,7 +3954,7 @@ function setView(view, isBack) {
     radar:      'Precipitation Radar',
     pressure:   'Barometric Pressure',
     alerts:     'Weather Alerts',
-    log:        'Field Notes',
+    almanac:    'The Almanac',
   };
   if(sl) sl.textContent = labels[view] || '';
 
@@ -3942,7 +3964,7 @@ function setView(view, isBack) {
     case 'radar':    renderRadarView();    break;
     case 'pressure': renderPressureView(); break;
     case 'alerts':   renderAlertsView();   break;
-    case 'log':      renderLogView();      break;
+    case 'almanac':  renderAlmanacView();  break;
     default:
       if(!document.getElementById('weather-grid')) {
         main.innerHTML = '<div class="grid" id="weather-grid"></div>';
@@ -4145,11 +4167,11 @@ async function addMyLocation() {
   // The onboarding empty state replaces <main> entirely, so there's no
   // #weather-grid to append a card into yet — same fix addCity() already
   // has for its own search-result path. It also hides the mobile
-  // nameplate (city name, Front Page/Radar/Field Notes tabs) while
+  // nameplate (city name, Front Page/Radar/Almanac tabs) while
   // onboarding is showing — buildGrid()'s normal path un-hides it again,
   // but this function's success path never calls buildGrid(), so without
   // this it stayed hidden indefinitely after using this button from the
-  // onboarding screen. That's what made Radar and Field Notes vanish.
+  // onboarding screen. That's what made Radar and Almanac vanish.
   const ensureGrid = () => {
     const main = document.querySelector('main');
     if (main && !document.getElementById('weather-grid')) {
@@ -5200,7 +5222,7 @@ function pushObs(entry) {
 }
 function clearLog() {
   localStorage.removeItem('doldrums_log');
-  renderLogView();
+  renderAlmanacView();
 }
 function exportLog() {
   const log = getObsLog();
@@ -5237,7 +5259,7 @@ function addNote() {
   saveNotes(notes);
   ta.value = '';
   updateNoteCount();
-  renderLogView();
+  renderAlmanacView();
 }
 function editNote(ts) {
   const notes = getNotes();
@@ -5266,7 +5288,7 @@ function editNote(ts) {
 function deleteNote(ts) {
   const notes = getNotes().filter(n => n.ts !== ts);
   saveNotes(notes);
-  renderLogView();
+  renderAlmanacView();
 }
 function updateNoteCount() {
   const ta = document.getElementById('note-textarea');
@@ -5276,48 +5298,341 @@ function updateNoteCount() {
   if(btn) btn.disabled = !ta?.value.trim();
 }
 
-function renderLogView() {
-  const main = document.querySelector('main');
-  if(!main) return;
+// ── ALMANAC ─────────────────────────────────────────────────────────────────
+// The third tab. Farm-first, never hokey: frost dates, growing degree days,
+// a real planting calendar, sun & moon, tides. Data: Open-Meteo + NOAA CO-OPS,
+// no keys needed. (Field Notes storage in doldrums_notes is left intact.)
 
-  const notes = getNotes().slice().sort((a,b) => b.ts - a.ts);
-  const count = notes.length;
+let _almCache = { data: null, key: null, ts: 0 };
+let _almGeo = null; // session-cached geolocation
 
-  let out = `<div class="log-view" style="padding:0 14px 40px;">
-    <div class="fn-head">
-      <span class="fn-kicker">Field Notes</span>
-      <span class="fn-count">${count ? count + (count === 1 ? ' dispatch' : ' dispatches') : ''}</span>
-    </div>`;
+const ALM_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  if(count === 0) {
-    out += `<div class="fn-empty">
-      <div class="fn-empty-title">Nothing on record.</div>
-      <div class="fn-empty-sub">What's the sky doing right now? Tap the pencil and file the first dispatch.</div>
-    </div>`;
-  } else {
-    notes.forEach(e => {
-      const d = new Date(e.ts);
-      const timeStr = d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
-      out += `<div class="log-note-row" style="border:none;background:transparent;padding:0;margin-bottom:12px;">
-        <div class="log-entry-card" style="flex:1;margin-bottom:0;">
-          ${e.mood ? `<div class="log-entry-card-mood">${e.mood}</div>` : ''}
-          ${e.text ? `<div class="log-entry-card-note">${e.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
-          ${e.context ? `<div class="log-entry-card-context">
-            ${e.context.city ? `<span>${e.context.city}${e.context.state ? ', '+e.context.state : ''}</span>` : ''}
-            ${e.context.cond ? `<span>${e.context.cond}</span>` : ''}
-            ${e.context.temp ? `<span>${e.context.temp}</span>` : ''}
-          </div>` : ''}
-          <div class="log-entry-card-timestamp">${timeStr}</div>
-        </div>
-        <button class="log-note-del" onclick="deleteNote(${e.ts})" title="Delete" aria-label="Delete note" style="color:rgba(11,37,69,0.35);font-size:14px;background:none;border:none;cursor:pointer;padding:4px 6px;flex-shrink:0;">✕</button>
-      </div>`;
-    });
-  }
-
-  out += '</div>';
-  main.innerHTML = out;
+function almPad(n){ return String(n).padStart(2,'0'); }
+function almEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function almDayStr(offset){
+  const d = new Date(); d.setDate(d.getDate() + (offset || 0));
+  return d.getFullYear() + '-' + almPad(d.getMonth()+1) + '-' + almPad(d.getDate());
+}
+function almFmtD(d){ return ALM_MONTHS[d.getMonth()] + ' ' + d.getDate(); }
+function almAddDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function almFmtClock(d){
+  let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return h + ':' + almPad(d.getMinutes()) + ' ' + ap;
+}
+function almWeekday(ds){ return new Date(ds + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' }); }
+function almFetchJSON(url){
+  return fetch(url).then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+function almHaversine(a,b,c,d){
+  const R = 6371, r = x => x * Math.PI / 180;
+  const h = Math.sin(r(c-a)/2) ** 2 + Math.cos(r(a)) * Math.cos(r(c)) * Math.sin(r(d-b)/2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function almDoyToMD(doy){
+  const t = new Date(2023, 0, doy);
+  return ALM_MONTHS[t.getMonth()] + ' ' + t.getDate();
+}
+function almOffLabel(r){
+  const f = x => { const v = Math.round(x * 2) / 2; return String(v).replace('.5', '½'); };
+  const dir = r[0] < 0 ? 'before' : 'after';
+  return f(Math.abs(r[0]) / 7) + '–' + f(Math.abs(r[1]) / 7) + ' wks ' + dir + ' last frost';
 }
 
+// Kitchen-garden staples. Offsets are days relative to last spring frost
+// (negative = before). indoor = start seeds inside; out = direct sow / set out.
+const ALM_CROPS = [
+  { n:'Peas',     out:[-42,-28] },
+  { n:'Spinach',  out:[-42,-28] },
+  { n:'Radishes', out:[-28,-14] },
+  { n:'Lettuce',  out:[-28,-14] },
+  { n:'Carrots',  out:[-28,-14] },
+  { n:'Kale',     out:[-28,-14] },
+  { n:'Beets',    out:[-21,-14] },
+  { n:'Broccoli', indoor:[-56,-42], out:[-28,-14] },
+  { n:'Tomatoes', indoor:[-56,-42], out:[7,14] },
+  { n:'Peppers',  indoor:[-70,-56], out:[14,21] },
+  { n:'Cucumbers',out:[7,14] },
+  { n:'Squash',   out:[7,14] },
+  { n:'Beans',    out:[7,14] },
+  { n:'Corn',     out:[14,21] },
+];
+
+function almMoon(date){
+  const syn = 29.530588853;
+  const known = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+  let age = (date.getTime() / 86400000 - known) % syn;
+  if(age < 0) age += syn;
+  const illum = Math.round((1 - Math.cos(2 * Math.PI * age / syn)) / 2 * 100);
+  const names = ['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous',
+                 'Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  const idx = Math.floor(age / syn * 8 + 0.5) % 8;
+  return { name: names[idx], illum, idx };
+}
+function almMoonLore(idx){
+  if(idx === 0 || idx === 4) return 'the old books call it a rest day.';
+  if(idx < 4) return 'old lore favors above-ground crops.';
+  return 'old lore favors roots and bulbs.';
+}
+
+function almGetCoords(cb){
+  if(_almGeo) return cb(_almGeo);
+  const fallback = (typeof LOCATIONS !== 'undefined' && LOCATIONS.length)
+    ? { lat: LOCATIONS[0].lat, lon: LOCATIONS[0].lon, name: LOCATIONS[0].name } : null;
+  if(!navigator.geolocation) return cb(fallback);
+  let done = false;
+  const finish = v => { if(!done){ done = true; cb(v); } };
+  const timer = setTimeout(() => finish(fallback), 8000);
+  navigator.geolocation.getCurrentPosition(
+    pos => { clearTimeout(timer); _almGeo = { lat: pos.coords.latitude, lon: pos.coords.longitude }; finish(_almGeo); },
+    () => { clearTimeout(timer); finish(fallback); },
+    { timeout: 7000, maximumAge: 600000 }
+  );
+}
+
+function almPlaceName(coords){
+  if(coords.name) return Promise.resolve(coords.name);
+  return almFetchJSON('https://nominatim.openstreetmap.org/reverse?format=json&lat=' +
+      coords.lat.toFixed(4) + '&lon=' + coords.lon.toFixed(4) + '&accept-language=en')
+    .then(j => { const a = j.address || {}; return a.city || a.town || a.village || a.hamlet || a.county || 'Current location'; })
+    .catch(() => 'Current location');
+}
+
+function almCompute(lat, fcast, frost, gddArch){
+  const d = {};
+  const south = lat < 0;
+
+  // — Frost normals from 3 full prior years of observed daily mins —
+  const yrs = {};
+  const ft = (frost.daily && frost.daily.time) || [];
+  const fm = (frost.daily && frost.daily.temperature_2m_min) || [];
+  ft.forEach((t, i) => {
+    if(fm[i] == null) return;
+    const y = t.slice(0, 4);
+    (yrs[y] = yrs[y] || []).push({ t, min: fm[i] });
+  });
+  const lastF = [], firstF = [];
+  Object.keys(yrs).sort().forEach(y => {
+    const days = yrs[y];
+    const spring = days.filter(x => { const m = +x.t.slice(5, 7); return south ? m >= 7 : m <= 6; });
+    const fall   = days.filter(x => { const m = +x.t.slice(5, 7); return south ? m <= 6 : m >= 7; });
+    const lf = spring.filter(x => x.min <= 32).pop();
+    const ff = fall.find(x => x.min <= 32);
+    if(lf) lastF.push(lf.t);
+    if(ff) firstF.push(ff.t);
+  });
+  const medDoy = arr => {
+    if(!arr.length) return null;
+    const doys = arr.map(t => {
+      const p = t.split('-').map(Number);
+      return Math.round((new Date(p[0], p[1]-1, p[2]) - new Date(p[0], 0, 0)) / 86400000);
+    }).sort((a, b) => a - b);
+    return doys[Math.floor(doys.length / 2)];
+  };
+  const lastDoy = medDoy(lastF), firstDoy = medDoy(firstF);
+  const year = new Date().getFullYear();
+  const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  const lfThisYear = lastDoy ? new Date(year, 0, lastDoy) : null;
+  d.plantYear = (lfThisYear && lfThisYear < today0) ? year + 1 : year;
+  d.lastFrostDate = lastDoy ? new Date(d.plantYear, 0, lastDoy) : null;
+  d.firstFrostDate = firstDoy ? new Date(year, 0, firstDoy) : null;
+  d.lastFrostMD = lastDoy ? almDoyToMD(lastDoy) : null;
+  d.firstFrostMD = firstDoy ? almDoyToMD(firstDoy) : null;
+  d.seasonDays = (lastDoy && firstDoy) ? firstDoy - lastDoy : null;
+
+  // — Growing degree days, base 50°F, since April 1 —
+  let gdd = 0;
+  const gt = (gddArch.daily && gddArch.daily.time) || [];
+  const gx = (gddArch.daily && gddArch.daily.temperature_2m_max) || [];
+  const gn = (gddArch.daily && gddArch.daily.temperature_2m_min) || [];
+  gt.forEach((t, i) => {
+    if(gx[i] != null && gn[i] != null) gdd += Math.max(0, (gx[i] + gn[i]) / 2 - 50);
+  });
+  d.gdd = Math.round(gdd);
+
+  // — Frost watch: next 16 nights of forecast —
+  const fct = (fcast.daily && fcast.daily.time) || [];
+  const fcm = (fcast.daily && fcast.daily.temperature_2m_min) || [];
+  let watch = null;
+  for(let i = 0; i < fct.length; i++){
+    if(fcm[i] != null && fcm[i] <= 36){ watch = { date: fct[i], min: Math.round(fcm[i]), hard: fcm[i] <= 32 }; break; }
+  }
+  d.frostWatch = watch
+    ? 'Frost ' + (watch.hard ? 'likely' : 'possible') + ' ' + almWeekday(watch.date) +
+      ' night — down to ' + watch.min + '°F. Cover the tender things.'
+    : 'No frost in the next 16 nights.';
+
+  // — Planting calendar, resolved against this ground's last frost —
+  d.crops = ALM_CROPS.map(c => {
+    const fmtR = r => d.lastFrostDate
+      ? almFmtD(almAddDays(d.lastFrostDate, r[0])) + ' – ' + almFmtD(almAddDays(d.lastFrostDate, r[1]))
+      : almOffLabel(r);
+    return { n: c.n, indoor: c.indoor ? fmtR(c.indoor) : null, out: fmtR(c.out) };
+  });
+  d.fallNote = null;
+  if(d.firstFrostDate){
+    const sowD = almAddDays(d.firstFrostDate, -56);
+    if(sowD >= today0)
+      d.fallNote = 'For a fall harvest, sow spinach, lettuce & kale around ' +
+        almFmtD(sowD) + ' — eight weeks before first frost.';
+  }
+
+  // — Sun —
+  const sr = fcast.daily.sunrise[0], ss = fcast.daily.sunset[0];
+  const srD = new Date(sr), ssD = new Date(ss);
+  const sr2 = new Date(fcast.daily.sunrise[1]), ss2 = new Date(fcast.daily.sunset[1]);
+  const mins = Math.round((ssD - srD) / 60000);
+  const mins2 = Math.round((ss2 - sr2) / 60000);
+  d.sunrise = almFmtClock(srD);
+  d.sunset = almFmtClock(ssD);
+  d.dayLen = Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm';
+  d.dayDelta = mins2 - mins;
+
+  // — Moon —
+  d.moon = almMoon(new Date());
+  d.moonLore = almMoonLore(d.moon.idx);
+  return d;
+}
+
+async function almGetData(lat, lon){
+  const key = lat.toFixed(2) + ',' + lon.toFixed(2);
+  const now = Date.now();
+  if(_almCache.key === key && _almCache.data && (now - _almCache.ts) < 6 * 3600 * 1000) return _almCache.data;
+  const year = new Date().getFullYear();
+  const ll = 'latitude=' + lat.toFixed(4) + '&longitude=' + lon.toFixed(4);
+  const [fcast, frost, gddArch] = await Promise.all([
+    almFetchJSON('https://api.open-meteo.com/v1/forecast?' + ll +
+      '&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&temperature_unit=fahrenheit&timezone=auto&forecast_days=16'),
+    almFetchJSON('https://archive-api.open-meteo.com/v1/archive?' + ll +
+      '&start_date=' + (year-3) + '-01-01&end_date=' + (year-1) + '-12-31&daily=temperature_2m_min&temperature_unit=fahrenheit&timezone=auto'),
+    almFetchJSON('https://archive-api.open-meteo.com/v1/archive?' + ll +
+      '&start_date=' + year + '-04-01&end_date=' + almDayStr(0) + '&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto'),
+  ]);
+  const data = almCompute(lat, fcast, frost, gddArch);
+  _almCache = { data, key, ts: now };
+  return data;
+}
+
+async function almTides(lat, lon){
+  let stations = null;
+  try { stations = JSON.parse(localStorage.getItem('doldrums_noaa_stations_v1') || 'null'); } catch(e){}
+  if(!Array.isArray(stations) || !stations.length){
+    const j = await almFetchJSON('https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=tidepredictions');
+    stations = (j.stations || []).map(s => [s.id, +s.lat, +s.lng, s.name]).filter(s => s[1] && s[2]);
+    try { localStorage.setItem('doldrums_noaa_stations_v1', JSON.stringify(stations)); } catch(e){}
+  }
+  let best = null, bestD = 1e9;
+  for(const s of stations){
+    const dd = almHaversine(lat, lon, s[1], s[2]);
+    if(dd < bestD){ bestD = dd; best = s; }
+  }
+  if(!best || bestD > 150) return null; // too far inland for tides
+  const begin = almDayStr(0).replace(/-/g, ''), end = almDayStr(1).replace(/-/g, '');
+  const j = await almFetchJSON('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?station=' + best[0] +
+    '&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json&begin_date=' + begin + '&end_date=' + end);
+  const now = new Date();
+  const preds = ((j.predictions) || []).map(p => ({
+    t: new Date(p.t.replace(' ', 'T') + ':00'),
+    type: p.type, v: (+p.v).toFixed(1)
+  })).filter(p => !isNaN(p.t));
+  const upcoming = preds.filter(p => p.t > now);
+  const nextH = upcoming.find(p => p.type === 'H') || null;
+  const nextL = upcoming.find(p => p.type === 'L') || null;
+  const dist = bestD < 1.6 ? Math.round(bestD * 0.621371 * 10) / 10 + ' mi'
+                           : Math.round(bestD * 0.621371) + ' mi';
+  return {
+    stationName: best[3], stationDist: dist,
+    nextH: nextH ? { t: almFmtClock(nextH.t), v: nextH.v } : null,
+    nextL: nextL ? { t: almFmtClock(nextL.t), v: nextL.v } : null,
+    rows: preds.filter(p => p.t > new Date(now.getTime() - 6 * 3600 * 1000))
+               .slice(0, 6).map(p => ({ type: p.type, t: almFmtClock(p.t), v: p.v })),
+  };
+}
+
+function almFig(val, label){
+  return '<div class="alm-fig"><div class="alm-fig-val">' + almEsc(val) + '</div><div class="alm-fig-label">' + label + '</div></div>';
+}
+
+function almHTML(d, tides, place){
+  const todayLine = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  let h = '<div class="alm-view">';
+  h += '<div class="alm-head"><span class="alm-kicker">The Almanac</span><span class="alm-place">' +
+       almEsc(place) + ' · ' + todayLine + '</span></div>';
+  h += '<div class="alm-lede">Frost dates, degree days & planting times for this ground — worked out from three years of observed weather, not folklore.</div>';
+
+  // Field & vine
+  h += '<div class="alm-section"><div class="alm-sec-kicker">Field &amp; Vine</div>';
+  h += '<div class="alm-figures">';
+  h += almFig(d.lastFrostMD || '—', 'Last frost · typical');
+  h += almFig(d.firstFrostMD || '—', 'First frost · typical');
+  h += almFig(d.seasonDays != null ? d.seasonDays : '—', 'Season · days');
+  h += '</div>';
+  h += '<div class="alm-line"><b>' + d.gdd.toLocaleString() + '</b> growing degree days (base 50°F) banked since April 1.</div>';
+  h += '<div class="alm-line">' + almEsc(d.frostWatch) + '</div>';
+  h += '</div>';
+
+  // Planting calendar
+  h += '<div class="alm-section"><div class="alm-sec-kicker">Planting Calendar · ' + d.plantYear + '</div>';
+  h += '<div class="alm-tide-row" style="border-bottom:1px solid var(--rule);">' +
+       '<span class="alm-tide-type">Crop</span><span class="alm-tide-type">Start indoors</span>' +
+       '<span class="alm-tide-type">Sow / set out</span></div>';
+  d.crops.forEach(c => {
+    h += '<div class="alm-tide-row"><span>' + c.n + '</span><span>' + (c.indoor || '—') + '</span><span>' + c.out + '</span></div>';
+  });
+  if(d.fallNote) h += '<div class="alm-line alm-lore">' + almEsc(d.fallNote) + '</div>';
+  h += '</div>';
+
+  // Sun & moon
+  h += '<div class="alm-section"><div class="alm-sec-kicker">Sun &amp; Moon</div>';
+  h += '<div class="alm-line">Sunrise <b>' + d.sunrise + '</b> · Sunset <b>' + d.sunset + '</b></div>';
+  h += '<div class="alm-line"><b>' + d.dayLen + '</b> of daylight — ' + (d.dayDelta >= 0 ? 'growing' : 'shrinking') + '.</div>';
+  h += '<div class="alm-line">' + d.moon.name + ', <b>' + d.moon.illum + '%</b> lit. ' +
+       '<span class="alm-lore">' + almMoonLore(d.moon.idx) + '</span></div>';
+  h += '</div>';
+
+  // Tides, coastal only
+  if(tides){
+    h += '<div class="alm-section"><div class="alm-sec-kicker">Tide Table</div>';
+    h += '<div class="alm-line">' + almEsc(tides.stationName) + ' — ' + tides.stationDist + ' away</div>';
+    if(tides.nextH && tides.nextL)
+      h += '<div class="alm-line">Next high <b>' + tides.nextH.t + '</b> · ' + tides.nextH.v +
+           ' ft &nbsp;·&nbsp; next low <b>' + tides.nextL.t + '</b> · ' + tides.nextL.v + ' ft</div>';
+    tides.rows.forEach(r => {
+      h += '<div class="alm-tide-row"><span class="alm-tide-type">' + (r.type === 'H' ? 'High' : 'Low') +
+           '</span><span>' + r.t + '</span><span>' + r.v + ' ft</span></div>';
+    });
+    h += '</div>';
+  }
+
+  h += '<div class="alm-foot">Frost normals from three years of observed temps · Tides: NOAA CO-OPS · For planning, not navigation</div>';
+  h += '</div>';
+  return h;
+}
+
+function renderAlmanacView(){
+  const main = document.querySelector('main');
+  if(!main) return;
+  main.innerHTML = '<div class="alm-view"><div class="alm-loading">Consulting the heavens…</div></div>';
+  almGetCoords(coords => {
+    if(typeof currentView !== 'undefined' && currentView !== 'almanac') return;
+    if(!coords){
+      main.innerHTML = '<div class="alm-view"><div class="alm-head"><span class="alm-kicker">The Almanac</span></div>' +
+        '<div class="alm-loading">Add a city on the Front Page, and the Almanac will read its sky.</div></div>';
+      return;
+    }
+    almGetData(coords.lat, coords.lon)
+      .then(data => Promise.all([data, almPlaceName(coords), almTides(coords.lat, coords.lon).catch(() => null)]))
+      .then(([data, place, tides]) => {
+        if(typeof currentView !== 'undefined' && currentView !== 'almanac') return;
+        main.innerHTML = almHTML(data, tides, place);
+      })
+      .catch(() => {
+        if(typeof currentView !== 'undefined' && currentView !== 'almanac') return;
+        main.innerHTML = '<div class="alm-view"><div class="alm-head"><span class="alm-kicker">The Almanac</span></div>' +
+          '<div class="alm-loading">The heavens are cloudy — try again in a bit.</div></div>';
+      });
+  });
+}
 
 // ── PWA INSTALL PROMPT ────────────────────────────────────────────────────────
 let _deferredInstall = null;
@@ -5470,7 +5785,7 @@ function saveQuickNote() {
     if(saveBtn) saveBtn.textContent = 'File it';
     qnInput();
     dismissQuickNote();
-    if(currentView === 'log') renderLogView();
+    if(currentView === 'almanac') renderAlmanacView();
     const fab = document.getElementById('fab');
     if(fab) { fab.textContent='✓'; fab.style.background='var(--orange)'; setTimeout(()=>{fab.textContent='✏';fab.style.background='';},1400); }
     return;
@@ -5501,7 +5816,7 @@ function saveQuickNote() {
   });
   saveNotes(notes);
   dismissQuickNote();
-  if(currentView === 'log') renderLogView();
+  if(currentView === 'almanac') renderAlmanacView();
   maybeRequestReview();
   const fab = document.getElementById('fab');
   if(fab) {
@@ -5601,9 +5916,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <span class="bottom-nav-icon" style="font-size:20px">◈</span>
     <span class="bottom-nav-label">Radar</span>
   </button>
-  <button class="bottom-nav-item" data-view="log" onclick="navTo('log')">
-    <span class="bottom-nav-icon" style="font-size:22px;letter-spacing:-1px">≡</span>
-    <span class="bottom-nav-label">Notes</span>
+  <button class="bottom-nav-item" data-view="almanac" onclick="navTo('almanac')">
+    <span class="bottom-nav-icon" style="font-size:22px;letter-spacing:-1px">❦</span>
+    <span class="bottom-nav-label">Almanac</span>
   </button>
 </nav>
 
