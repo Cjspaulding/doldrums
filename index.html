@@ -386,9 +386,12 @@
 
     .remove-btn {
       font-size:13px;color:var(--ink5);background:none;border:none;cursor:pointer;
-      padding:2px 4px;transition:color .2s;line-height:1;opacity:0.35;
+      padding:6px 8px;transition:color .2s,opacity .2s;line-height:1;opacity:0.35;
     }
     .remove-btn:hover { color:var(--orange);opacity:1; }
+    @media (hover:none){
+      .remove-btn{opacity:.8;padding:10px 12px;}
+    }
 
     /* TEMP HERO */
     .temp-hero {
@@ -3082,7 +3085,7 @@ function buildGrid() {
         <div class="card-head-right">
           <div class="card-icon" id="icon-${i}">—</div>
           <div class="card-cond" id="cond-${i}">—</div>
-          ${`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>`}
+          ${LOCATIONS.length>1?`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>`:''}
         </div>
       </div>
       <div id="body-${i}">
@@ -3733,6 +3736,7 @@ function addCity(idx){
 }
 
 function removeCity(i){
+  if(LOCATIONS.length <= 1) return; // never remove the last station
   LOCATIONS.splice(i,1);
   saveCities();
   refreshAll();
@@ -4306,7 +4310,7 @@ function appendCard(loc, i) {
       <div class="card-head-right">
         <div class="card-icon" id="icon-${i}">—</div>
         <div class="card-cond" id="cond-${i}">—</div>
-        <button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>
+        ${LOCATIONS.length>1?`<button class="remove-btn" onclick="removeCity(${i})" title="Remove station" aria-label="Remove ${loc.name}">✕</button>`:''}
       </div>
     </div>
     <div id="body-${i}">
@@ -5369,12 +5373,6 @@ function almMoon(date){
   const idx = Math.floor(age / syn * 8 + 0.5) % 8;
   return { name: names[idx], illum, idx };
 }
-function almMoonLore(idx){
-  if(idx === 0 || idx === 4) return 'the old books call it a rest day.';
-  if(idx < 4) return 'old lore favors above-ground crops.';
-  return 'old lore favors roots and bulbs.';
-}
-
 function almGetCoords(cb){
   if(_almGeo) return cb(_almGeo);
   const fallback = (typeof LOCATIONS !== 'undefined' && LOCATIONS.length)
@@ -5459,7 +5457,7 @@ function almCompute(lat, fcast, frost, gddArch){
   }
   d.frostWatch = watch
     ? 'Frost ' + (watch.hard ? 'likely' : 'possible') + ' ' + almWeekday(watch.date) +
-      ' night — down to ' + watch.min + '°F. Cover the tender things.'
+      ' night, down to ' + watch.min + '°F. Cover the tender things.'
     : 'No frost in the next 16 nights.';
 
   // — Planting calendar, resolved against this ground's last frost —
@@ -5474,7 +5472,7 @@ function almCompute(lat, fcast, frost, gddArch){
     const sowD = almAddDays(d.firstFrostDate, -56);
     if(sowD >= today0)
       d.fallNote = 'For a fall harvest, sow spinach, lettuce & kale around ' +
-        almFmtD(sowD) + ' — eight weeks before first frost.';
+        almFmtD(sowD) + ', eight weeks before first frost.';
   }
 
   // — Sun —
@@ -5490,7 +5488,6 @@ function almCompute(lat, fcast, frost, gddArch){
 
   // — Moon —
   d.moon = almMoon(new Date());
-  d.moonLore = almMoonLore(d.moon.idx);
   return d;
 }
 
@@ -5558,7 +5555,7 @@ function almHTML(d, tides, place){
   let h = '<div class="alm-view">';
   h += '<div class="alm-head"><span class="alm-kicker">The Almanac</span><span class="alm-place">' +
        almEsc(place) + ' · ' + todayLine + '</span></div>';
-  h += '<div class="alm-lede">Frost dates, degree days & planting times for this ground — worked out from three years of observed weather, not folklore.</div>';
+  h += '<div class="alm-lede">Frost dates, degree days & planting times for this ground, from three years of real weather.</div>';
 
   // Field & vine
   h += '<div class="alm-section"><div class="alm-sec-kicker">Field &amp; Vine</div>';
@@ -5585,15 +5582,14 @@ function almHTML(d, tides, place){
   // Sun & moon
   h += '<div class="alm-section"><div class="alm-sec-kicker">Sun &amp; Moon</div>';
   h += '<div class="alm-line">Sunrise <b>' + d.sunrise + '</b> · Sunset <b>' + d.sunset + '</b></div>';
-  h += '<div class="alm-line"><b>' + d.dayLen + '</b> of daylight — ' + (d.dayDelta >= 0 ? 'growing' : 'shrinking') + '.</div>';
-  h += '<div class="alm-line">' + d.moon.name + ', <b>' + d.moon.illum + '%</b> lit. ' +
-       '<span class="alm-lore">' + almMoonLore(d.moon.idx) + '</span></div>';
+  h += '<div class="alm-line"><b>' + d.dayLen + '</b> of daylight and ' + (d.dayDelta >= 0 ? 'growing' : 'shrinking') + '.</div>';
+  h += '<div class="alm-line">' + d.moon.name + ', <b>' + d.moon.illum + '%</b> lit.</div>';
   h += '</div>';
 
   // Tides, coastal only
   if(tides){
     h += '<div class="alm-section"><div class="alm-sec-kicker">Tide Table</div>';
-    h += '<div class="alm-line">' + almEsc(tides.stationName) + ' — ' + tides.stationDist + ' away</div>';
+    h += '<div class="alm-line">' + almEsc(tides.stationName) + ', ' + tides.stationDist + ' away</div>';
     if(tides.nextH && tides.nextL)
       h += '<div class="alm-line">Next high <b>' + tides.nextH.t + '</b> · ' + tides.nextH.v +
            ' ft &nbsp;·&nbsp; next low <b>' + tides.nextL.t + '</b> · ' + tides.nextL.v + ' ft</div>';
@@ -5629,7 +5625,7 @@ function renderAlmanacView(){
       .catch(() => {
         if(typeof currentView !== 'undefined' && currentView !== 'almanac') return;
         main.innerHTML = '<div class="alm-view"><div class="alm-head"><span class="alm-kicker">The Almanac</span></div>' +
-          '<div class="alm-loading">The heavens are cloudy — try again in a bit.</div></div>';
+          '<div class="alm-loading">The heavens are cloudy. Try again in a bit.</div></div>';
       });
   });
 }
