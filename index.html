@@ -2961,6 +2961,57 @@ function unitsForTz(tz) {
 }
 
 // ── BUILD GRID ────────────────────────────────────────────────────────────────
+// ── CITY TABS ─────────────────────────────────────────────────────────────────
+// The strip tabs switch the active edition (LOCATIONS[0]) — the front page and
+// the Almanac both follow it. Tapping the already-active tab just scrolls to it.
+function switchEdition(i){
+  if(!LOCATIONS[i]) return;
+  if(i === 0){ scrollToCard(0); return; }
+  makePrimary(i);      // reorder + save + refresh + almanac re-render if on it
+  renderCityPills();    // tabs reflect the new order
+  if(typeof currentView !== 'undefined' && currentView === 'conditions') scrollToCard(0);
+}
+function renderCityPills(){
+  const scroll = document.getElementById('summary-scroll');
+  if(!scroll) return;
+  // Keep the Add City pill
+  const addPill = scroll.querySelector('.add-city-pill');
+  scroll.innerHTML = '';
+
+  LOCATIONS.forEach((loc, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'summary-pill';
+    pill.id = `sum-${i}`;
+    pill.setAttribute('role', 'button');
+    pill.tabIndex = 0;
+    pill.setAttribute('aria-label', 'Switch to ' + loc.name);
+    pill.onclick = () => switchEdition(i);
+    pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchEdition(i); } };
+    pill.innerHTML = `
+      <div class="sum-icon" id="sum-icon-${i}"></div>
+      <div>
+        <div class="sum-name">${loc.name}${loc.state?', '+stateAbbr(loc.state):''}</div>
+        <div class="sum-temp" id="sum-temp-${i}">—</div>
+      </div>`;
+    scroll.appendChild(pill);
+  });
+
+  scroll.appendChild(addPill || (() => {
+    const p = document.createElement('div');
+    p.className='add-city-pill';
+    p.setAttribute('role', 'button');
+    p.tabIndex = 0;
+    p.setAttribute('aria-label', 'Add city');
+    p.onclick=openModal;
+    p.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); } };
+    p.innerHTML='<span class="add-city-plus">+</span><span>Add City</span>';
+    return p;
+  })());
+
+  const count = `${LOCATIONS.length} stations`;
+  ['station-count','sticky-count'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=count;});
+}
+
 function buildGrid() {
   const now = new Date();
   const el = document.getElementById('masthead-date');
@@ -3035,43 +3086,7 @@ function buildGrid() {
   }
 
   // Summary pills (inject before the Add City pill)
-  const scroll = document.getElementById('summary-scroll');
-  // Keep the Add City pill
-  const addPill = scroll.querySelector('.add-city-pill');
-  scroll.innerHTML = '';
-
-  LOCATIONS.forEach((loc, i) => {
-    const pill = document.createElement('div');
-    pill.className = 'summary-pill';
-    pill.id = `sum-${i}`;
-    pill.setAttribute('role', 'button');
-    pill.tabIndex = 0;
-    pill.setAttribute('aria-label', 'Jump to ' + loc.name);
-    pill.onclick = () => scrollToCard(i);
-    pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToCard(i); } };
-    pill.innerHTML = `
-      <div class="sum-icon" id="sum-icon-${i}"></div>
-      <div>
-        <div class="sum-name">${loc.name}${loc.state?', '+stateAbbr(loc.state):''}</div>
-        <div class="sum-temp" id="sum-temp-${i}">—</div>
-      </div>`;
-    scroll.appendChild(pill);
-  });
-
-  scroll.appendChild(addPill || (() => {
-    const p = document.createElement('div');
-    p.className='add-city-pill';
-    p.setAttribute('role', 'button');
-    p.tabIndex = 0;
-    p.setAttribute('aria-label', 'Add city');
-    p.onclick=openModal;
-    p.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); } };
-    p.innerHTML='<span class="add-city-plus">+</span><span>Add City</span>';
-    return p;
-  })());
-
-  const count = `${LOCATIONS.length} stations`;
-  ['station-count','sticky-count'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=count;});
+  renderCityPills();
 
   document.getElementById('weather-grid').innerHTML = LOCATIONS.map((loc,i) => `
     <div class="card" id="card-${i}" style="animation-delay:${i*90}ms">
@@ -3397,6 +3412,7 @@ function makePrimary(i) {
   closeCitySheet();
   refreshAll();
   updateNameplate();
+  renderCityPills();
   if(typeof currentView !== 'undefined' && currentView === 'almanac') renderAlmanacView();
 }
 
@@ -4328,9 +4344,9 @@ function appendCard(loc, i) {
   pill.className = 'summary-pill'; pill.id = `sum-${i}`;
   pill.setAttribute('role', 'button');
   pill.tabIndex = 0;
-  pill.setAttribute('aria-label', 'Jump to ' + loc.name);
-  pill.onclick = () => scrollToCard(i);
-  pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollToCard(i); } };
+  pill.setAttribute('aria-label', 'Switch to ' + loc.name);
+  pill.onclick = () => switchEdition(i);
+  pill.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchEdition(i); } };
   pill.innerHTML = `
     <div class="sum-icon" id="sum-icon-${i}"></div>
     <div>
