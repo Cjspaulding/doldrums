@@ -1295,7 +1295,7 @@
     .fn-empty-sub { font-family:'Spectral',serif; font-size:13px; color:var(--ink3); line-height:1.5; max-width:260px; margin:0 auto; }
 
     /* Almanac */
-    .alm-view { padding:0 14px 44px; max-width:640px; margin:0 auto; }
+    .alm-view { padding:0 14px 110px; max-width:640px; margin:0 auto; }
     .alm-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--ink); padding:6px 0 8px; margin-bottom:4px; }
     .alm-kicker { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink); font-weight:600; }
     .alm-place { font-family:'IBM Plex Mono',monospace; font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); text-align:right; }
@@ -3397,6 +3397,7 @@ function makePrimary(i) {
   closeCitySheet();
   refreshAll();
   updateNameplate();
+  if(typeof currentView !== 'undefined' && currentView === 'almanac') renderAlmanacView();
 }
 
 function removeEdition(i) {
@@ -5374,16 +5375,20 @@ function almMoon(date){
   return { name: names[idx], illum, idx };
 }
 function almGetCoords(cb){
+  // The Almanac follows the selected city (LOCATIONS[0]) — the same place
+  // the nameplate, Front Page, and Radar show. GPS is only for first run
+  // with no cities saved yet.
+  if(typeof LOCATIONS !== 'undefined' && LOCATIONS.length && LOCATIONS[0] && LOCATIONS[0].lat != null){
+    return cb({ lat: LOCATIONS[0].lat, lon: LOCATIONS[0].lon, name: LOCATIONS[0].name });
+  }
   if(_almGeo) return cb(_almGeo);
-  const fallback = (typeof LOCATIONS !== 'undefined' && LOCATIONS.length)
-    ? { lat: LOCATIONS[0].lat, lon: LOCATIONS[0].lon, name: LOCATIONS[0].name } : null;
-  if(!navigator.geolocation) return cb(fallback);
+  if(!navigator.geolocation) return cb(null);
   let done = false;
   const finish = v => { if(!done){ done = true; cb(v); } };
-  const timer = setTimeout(() => finish(fallback), 8000);
+  const timer = setTimeout(() => finish(null), 8000);
   navigator.geolocation.getCurrentPosition(
     pos => { clearTimeout(timer); _almGeo = { lat: pos.coords.latitude, lon: pos.coords.longitude }; finish(_almGeo); },
-    () => { clearTimeout(timer); finish(fallback); },
+    () => { clearTimeout(timer); finish(null); },
     { timeout: 7000, maximumAge: 600000 }
   );
 }
