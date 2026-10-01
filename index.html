@@ -1993,13 +1993,13 @@
       .onboarding-btn-secondary {
         width: 100%;
         padding: 18px 24px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
+        background: transparent;
+        border: 1px solid rgba(11,37,69,0.35);
         border-radius: 14px;
         font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         font-size: 16px;
         font-weight: 500;
-        color: rgba(255,255,255,0.8);
+        color: var(--navy);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2021,7 +2021,7 @@
       .onboarding-footer {
         font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         font-size: 11px;
-        color: rgba(255,255,255,0.2);
+        color: var(--ink4);
         text-align: center;
         margin-top: 20px;
         letter-spacing: 0.04em;
@@ -3324,13 +3324,10 @@ async function fetchWeather(loc,i){
 }
 
 // ── AUTO-REFRESH (silent, every 10 min) ────────────────────────────────────────
-let countdownSec=600,countdownTimer=null;
+let countdownTimer=null;
 function startCountdown(){
-  clearInterval(countdownTimer);countdownSec=600;
-  countdownTimer=setInterval(()=>{
-    countdownSec--;
-    if(countdownSec<=0)refreshAll();
-  },1000);
+  clearTimeout(countdownTimer);
+  countdownTimer=setTimeout(()=>{ refreshAll(); }, 600000); // single shot; refreshAll re-arms at its end
 }
 
 // ── REFRESH ───────────────────────────────────────────────────────────────────
@@ -3548,8 +3545,8 @@ function addCityAsPrimary(idx) {
   closeCitySheet();
 
   if (alreadySaved || isFirstEverCity) {
-    saveCities();
     clearPreview();
+    saveCities();
   } else {
     showPreview(loc.name, loc.state);
   }
@@ -3596,8 +3593,8 @@ function clearPreview() {
 }
 
 function savePreview() {
-  saveCities();
   clearPreview();
+  saveCities();
 }
 
 function dismissPreview() {
@@ -6848,7 +6845,8 @@ function drawSkyMoon(ctx, x, y, r, phase01, paper, ink) {
   ctx.fillStyle = ink; ctx.globalAlpha = 0.28;
   ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
   ctx.globalAlpha = 1;
-  ctx.fillStyle = paper === '#f6f1e6' ? '#fffdf6' : paper;
+  const moonPaper = paper === '#f6f1e6' ? '#fffdf6' : paper;
+  ctx.fillStyle = moonPaper;
   ctx.strokeStyle = ink; ctx.globalAlpha = 0.9;
   // lit semicircle
   ctx.beginPath();
@@ -6859,7 +6857,7 @@ function drawSkyMoon(ctx, x, y, r, phase01, paper, ink) {
   ctx.beginPath();
   ctx.ellipse(x, y, Math.max(0.01, Math.abs(r * k)), r, 0, 0, Math.PI * 2);
   const gibbous = (waxing && k < 0) || (!waxing && k > 0);
-  if (gibbous) { ctx.fillStyle = light; ctx.globalAlpha = 0.9; ctx.fill(); }
+  if (gibbous) { ctx.fillStyle = moonPaper; ctx.globalAlpha = 0.9; ctx.fill(); }
   else { ctx.fillStyle = ink; ctx.globalAlpha = 0.28; ctx.fill(); }
   ctx.restore();
   ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
