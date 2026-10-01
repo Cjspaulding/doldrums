@@ -1314,7 +1314,9 @@
     .alm-line:last-child { border-bottom:none; }
     .alm-line b, .alm-line strong { color:var(--ink); }
     .alm-lore { font-style:italic; color:var(--ink3); font-size:13px; }
-    .alm-tide-row { display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:6px 0; border-bottom:1px dotted var(--rule); color:var(--ink2); }
+    .alm-tide-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:6px 0; border-bottom:1px dotted var(--rule); color:var(--ink2); }
+    .alm-tide-row > span { min-width:0; }
+    .alm-tide-row > span:last-child { text-align:right; }
     .alm-tide-row:last-child { border-bottom:none; }
     .alm-tide-type { text-transform:uppercase; letter-spacing:.14em; font-size: 10px; color:var(--ink4); }
     .alm-loading { padding:48px 8px; text-align:center; font-family:'Spectral',serif; font-style:italic; font-size:14px; color:var(--ink3); }
@@ -5541,10 +5543,10 @@ function almMercury(now){
   return { retro, start, end };
 }
 function almSignVerdict(sign, waxing){
-  if(sign.el === 'water') return waxing ? 'prime planting day — sow and transplant' : 'plant root crops, transplant';
-  if(sign.el === 'earth') return waxing ? 'good for sowing, best for root crops' : 'plant root crops, harvest';
-  if(sign.el === 'fire') return 'weed, cultivate, turn the compost';
-  return 'harvest, prune, patrol for pests';
+  if(sign.el === 'water') return waxing ? 'sow & transplant' : 'plant roots';
+  if(sign.el === 'earth') return waxing ? 'sow, best for roots' : 'roots & harvest';
+  if(sign.el === 'fire') return 'weed & cultivate';
+  return 'harvest & prune';
 }
 function almHeavens(now){
   const DAY = 864e5;
