@@ -5890,6 +5890,32 @@ function almHTML(d, tides, place){
        'Apples want 800–1,000; peaches 600–900; plums 500–800.</div>';
   h += '</div>';
 
+  // Signs & Seasons — old-almanac astrology, honestly labeled
+  const hv = d.heavens;
+  h += '<div class="alm-section"><div class="alm-sec-kicker">Signs &amp; Seasons</div>';
+  h += '<div class="alm-line alm-lore">Old-almanac astrology. Not science — but grandmother checked it every morning.</div>';
+  h += '<div class="alm-line">Sun in <b>' + hv.sun.name + ' ' + hv.sun.glyph + '</b>' +
+       (hv.sunNext ? ' until ' + almFmtD(hv.sunNext.date) : '') +
+       ' · Moon in <b>' + hv.moon.name + ' ' + hv.moon.glyph + '</b>' +
+       (hv.moonNext ? ', enters ' + hv.moonNext.sign.name + ' ' + hv.moonNext.date.toLocaleDateString('en-US', { weekday: 'short' }) : '') + '</div>';
+  if(hv.merc.retro){
+    h += '<div class="alm-line">☿ Mercury is <b>retrograde</b>' +
+         (hv.merc.end ? ' until ' + almFmtD(hv.merc.end) : '') +
+         ' — sign nothing, back everything up, expect small machinery to act up.</div>';
+  } else {
+    h += '<div class="alm-line">☿ Mercury is <b>direct</b>' +
+         (hv.merc.start ? ' — next retrograde begins ' + almFmtD(hv.merc.start) : '') + '.</div>';
+  }
+  if(hv.best.length)
+    h += '<div class="alm-line">Best days to plant: <b>' + hv.best.join(', ') + '.</b></div>';
+  hv.days.forEach(g => {
+    h += '<div class="alm-tide-row"><span class="alm-tide-type">' + g.wd + ' ' + g.date + '</span>' +
+         '<span>' + g.sign.glyph + ' ' + g.sign.name + '</span><span>' + almEsc(g.verdict) + '</span></div>';
+  });
+  h += '<div class="alm-line alm-lore">Water signs (♋ ♏ ♓) favor sowing · earth (♉ ♍ ♑) favor root crops · ' +
+       'fire and air are for weeding, harvest, and pest patrol.</div>';
+  h += '</div>';
+
   // Frost watch — the tiered warning
   h += '<div class="alm-section"><div class="alm-sec-kicker">Frost Watch · 16 nights</div>';
   h += '<div class="alm-line"><b>' + almEsc(d.frostWatch) + '</b></div>';
@@ -5948,31 +5974,6 @@ function almHTML(d, tides, place){
   });
   h += '</div>';
 
-  // Signs & Seasons — old-almanac astrology, honestly labeled
-  const hv = d.heavens;
-  h += '<div class="alm-section"><div class="alm-sec-kicker">Signs &amp; Seasons</div>';
-  h += '<div class="alm-line alm-lore">Old-almanac astrology. Not science — but grandmother checked it every morning.</div>';
-  h += '<div class="alm-line">Sun in <b>' + hv.sun.name + ' ' + hv.sun.glyph + '</b>' +
-       (hv.sunNext ? ' until ' + almFmtD(hv.sunNext.date) : '') +
-       ' · Moon in <b>' + hv.moon.name + ' ' + hv.moon.glyph + '</b>' +
-       (hv.moonNext ? ', enters ' + hv.moonNext.sign.name + ' ' + hv.moonNext.date.toLocaleDateString('en-US', { weekday: 'short' }) : '') + '</div>';
-  if(hv.merc.retro){
-    h += '<div class="alm-line">☿ Mercury is <b>retrograde</b>' +
-         (hv.merc.end ? ' until ' + almFmtD(hv.merc.end) : '') +
-         ' — sign nothing, back everything up, expect small machinery to act up.</div>';
-  } else {
-    h += '<div class="alm-line">☿ Mercury is <b>direct</b>' +
-         (hv.merc.start ? ' — next retrograde begins ' + almFmtD(hv.merc.start) : '') + '.</div>';
-  }
-  if(hv.best.length)
-    h += '<div class="alm-line">Best days to plant: <b>' + hv.best.join(', ') + '.</b></div>';
-  hv.days.forEach(g => {
-    h += '<div class="alm-tide-row"><span class="alm-tide-type">' + g.wd + ' ' + g.date + '</span>' +
-         '<span>' + g.sign.glyph + ' ' + g.sign.name + '</span><span>' + almEsc(g.verdict) + '</span></div>';
-  });
-  h += '<div class="alm-line alm-lore">Water signs (♋ ♏ ♓) favor sowing · earth (♉ ♍ ♑) favor root crops · ' +
-       'fire and air are for weeding, harvest, and pest patrol.</div>';
-  h += '</div>';
 
   // Season ahead
   h += '<div class="alm-section"><div class="alm-sec-kicker">Season Ahead</div>';
