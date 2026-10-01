@@ -55,6 +55,10 @@
       --orange:     #c84b11;
       --orange2:    #e05c1a;
       --orange-dim: rgba(200,75,17,0.08);
+      --z-fire:     #b04a32;
+      --z-earth:    #5f7a44;
+      --z-water:    #3a6b9c;
+      --z-air:      #a8842c;
       --ink:        #0b1929;
       --ink2:       #2c3e55;
       --ink3:       #5a7080;
@@ -1224,6 +1228,10 @@
       --navy-pale:  #1e3050;
       --shadow:     0 1px 4px rgba(0,0,0,0.35), 0 2px 12px rgba(0,0,0,0.25);
       --shadow-lg:  0 4px 32px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.35);
+      --z-fire:     #d4715a;
+      --z-earth:    #93a86b;
+      --z-water:    #7ba3cc;
+      --z-air:      #d4af5a;
     }
 
     .dark-toggle {
@@ -1312,6 +1320,8 @@
     .alm-fig-label { font-family:'IBM Plex Mono',monospace; font-size: 8.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); margin-top:5px; line-height:1.5; }
     .alm-signs-present { grid-template-columns:repeat(2,1fr); margin:12px 0 4px; }
     .alm-zod { font-size:38px; line-height:1; padding:4px 0 2px; }
+    .z-fire { color:var(--z-fire); } .z-earth { color:var(--z-earth); }
+    .z-water { color:var(--z-water); } .z-air { color:var(--z-air); }
     .alm-line { font-family:'Spectral',serif; font-size:14px; color:var(--ink2); line-height:1.55; padding:7px 0; border-bottom:1px dotted var(--rule); }
     .alm-line:last-child { border-bottom:none; }
     .alm-line b, .alm-line strong { color:var(--ink); }
@@ -5898,12 +5908,11 @@ function almHTML(d, tides, place){
   // Signs & Seasons — old-almanac astrology, honestly labeled
   const hv = d.heavens;
   h += '<div class="alm-section"><div class="alm-sec-kicker">Signs &amp; Seasons</div>';
-  h += '<div class="alm-line alm-lore">Old-almanac astrology. Not science — but grandmother checked it every morning.</div>';
   h += '<div class="alm-figures alm-signs-present">';
-  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod">' + hv.sun.glyph + '</div>' +
+  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod z-' + hv.sun.el + '">' + hv.sun.glyph + '</div>' +
        '<div class="alm-fig-label">Sun in ' + hv.sun.name + ' · ' + hv.sun.range +
        (hv.sunNext ? ' · until ' + almFmtD(hv.sunNext.date) : '') + '</div></div>';
-  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod">' + hv.moon.glyph + '</div>' +
+  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod z-' + hv.moon.el + '">' + hv.moon.glyph + '</div>' +
        '<div class="alm-fig-label">Moon in ' + hv.moon.name +
        (hv.moonNext ? ' · enters ' + hv.moonNext.sign.name + ' ' + hv.moonNext.date.toLocaleDateString('en-US', { weekday: 'short' }) : '') + '</div></div>';
   h += '</div>';
@@ -5919,10 +5928,8 @@ function almHTML(d, tides, place){
     h += '<div class="alm-line">Best days to plant: <b>' + hv.best.join(', ') + '.</b></div>';
   hv.days.forEach(g => {
     h += '<div class="alm-tide-row"><span class="alm-tide-type">' + g.wd + ' ' + g.date + '</span>' +
-         '<span>' + g.sign.glyph + ' ' + g.sign.name + '</span><span>' + almEsc(g.verdict) + '</span></div>';
+         '<span><span class="z-' + g.sign.el + '">' + g.sign.glyph + '</span> ' + g.sign.name + '</span><span>' + almEsc(g.verdict) + '</span></div>';
   });
-  h += '<div class="alm-line alm-lore">Water (♋︎ ♏︎ ♓︎) favors sowing · earth (♉︎ ♍︎ ♑︎) favors roots · ' +
-       'fire and air are for weeding and harvest.</div>';
   h += '</div>';
 
   // Frost watch — the tiered warning
@@ -5976,7 +5983,6 @@ function almHTML(d, tides, place){
 
   // Moon lore — honestly labeled
   h += '<div class="alm-section"><div class="alm-sec-kicker">Moon Lore</div>';
-  h += '<div class="alm-line alm-lore">Grandmother’s planting calendar. Not science — but a fine rhythm to garden by.</div>';
   d.lunar.slice(0, 7).forEach(l => {
     h += '<div class="alm-tide-row"><span class="alm-tide-type">' + l.wd + ' ' + l.date + '</span>' +
          '<span>' + almEsc(l.phase) + '</span><span>' + almEsc(l.task.split(' — ')[1] || l.task) + '</span></div>';
