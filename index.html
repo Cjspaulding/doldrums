@@ -204,9 +204,6 @@
 
     .masthead-actions { display:flex;align-items:center;gap:14px; }
 
-    .countdown-txt { font-size: 11px;color:rgba(255,255,255,0.3);letter-spacing:.1em;display:none; }
-    @media(min-width:520px){ .countdown-txt{display:block;} }
-
     .refresh-btn {
       background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);
       padding:7px 18px;font-family:'IBM Plex Mono',monospace;font-size: 10.5px;cursor:pointer;
@@ -688,7 +685,6 @@
       .masthead-nav { gap:0; flex-shrink:0; }
       .nav-item { padding:10px 10px; font-size: 9.5px; letter-spacing:.12em; white-space:nowrap; }
       .masthead-actions { gap:8px; flex-shrink:0; }
-      .countdown-txt { display:none !important; }
       .refresh-btn { padding:6px 12px; font-size: 10px; white-space:nowrap; }
 
       /* Sticky */
@@ -2524,7 +2520,6 @@
       <div class="nav-item" role="button" tabindex="0" onclick="setView('sky')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Sky</div>
     </div>
     <div class="masthead-actions">
-      <div class="countdown-txt" id="countdown"></div>
       <button class="refresh-btn" id="refresh-btn" onclick="refreshAll()">
         <span id="refresh-icon">↺</span><span class="refresh-label"> Refresh</span>
       </button>
@@ -3328,15 +3323,12 @@ async function fetchWeather(loc,i){
   }catch(err){renderError(i,err.message);}
 }
 
-// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+// ── AUTO-REFRESH (silent, every 10 min) ────────────────────────────────────────
 let countdownSec=600,countdownTimer=null;
 function startCountdown(){
   clearInterval(countdownTimer);countdownSec=600;
   countdownTimer=setInterval(()=>{
     countdownSec--;
-    const m=Math.floor(countdownSec/60),s=countdownSec%60;
-    const el=document.getElementById('countdown');
-    if(el)el.textContent=`↺ ${m}:${String(s).padStart(2,'0')}`;
     if(countdownSec<=0)refreshAll();
   },1000);
 }
@@ -3354,7 +3346,7 @@ async function refreshAll(){
     && !!document.getElementById('body-0');
 
   // Only rebuild the grid when the Conditions view is actually on screen.
-  // Otherwise a background refresh (10-min countdown, add/remove city) would
+  // Otherwise a background refresh (10-min auto-refresh, add/remove city) would
   // replace <main> and wipe whatever view the user is on — e.g. Almanac.
   if(!gridExists && currentView === 'conditions') {
     buildGrid();
