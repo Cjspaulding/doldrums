@@ -1319,9 +1319,10 @@
     .alm-fig-val { font-family:'Cormorant Garamond',serif; font-size:25px; color:var(--ink); line-height:1.1; }
     .alm-fig-label { font-family:'IBM Plex Mono',monospace; font-size: 8.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); margin-top:5px; line-height:1.5; }
     .alm-signs-present { grid-template-columns:repeat(2,1fr); margin:12px 0 4px; }
-    .alm-zod { font-size:38px; line-height:1; padding:4px 0 2px; }
+    .alm-zod { font-size:38px; line-height:1; padding:4px 0 2px; font-weight:700; -webkit-text-stroke:.7px currentColor; }
     .z-fire { color:var(--z-fire); } .z-earth { color:var(--z-earth); }
     .z-water { color:var(--z-water); } .z-air { color:var(--z-air); }
+    .z-fire, .z-earth, .z-water, .z-air { font-weight:700; -webkit-text-stroke:.35px currentColor; }
     .alm-line { font-family:'Spectral',serif; font-size:14px; color:var(--ink2); line-height:1.55; padding:7px 0; border-bottom:1px dotted var(--rule); }
     .alm-line:last-child { border-bottom:none; }
     .alm-line b, .alm-line strong { color:var(--ink); }
@@ -5890,7 +5891,7 @@ function almHTML(d, tides, place){
   let h = '<div class="alm-view">';
   h += '<div class="alm-head"><span class="alm-kicker">The Almanac</span><span class="alm-place">' +
        almEsc(place) + ' · ' + todayLine + '</span></div>';
-  h += '<div class="alm-lede">Frost dates, hardiness zone, soil & planting times for this ground — from real observed weather, not vibes.</div>';
+  h += '<div class="alm-lede">Frost dates, hardiness zone, soil & planting times for this ground — from real observed weather. The rest is up to the farmers.</div>';
 
   // Field & vine
   h += '<div class="alm-section"><div class="alm-sec-kicker">Field &amp; Vine</div>';
