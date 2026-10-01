@@ -5948,9 +5948,9 @@ function almHTML(d, tides, place){
   });
   h += '</div>';
 
-  // The Heavens — old-almanac astrology, honestly labeled
+  // Signs & Seasons — old-almanac astrology, honestly labeled
   const hv = d.heavens;
-  h += '<div class="alm-section"><div class="alm-sec-kicker">The Heavens</div>';
+  h += '<div class="alm-section"><div class="alm-sec-kicker">Signs &amp; Seasons</div>';
   h += '<div class="alm-line alm-lore">Old-almanac astrology. Not science — but grandmother checked it every morning.</div>';
   h += '<div class="alm-line">Sun in <b>' + hv.sun.name + ' ' + hv.sun.glyph + '</b>' +
        (hv.sunNext ? ' until ' + almFmtD(hv.sunNext.date) : '') +
