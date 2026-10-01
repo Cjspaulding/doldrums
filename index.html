@@ -923,8 +923,8 @@
     .pv-fl { text-transform:uppercase;letter-spacing:.16em;margin-right:6px;color:var(--ink5); }
     .pv-fv { color:var(--ink2);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:300; }
 
-    /* ── ALERTS VIEW ──────────────────────────────────────────────────────── */
-    .alert-view, .log-view { }
+    /* ── LOG VIEW ─────────────────────────────────────────────────────────── */
+    .log-view { }
 
     .log-toolbar {
       display:flex;align-items:center;justify-content:space-between;
@@ -949,26 +949,6 @@
     }
     .log-export-btn:hover { background:var(--navy2); }
 
-    .alert-list { display:flex;flex-direction:column;gap:3px; }
-
-    .alert-row {
-      display:flex;align-items:flex-start;gap:14px;
-      padding:14px 16px;background:var(--white);
-      border:1px solid var(--rule);border-left:3px solid var(--orange2);
-    }
-
-    .alert-row.severe { border-left-color:#5a3e8a; }
-
-    .alert-row-icon { font-size:22px;flex-shrink:0;line-height:1.2; }
-
-    .alert-row-msg {
-      font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:400;
-      color:var(--ink);margin-bottom:5px;letter-spacing:.04em;
-    }
-
-    .alert-row-time {
-      font-size: 10px;color:var(--ink4);letter-spacing:.1em;text-transform:uppercase;
-    }
 
     /* ── LOG VIEW ─────────────────────────────────────────────────────────── */
     .log-stream {
@@ -2540,7 +2520,6 @@
       <div class="nav-item" role="button" tabindex="0" onclick="setView('forecast')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Forecast</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('hourly')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Hourly</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('radar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Radar</div>
-      <div class="nav-item" role="button" tabindex="0" onclick="setView('alerts')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Alerts</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('almanac')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Almanac</div>
       <div class="nav-item" role="button" tabindex="0" onclick="setView('sky')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Sky</div>
     </div>
@@ -3802,56 +3781,10 @@ function removeCity(i){
   refreshAll();
 }
 
-// ── WEATHER ALERTS ────────────────────────────────────────────────────────────
-const prevConditions = {};
-
-const SEVERE = new Set([82,95,96,99]); // heavy showers, thunderstorm, hail
-const BAD    = new Set([55,65,75,86]); // heavy drizzle/rain/snow
-
-function checkAlert(i, loc, newCode) {
-  const prev = prevConditions[i];
-  prevConditions[i] = newCode;
-  if(prev === undefined) return; // first load, no comparison
-
-  const wasOk   = !SEVERE.has(prev) && !BAD.has(prev);
-  const nowBad  = SEVERE.has(newCode) || BAD.has(newCode);
-  const nowWorse = SEVERE.has(newCode) && !SEVERE.has(prev);
-
-  if((wasOk && nowBad) || nowWorse) {
-    const w = wmo(newCode);
-    const severity = SEVERE.has(newCode) ? 'severe' : 'bad';
-    showAlert(`${loc.name}: ${w.label}`, w.icon, severity);
-  }
-}
-
-function showAlert(msg, icon='⚠️', severity='') {
-  // Persist to localStorage
-  pushAlert({ ts: Date.now(), msg: `${icon} ${msg}`, icon, severity });
-  if(currentView === 'alerts') renderAlertsView();
-
-  let bar = document.getElementById('alert-bar');
-  if(!bar) {
-    bar = document.createElement('div');
-    bar.id = 'alert-bar';
-    bar.style.cssText = `
-      position:fixed;bottom:0;left:0;right:0;z-index:200;
-      background:var(--orange);color:#fff;
-      padding:12px 20px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-      display:flex;align-items:center;justify-content:space-between;
-      font-family:'IBM Plex Mono',monospace;
-      box-shadow:0 -2px 12px rgba(0,0,0,0.2);
-    `;
-    document.body.appendChild(bar);
-  }
-  bar.innerHTML = `<span>${icon} ${msg}</span><button onclick="this.parentElement.remove()" aria-label="Dismiss" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>`;
-  setTimeout(() => bar?.remove(), 8000);
-}
-
-// Patch renderCard: alerts + observation log + pressure history
+// Patch renderCard: observation log + pressure history
 const _origRenderCard = renderCard;
 window.renderCard = function(i, loc, data) {
   _origRenderCard(i, loc, data);
-  checkAlert(i, loc, data.current.weather_code);
 
   // Log observation
   const w = wmo(data.current.weather_code);
@@ -3948,7 +3881,7 @@ window.addEventListener('load', () => { sizeNameplate(); setTimeout(sizeNameplat
 const _navHistory = [];
 const _viewLabels = {
   conditions:'Now', forecast:'Forecast', hourly:'Hourly',
-  radar:'Radar', alerts:'Alerts', almanac:'Almanac', sky:'Sky'
+  radar:'Radar', almanac:'Almanac', sky:'Sky'
 };
 
 function goBack() {
@@ -4017,7 +3950,6 @@ function setView(view, isBack) {
     hourly:     'Hourly Outlook',
     radar:      'Precipitation Radar',
     pressure:   'Barometric Pressure',
-    alerts:     'Weather Alerts',
     almanac:    'The Almanac',
     sky:        'The Night Sky',
   };
@@ -4028,7 +3960,6 @@ function setView(view, isBack) {
     case 'hourly':   renderHourlyView();   break;
     case 'radar':    renderRadarView();    break;
     case 'pressure': renderPressureView(); break;
-    case 'alerts':   renderAlertsView();   break;
     case 'almanac':  renderAlmanacView();  break;
     case 'sky':      renderSkyView();      break;
     default:
@@ -5221,58 +5152,6 @@ function drawWind() {
   }
 }
 
-// ── ALERT LOG ─────────────────────────────────────────────────────────────────
-function getAlertLog() {
-  try { return JSON.parse(localStorage.getItem('doldrums_alerts') || '[]'); } catch(e) { return []; }
-}
-function saveAlertLog(log) {
-  localStorage.setItem('doldrums_alerts', JSON.stringify(log.slice(-100)));
-}
-function pushAlert(entry) {
-  const log = getAlertLog();
-  log.push(entry);
-  saveAlertLog(log);
-}
-function clearAlerts() {
-  localStorage.removeItem('doldrums_alerts');
-  renderAlertsView();
-}
-
-function renderAlertsView() {
-  const main = document.querySelector('main');
-  const log  = getAlertLog().slice().reverse();
-
-  if(log.length === 0) {
-    main.innerHTML = `<div class="empty-state">
-      <div class="empty-icon" style="font-size:42px;opacity:.35">✅</div>
-      <div class="empty-title">All Clear</div>
-      <div class="empty-sub">No significant weather events recorded yet.</div>
-    </div>`;
-    return;
-  }
-
-  main.innerHTML = `<div class="alert-view">
-    <div class="log-toolbar">
-      <span class="log-count">${log.length} alert${log.length !== 1 ? 's' : ''} recorded</span>
-      <button class="log-clear-btn" onclick="clearAlerts()">Clear All</button>
-    </div>
-    <div class="alert-list">
-      ${log.map(e => `
-        <div class="alert-row ${e.severity || ''}">
-          <div class="alert-row-icon">${e.icon || '⚠️'}</div>
-          <div>
-            <div class="alert-row-msg">${e.msg}</div>
-            <div class="alert-row-time">${new Date(e.ts).toLocaleString('en-US',{
-              weekday:'short', month:'short', day:'numeric',
-              hour:'numeric', minute:'2-digit', hour12:true
-            })}</div>
-          </div>
-        </div>`).join('')}
-    </div>
-  </div>`;
-}
-
-// ── OBSERVATION LOG ────────────────────────────────────────────────────────────
 function getObsLog() {
   try { return JSON.parse(localStorage.getItem('doldrums_log') || '[]'); } catch(e) { return []; }
 }
