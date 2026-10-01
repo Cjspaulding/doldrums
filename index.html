@@ -1310,6 +1310,8 @@
     .alm-fig { background:var(--white); border:1px solid var(--rule); border-top:2px solid var(--navy3); padding:10px 6px 8px; text-align:center; }
     .alm-fig-val { font-family:'Cormorant Garamond',serif; font-size:25px; color:var(--ink); line-height:1.1; }
     .alm-fig-label { font-family:'IBM Plex Mono',monospace; font-size: 8.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink4); margin-top:5px; line-height:1.5; }
+    .alm-signs-present { grid-template-columns:repeat(2,1fr); margin:12px 0 4px; }
+    .alm-zod { font-size:38px; line-height:1; padding:4px 0 2px; }
     .alm-line { font-family:'Spectral',serif; font-size:14px; color:var(--ink2); line-height:1.55; padding:7px 0; border-bottom:1px dotted var(--rule); }
     .alm-line:last-child { border-bottom:none; }
     .alm-line b, .alm-line strong { color:var(--ink); }
@@ -5509,10 +5511,11 @@ const ALM_ZODIAC = [['Aries','♈'],['Taurus','♉'],['Gemini','♊'],['Cancer',
   ['Leo','♌'],['Virgo','♍'],['Libra','♎'],['Scorpio','♏'],
   ['Sagittarius','♐'],['Capricorn','♑'],['Aquarius','♒'],['Pisces','♓']];
 const ALM_ZODIAC_EL = ['fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'];
+const ALM_ZODIAC_RANGE = ['Mar 21 – Apr 19','Apr 20 – May 20','May 21 – Jun 20','Jun 21 – Jul 22','Jul 23 – Aug 22','Aug 23 – Sep 22','Sep 23 – Oct 22','Oct 23 – Nov 21','Nov 22 – Dec 21','Dec 22 – Jan 19','Jan 20 – Feb 18','Feb 19 – Mar 20'];
 function almZodiac(lon){
   const l = (((lon % 360) + 360) % 360);
   const i = Math.floor(l / 30) % 12;
-  return { name: ALM_ZODIAC[i][0], glyph: ALM_ZODIAC[i][1], el: ALM_ZODIAC_EL[i], idx: i };
+  return { name: ALM_ZODIAC[i][0], glyph: ALM_ZODIAC[i][1] + '︎', el: ALM_ZODIAC_EL[i], idx: i, range: ALM_ZODIAC_RANGE[i] };
 }
 function almLonDelta(a, b){ let dd = a - b; if(dd > 180) dd -= 360; if(dd < -180) dd += 360; return dd; }
 function almPlanetLon(name, date){
@@ -5896,10 +5899,14 @@ function almHTML(d, tides, place){
   const hv = d.heavens;
   h += '<div class="alm-section"><div class="alm-sec-kicker">Signs &amp; Seasons</div>';
   h += '<div class="alm-line alm-lore">Old-almanac astrology. Not science — but grandmother checked it every morning.</div>';
-  h += '<div class="alm-line">Sun in <b>' + hv.sun.name + ' ' + hv.sun.glyph + '</b>' +
-       (hv.sunNext ? ' until ' + almFmtD(hv.sunNext.date) : '') +
-       ' · Moon in <b>' + hv.moon.name + ' ' + hv.moon.glyph + '</b>' +
-       (hv.moonNext ? ', enters ' + hv.moonNext.sign.name + ' ' + hv.moonNext.date.toLocaleDateString('en-US', { weekday: 'short' }) : '') + '</div>';
+  h += '<div class="alm-figures alm-signs-present">';
+  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod">' + hv.sun.glyph + '</div>' +
+       '<div class="alm-fig-label">Sun in ' + hv.sun.name + ' · ' + hv.sun.range +
+       (hv.sunNext ? ' · until ' + almFmtD(hv.sunNext.date) : '') + '</div></div>';
+  h += '<div class="alm-fig"><div class="alm-fig-val alm-zod">' + hv.moon.glyph + '</div>' +
+       '<div class="alm-fig-label">Moon in ' + hv.moon.name +
+       (hv.moonNext ? ' · enters ' + hv.moonNext.sign.name + ' ' + hv.moonNext.date.toLocaleDateString('en-US', { weekday: 'short' }) : '') + '</div></div>';
+  h += '</div>';
   if(hv.merc.retro){
     h += '<div class="alm-line">☿ Mercury is <b>retrograde</b>' +
          (hv.merc.end ? ' until ' + almFmtD(hv.merc.end) : '') +
@@ -5914,8 +5921,8 @@ function almHTML(d, tides, place){
     h += '<div class="alm-tide-row"><span class="alm-tide-type">' + g.wd + ' ' + g.date + '</span>' +
          '<span>' + g.sign.glyph + ' ' + g.sign.name + '</span><span>' + almEsc(g.verdict) + '</span></div>';
   });
-  h += '<div class="alm-line alm-lore">Water signs (♋ ♏ ♓) favor sowing · earth (♉ ♍ ♑) favor root crops · ' +
-       'fire and air are for weeding, harvest, and pest patrol.</div>';
+  h += '<div class="alm-line alm-lore">Water (♋︎ ♏︎ ♓︎) favors sowing · earth (♉︎ ♍︎ ♑︎) favors roots · ' +
+       'fire and air are for weeding and harvest.</div>';
   h += '</div>';
 
   // Frost watch — the tiered warning
